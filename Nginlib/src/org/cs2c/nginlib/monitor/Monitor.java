@@ -1,0 +1,51 @@
+/**
+ * 
+ */
+package org.cs2c.nginlib.monitor;
+import org.cs2c.nginlib.*;
+/**
+ * @author Mikes
+ * <P/>This interface will get the various host status by remote operating.
+ * The status type includes CPU, IO, network, mid-ware and memory.
+ * @see CPUStatus
+ * @see IOStatus
+ * @see NetworkStatus
+ * @see MemoryStatus
+ * @see MiddlewareStatus
+ */
+public interface Monitor {
+	/**
+	 * Remotely fetch the CPU status info, and return a CPUStatus handler by which to get the info already fetched.
+	 * The command can be "vmstat" on the remote host.
+	 * @return A CPUStatus handler by which to get the info already fetched.
+	 * @throws RemoteException When this remote operation fails for any non-local reason.
+	 * */
+	CPUStatus getCPUStatus() throws RemoteException;
+	/**
+	 * Remotely fetch the IO status info, and return a IOStatus handler by which to get the info already fetched.
+	 * The command can be "vmstat" and "iostat" on the remote host.
+	 * @return A IOStatus handler by which to get the info already fetched.
+	 * @throws RemoteException When this remote operation fails for any non-local reason.
+	 * */
+	IOStatus getIOStatus() throws RemoteException;
+	/**
+	 * Remotely fetch the network status info, and return a NetworkStatus handler by which to get the info already fetched.
+	 * The command can be "ifstat" on the remote host but ifstat tool need be installed individually.
+	 * @return A NetworkStatus handler by which to get the info already fetched.
+	 * @throws RemoteException When this remote operation fails for any non-local reason.
+	 * */
+	NetworkStatus getNetworkStatus() throws RemoteException;
+	/**
+	 * Remotely fetch the memory status info, and return a MemoryStatus handler by which to get the info already fetched.
+	 * The command can be "vmstat" and "free" on the remote host but ifstat tool need be installed individually.
+	 * @return A MemoryStatus handler by which to get the info already fetched.
+	 * @throws RemoteException When this remote operation fails for any non-local reason.
+	 * */
+	MemoryStatus getMemoryStatus() throws RemoteException;
+	/**
+	 * Remotely fetch the mid-ware status info, and return a MiddlewareStatus handler by which to get the info already fetched.
+	 * @return A MiddlewareStatus handler by which to get the info already fetched.
+	 * @throws RemoteException When this remote operation fails for any non-local reason.
+	 * */
+	MiddlewareStatus getMiddlewareStatus() throws RemoteException;
+}
