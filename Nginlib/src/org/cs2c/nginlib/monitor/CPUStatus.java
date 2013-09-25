@@ -10,6 +10,7 @@ package org.cs2c.nginlib.monitor;
  * The operate is off-line, and the instance state-less.
  */
 public interface CPUStatus {
+	
 	/**
 	 * Get current running task number which has already fetched from remote host.
 	 * @return The current running task number
