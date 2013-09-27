@@ -60,8 +60,7 @@ public class RecController implements Controller {
 
 		// start the nginx
 		String cmd = midwarePath + "sbin/nginx -c " + midwarePath
-				+ "conf/nginx.conf" + " && cat " + midwarePath
-				+ "logs/nginx.pid";
+				+ "conf/nginx.conf" ;//+ " && cat " + midwarePath+ "logs/nginx.pid"
 		System.out.println(cmd);
 		this.reauthInfo.execCommand(cmd, result, errorResult);
 
@@ -69,10 +68,8 @@ public class RecController implements Controller {
 			if (!errorResult.isEmpty())
 				throw new RemoteException(errorResult.toString());
 			else
-				throw new RemoteException("The Nginx start failed");
-		} else {
-			System.out.println("The Nginx start successfully");
-		}
+				System.out.println("The Nginx start successfully");
+		} 
 	}
 
 	@Override
@@ -111,8 +108,14 @@ public class RecController implements Controller {
 	@Override
 	public void restart() throws RemoteException {
 		// TODO Auto-generated method stub
-		shutdown();
-		start();
+		if (isRunning() == false) {
+			start();
+		}
+		else
+		{
+			shutdown();
+			start();
+		}
 	}
 
 	@Override
@@ -125,21 +128,23 @@ public class RecController implements Controller {
 		}
 		// determine the server is running or not
 		if (isRunning() == false) {
-			throw new RemoteException("The " + serverName
-					+ " is not running and can't reload");
+			start();
 		}
+		else
+		{
 
-		ArrayList<String> result = new ArrayList<String>(0);
-		ArrayList<String> errorResult = new ArrayList<String>(0);
-		String cmd = midwarePath + "sbin/nginx -s reload";
-
-		// reload the nginx
-		this.reauthInfo.execCommand(cmd, result, errorResult);
-		if (result.isEmpty()) {
-			if (!errorResult.isEmpty()) {
-				throw new RemoteException(errorResult.toString());
-			} else
-				System.out.println("Reload sucessfully.");
+			ArrayList<String> result = new ArrayList<String>(0);
+			ArrayList<String> errorResult = new ArrayList<String>(0);
+			String cmd = midwarePath + "sbin/nginx -s reload";
+	
+			// reload the nginx
+			this.reauthInfo.execCommand(cmd, result, errorResult);
+			if (result.isEmpty()) {
+				if (!errorResult.isEmpty()) {
+					throw new RemoteException(errorResult.toString());
+				} else
+					System.out.println("Reload sucessfully.");
+			}
 		}
 	}
 

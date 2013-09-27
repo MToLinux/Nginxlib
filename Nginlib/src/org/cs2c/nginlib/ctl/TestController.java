@@ -34,7 +34,7 @@ public class TestController {
 				}
 			else
 				try {
-					reccontro.restart();
+					reccontro.reload();
 				} catch (RemoteException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
