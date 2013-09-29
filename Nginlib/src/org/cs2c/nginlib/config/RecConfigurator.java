@@ -16,18 +16,29 @@ public class RecConfigurator implements Configurator {
 
 	private RecAuthInfo creauthInfo;
 	private String remoteTargetDirectory;
+	private String confPathWithName = null;
+	
+	public RecConfigurator()
+	{
+
+	}
 	
 	public RecConfigurator(AuthInfo reauthInfo,String midwarePath)
 	{
 		this.creauthInfo=(RecAuthInfo) reauthInfo;
 		this.remoteTargetDirectory=midwarePath;
 	}
-
+	
+	public void SetConfpathWithName(String PathWithName){
+		confPathWithName = PathWithName;
+	}
+	
 	@Override
 	public void append(Element element, String outerBlockNames)
 			throws RemoteException {
-		// TODO Auto-generated method stub
-		
+		RecRemoteOperator rro = new RecRemoteOperator();
+		rro.SetConfpathWithName(confPathWithName);
+		rro.append(element, outerBlockNames);
 	}
 
 	@Override
@@ -61,13 +72,17 @@ public class RecConfigurator implements Configurator {
 	@Override
 	public Block newBlock() {
 		// TODO Auto-generated method stub
-		return null;
+		Block opBlock = new RecBlock();
+		//opBlock.setName("server");
+		
+		return opBlock;
 	}
 
 	@Override
 	public Directive newDirective() {
 		// TODO Auto-generated method stub
-		return null;
+		Directive opDirective = new RecDirective();
+		return opDirective;
 	}
 
 	@Override
@@ -88,55 +103,4 @@ public class RecConfigurator implements Configurator {
 		return null;
 	}
 	
-	/**
-	 * Get the nginx.conf file which nginx.conf fullpath is parameter remoteFile.
-	 * */
-	public void ReadRemoteConf(String remoteFile) throws IOException
-	{
-		String localTargetDirectory = "D:\\eclipseWorkspace\\confpath";
-
-		Connection conn = new Connection(this.creauthInfo.getHostname());
-		/* Now connect */
-		conn.connect();
-		boolean isAuthenticated = conn.authenticateWithPassword(
-				this.creauthInfo.getUsername(), this.creauthInfo.getPassword());
-		if (isAuthenticated == false)
-			throw new IOException("Authentication failed.");
-		
-		SCPClient scpc=conn.createSCPClient();
-		
-		scpc.get(remoteFile, localTargetDirectory);
-		/* Close the connection */
-		conn.close();
-	}
-	
-	/**
-	 * Write the Remote nginx.conf file which is select.
-	 * */
-	public void WriteRemoteConf() throws IOException{
-		WriteRemoteConf(remoteTargetDirectory);
-	}
-	
-	public void WriteRemoteConf(String targetPath) throws IOException{
-		Connection conn = new Connection(this.creauthInfo.getHostname());
-		/* Now connect */
-		conn.connect();
-		boolean isAuthenticated = conn.authenticateWithPassword(
-				this.creauthInfo.getUsername(), this.creauthInfo.getPassword());
-		if (isAuthenticated == false)
-			throw new IOException("Authentication failed.");
-		
-		SCPClient scpc=conn.createSCPClient();
-		Session sess = conn.openSession();
-		
-		System.out.println("Here is some information about the remote host:");
-		
-		String localFile = "E:\\工作目录\\项目资料\\中间件监控管理平台\\nginx\\conf\\nginx.conf";
-		scpc.put(localFile, targetPath);
-		
-		/* Close this session */
-		sess.close();
-		/* Close the connection */
-		conn.close();
-		}
 }
