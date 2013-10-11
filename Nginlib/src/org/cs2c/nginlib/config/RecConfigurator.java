@@ -20,7 +20,6 @@ public class RecConfigurator implements Configurator {
 	
 	public RecConfigurator()
 	{
-
 	}
 	
 	public RecConfigurator(AuthInfo reauthInfo,String midwarePath)
@@ -44,63 +43,63 @@ public class RecConfigurator implements Configurator {
 	@Override
 	public void delete(Element element, String outerBlockNames)
 			throws RemoteException {
-		// TODO Auto-generated method stub
-		
+		RecRemoteOperator rro = new RecRemoteOperator();
+		rro.SetConfpathWithName(confPathWithName);
+		rro.delete(element, outerBlockNames);
 	}
 
 	@Override
 	public void insertAfter(Element element, Element after,
 			String outerBlockNames) throws RemoteException {
-		// TODO Auto-generated method stub
-		
+		RecRemoteOperator rro = new RecRemoteOperator();
+		rro.SetConfpathWithName(confPathWithName);
+		rro.insertAfter(element, after, outerBlockNames);
 	}
 
 	@Override
 	public void replace(Element oldElement, Element newElement,
 			String outerBlockNames) throws RemoteException {
-		// TODO Auto-generated method stub
-		
+		RecRemoteOperator rro = new RecRemoteOperator();
+		rro.SetConfpathWithName(confPathWithName);
+		rro.replace(oldElement, newElement, outerBlockNames);
 	}
 
 	@Override
 	public List<Block> getBlocks(String blockName, String outerBlockNames)
 			throws RemoteException {
-		// TODO Auto-generated method stub
-		return null;
+		RecRemoteOperator rro = new RecRemoteOperator();
+		rro.SetConfpathWithName(confPathWithName);
+		return rro.getBlocks(blockName, outerBlockNames);
 	}
 
 	@Override
 	public Block newBlock() {
-		// TODO Auto-generated method stub
 		Block opBlock = new RecBlock();
-		//opBlock.setName("server");
 		
 		return opBlock;
 	}
 
 	@Override
 	public Directive newDirective() {
-		// TODO Auto-generated method stub
 		Directive opDirective = new RecDirective();
 		return opDirective;
 	}
 
 	@Override
 	public Variable newVariable() {
-		// TODO Auto-generated method stub
-		return null;
+		Variable opVariable = new RecVariable();
+		return opVariable;
 	}
 
 	@Override
 	public StringParameter newStringParameter() {
-		// TODO Auto-generated method stub
-		return null;
+		StringParameter opStringParameter = new RecStringParameter();
+		return opStringParameter;
 	}
 
 	@Override
 	public Option newOption() {
-		// TODO Auto-generated method stub
-		return null;
+		Option opOption = new RecOption();
+		return opOption;
 	}
-	
 }

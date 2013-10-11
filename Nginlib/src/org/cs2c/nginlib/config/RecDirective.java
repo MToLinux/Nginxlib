@@ -2,18 +2,23 @@ package org.cs2c.nginlib.config;
 
 import java.util.List;
 
-public class RecDirective implements Directive{
+public class RecDirective implements Directive,Element{
 
+	private String directiveName=null;
+	private String directiveValue=null;
+	
+	public void SetDirectiveText(String DirectiveText) {
+		directiveValue = DirectiveText;
+	}
+	
 	@Override
 	public void setName(String name) {
-		// TODO Auto-generated method stub
-		
+		directiveName = name;
 	}
 
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
-		return null;
+		return directiveName;
 	}
 
 	@Override

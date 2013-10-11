@@ -15,7 +15,8 @@ public class RecBlock implements Block,Element {
 	
 	private String blockName = null;
 	private String blockValue = null;
-	private String confBlockText = null;
+	private String confText = null;
+	
 	private HashMap<String,String> hbMap=new HashMap<String,String>();
     
 	@Override
@@ -28,8 +29,12 @@ public class RecBlock implements Block,Element {
 		return blockName;
 	}
 
-	public void SetConfBlockText(String BlockText) {
-		confBlockText = BlockText;
+	public void SetBlockText(String BlockText) {
+		blockValue = BlockText;
+	}
+	
+	public void SetConfText(String outConfText) {
+		confText = outConfText;
 	}
 	
 	@Override
@@ -41,9 +46,10 @@ public class RecBlock implements Block,Element {
 		//Iterator iter = hbMap.entrySet().iterator();
 	    for (Entry<String, String> entry : hbMap.entrySet()) {
             System.out.println("Key:" + entry.getKey() + "value:" + entry.getValue().toString());
-    		Block objblock = new RecBlock();
+            RecBlock objblock = new RecBlock();
     		// get name
     		objblock.setName(entry.getKey());
+    		objblock.SetBlockText(entry.getValue());
     		list.add(objblock);
         }
 		return list;
@@ -51,8 +57,33 @@ public class RecBlock implements Block,Element {
 
 	@Override
 	public List<Directive> getDirectives() {
+		List<Directive> list = new ArrayList<Directive>();
+		
 		// TODO Auto-generated method stub
-		return null;
+		String linetxt = null;
+		String tempdname = null;
+		String tempdtext = null;
+		
+	    BufferedReader br = new BufferedReader(new StringReader(blockValue));
+
+		try {
+			while( (linetxt  = br.readLine()) != null) {
+				tempdname = GetDirectiveName(linetxt);
+				if((null != tempdname)){
+					tempdtext = linetxt.trim();
+					//System.out.println("blname:" + blname);
+					RecDirective objDirective = new RecDirective();
+					objDirective.setName(tempdname);
+					
+		    		list.add(objDirective);
+				}
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return list;
 	}
 
 	@Override
@@ -63,7 +94,7 @@ public class RecBlock implements Block,Element {
 		sb.append(block.toString());
 		sb.append("}");
 		// set blockValue
-		SetConfBlockText(sb.toString());
+		SetBlockText(sb.toString());
 	}
 
 	@Override
@@ -74,7 +105,7 @@ public class RecBlock implements Block,Element {
 		sb.append(directive.toString());
 		sb.append("}");
 		// set blockValue
-		SetConfBlockText(sb.toString());
+		SetBlockText(sb.toString());
 	}
 	
 	@Override
@@ -93,11 +124,18 @@ public class RecBlock implements Block,Element {
 	
 	@Override
 	public String toString(){
-		String blocktext = GetBlockText(blockName);
-		return blocktext;
+		String blocktext=null;
+		if((null != blockName) && (null != blockValue)){
+			return blockValue;
+		}else if((null != blockName) && (null == blockValue)){
+			blocktext = GetBlockText(blockName);
+			return blocktext;
+		}else{
+			return confText;
+		}
 	}
 	
-	public String GetBlockText(String gBlockName) {
+	private String GetBlockText(String gBlockName) {
 		int StartLine = 1;
 		return GetBlockText(gBlockName,StartLine);
 	}
@@ -117,7 +155,7 @@ public class RecBlock implements Block,Element {
 	    boolean bStartBlock = false;
 	    
 		try {
-		    BufferedReader br = new BufferedReader(new StringReader(confBlockText));
+		    BufferedReader br = new BufferedReader(new StringReader(confText));
 		    StringBuilder sb = new StringBuilder();
 		    
 			while( (linetxt = br.readLine()) != null) {
@@ -131,7 +169,6 @@ public class RecBlock implements Block,Element {
 				if(HasBlockName(gBlockName,linetxt)){
 					// make sure text start from the block name
 					bBlock = true;
-
 				}
 				
 				if(bBlock){
@@ -174,7 +211,7 @@ public class RecBlock implements Block,Element {
 	 * Get Sub Block.
 	 * */
 	private void GetSubBlock() {
-		GetSubBlock(confBlockText);
+		GetSubBlock(blockValue);
 	}
 	
 	/**
@@ -262,41 +299,9 @@ public class RecBlock implements Block,Element {
 		}
 		return bHasBlockName;
 	}
-	
-	/**
-	 * Get Block Text.
-	 * @return Block text.
-	 * */
-//	private String GetBlockText(String subBlockName) {
-//	    String s ="";
-//		try {
-//		    BufferedReader br = new BufferedReader(new StringReader(confBlockText));
-//		    StringBuilder sb = new StringBuilder();
-//		    
-//			while( (s = br.readLine()) != null) {
-//				String[] frages=s.split(" ");
-//				String dev=frages[0];
-//
-//				if(dev.equals(subBlockName) && s.contains("{")){
-//				    sb.append(s + "\n");
-//				}
-//			}
-//			
-//			return sb.toString();
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//			return null;
-//		}
-//	}
-	
 
-//	public Block getBlock() {
-//		// TODO Auto-generated method stub
-//		return objBlock;
-//	}
-	
 	private String GetDirectiveName(String linetxt) {
-		String bname = null;
+		String dName = null;
 		boolean bCret = IsComment(linetxt);
 		if(bCret){
 			return null;
@@ -308,14 +313,14 @@ public class RecBlock implements Block,Element {
 		}
 		
 		String[] lineArray=linetxt.trim().split(" ");
-		String dName = lineArray[0];
+		dName = lineArray[0];
 		
-		if(dName != null){
-			// Add to array
+		if(dName != ""){
+			// Add to array ?
 			// TODO
 		}
 		
-		return bname;
+		return dName;
 	}
 	
 	private boolean IsComment(String s) {
@@ -337,16 +342,7 @@ public class RecBlock implements Block,Element {
 			return true;
 		}
 	}
-	
-	private boolean EndWithSemicolon(String linetxt) {
-		String suffix = ";";
-		if(linetxt.trim().endsWith(suffix)){
-			return true;
-		}
-		else{
-			return false;
-		}
-	}
+
 	private boolean NotEndWithSemicolon(String linetxt) {
 		String suffix = ";";
 		if(linetxt.trim().endsWith(suffix)){

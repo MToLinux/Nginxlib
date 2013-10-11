@@ -75,7 +75,6 @@ public class RecRemoteOperator implements RemoteOperator{
 		//get location with outerBlockNames
 		if(outerBlockNames.contains("|")){
 			String[] arrayOuterBNames=outerBlockNames.split("\\|");
-			
 			for(int i=0;i<arrayOuterBNames.length;i++){
 				nameAndIndex = arrayOuterBNames[i];
 				String[] lineArray=nameAndIndex.split(":");
@@ -97,8 +96,8 @@ public class RecRemoteOperator implements RemoteOperator{
 		String BlockText = GetBlockTextWithIndex(blname,nblockNameNum);
 		int BlockLength = GetBlockLenth(BlockText);
 
-		String newConfText = GetPreBlockText(nblockNameNum)+BlockText+element.toString()+
-		GetSufBlockText(nblockNameNum+BlockLength);
+		String newConfText = GetPreBlockText(nblockNameNum)+BlockText+element.toString()
+				+GetSufBlockText(nblockNameNum+BlockLength);
 
 		// write to conf file
 		WriteConf(newConfText);
@@ -137,6 +136,7 @@ public class RecRemoteOperator implements RemoteOperator{
 		// TODO Auto-generated method stub
 		Block objblock = new RecBlock();
 		objblock.setName(outerBlockNames);
+		objblock.getBlocks();
 		
 		return null;
 	}
@@ -183,7 +183,6 @@ public class RecRemoteOperator implements RemoteOperator{
 			e.printStackTrace();
 			return -1;
 		}
-
 	}
 
 	/**
@@ -262,21 +261,21 @@ public class RecRemoteOperator implements RemoteOperator{
 			throw new IOException("Authentication failed.");
 		
 		SCPClient scpc=conn.createSCPClient();
-		Session sess = conn.openSession();
+//		Session sess = conn.openSession();
 		
 		System.out.println("Here is some information about the remote host:");
 		
-		String localFile = "E:\\工作目录\\项目资料\\中间件监控管理平台\\nginx\\conf\\nginx.conf";
+		String localFile = confPathWithName;
 		scpc.put(localFile, remoteTargetDirectory);
 		
 		/* Close this session */
-		sess.close();
+//		sess.close();
 		/* Close the connection */
 		conn.close();
 		}
 
 	/**
-	 * Get the conf text which conf path is parameter path.
+	 * Get the conf text which conf path is confPathWithName.
 	 * @param config path with fullname.
 	 * @return config text.
 	 * */
@@ -295,7 +294,6 @@ public class RecRemoteOperator implements RemoteOperator{
 			
 		    br.close();
 		    String str = sb.toString();
-//		    confBlockText = str;
 		    return str;
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -377,7 +375,7 @@ public class RecRemoteOperator implements RemoteOperator{
 	private String GetBlockTextWithIndex(String blname,int Index){
 		
 		RecBlock rb = new RecBlock();
-		rb.SetConfBlockText(confText);
+		rb.SetConfText(confText);
 		
 		String BlockText = rb.GetBlockText(blname,Index);
 		return BlockText;
