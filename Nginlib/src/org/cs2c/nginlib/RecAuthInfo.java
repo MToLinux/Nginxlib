@@ -10,6 +10,14 @@ import com.trilead.ssh2.Connection;
 import com.trilead.ssh2.Session;
 import com.trilead.ssh2.StreamGobbler;
 
+import junit.framework.Assert;
+import junit.framework.TestCase;
+
+import  org.junit.Before;
+import  org.junit.After;
+import  org.junit.Test;
+
+import static org.junit.Assert.*;
 /**
  * @author LiuQin
  * The implement class of AuthInfo 
@@ -31,7 +39,15 @@ public class RecAuthInfo implements AuthInfo {
 		// TODO Auto-generated method stub
 		this.hostName=hostName;
 	}
-
+	/**
+	@SuppressWarnings("deprecation")
+	@Test
+	public void testsetHost()
+	{
+		RecAuthInfo testRecAuthInfo=new RecAuthInfo();
+		testRecAuthInfo.setHost("10.1.50.6");
+		Assert.assertEquals(testRecAuthInfo.hostName, "10.1.50.6");
+	}*/
 	@Override
 	public void setUsername(String username) {
 		// TODO Auto-generated method stub

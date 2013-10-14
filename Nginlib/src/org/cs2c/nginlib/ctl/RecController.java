@@ -21,6 +21,7 @@ public class RecController implements Controller {
 	String midwarePath;
 	String serverName;
 	String confFile;
+	public static int flag=0;
 
 	/** Construct a RecController with specified properties */
 	public RecController(RecAuthInfo reauthInfo, String midwarePath) {
@@ -43,11 +44,14 @@ public class RecController implements Controller {
 	public void start() throws RemoteException {
 		// TODO Auto-generated method stub
 		// determine the configure file is existed or not
+		
 		if (isExistedFile(midwarePath + "conf", confFile) == false) {
+			flag=1;
 			throw new RemoteException("There is no " + confFile);
 		}
 		// determine the server is running or not
 		if (isRunning() == true) {
+			flag=2;
 			throw new RemoteException("The " + serverName
 					+ " is running already. ");
 		}
@@ -61,15 +65,28 @@ public class RecController implements Controller {
 		// start the nginx
 		String cmd = midwarePath + "sbin/nginx -c " + midwarePath
 				+ "conf/nginx.conf" ;//+ " && cat " + midwarePath+ "logs/nginx.pid"
+		//String cmd = midwarePath + "sbin/nginx -v " ;//+ " && cat " + midwarePath+ "logs/nginx.pid"
+				
 		System.out.println(cmd);
 		this.reauthInfo.execCommand(cmd, result, errorResult);
-
+		
 		if (result.isEmpty()) {
 			if (!errorResult.isEmpty())
+			{
+				flag=3;
 				throw new RemoteException(errorResult.toString());
+			}
 			else
+			{
+				flag=4;
 				System.out.println("The Nginx start successfully");
+			}
 		} 
+		else
+		{
+			flag=5;
+			System.out.println(result.toString());
+		}
 	}
 
 	@Override
@@ -227,7 +244,7 @@ public class RecController implements Controller {
 	 * 
 	 * @return The server is running return true;or else return false
 	 * */
-
+	
 	public boolean isRunning() {
 		ArrayList<String> result = new ArrayList<String>(0);
 		ArrayList<String> errorResult = new ArrayList<String>(0);
