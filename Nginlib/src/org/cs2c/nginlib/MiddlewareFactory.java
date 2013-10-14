@@ -60,5 +60,8 @@ public abstract class MiddlewareFactory {
 	 * Then you can set the instance info through AuthInfo interface.
 	 * @return An instance of AuthInfo without any info.
 	 * */
-	abstract public AuthInfo newAuthInfo();
+	static public AuthInfo newAuthInfo(){
+		// TODO
+		return null;
+	}
 }
