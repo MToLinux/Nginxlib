@@ -7,9 +7,13 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+
+import org.cs2c.nginlib.RemoteException;
 
 public class RecBlock implements Block,Element {
 	
@@ -17,7 +21,8 @@ public class RecBlock implements Block,Element {
 	private String blockValue = null;
 	private String confText = null;
 	
-	private HashMap<String,String> hbMap=new HashMap<String,String>();
+	List<Block> listGetBlocks = new ArrayList<Block>();
+	private Map<String,String> IhbMap=new IdentityHashMap<String,String>();
     
 	@Override
 	public void setName(String name) {
@@ -38,28 +43,17 @@ public class RecBlock implements Block,Element {
 	}
 	
 	@Override
-	public List<Block> getBlocks() {
-		//String conf = ReadConf();
-		List<Block> list = new ArrayList<Block>();
+	public List<Block> getBlocks() throws RemoteException {
 		
 		GetSubBlock();
-		//Iterator iter = hbMap.entrySet().iterator();
-	    for (Entry<String, String> entry : hbMap.entrySet()) {
-            System.out.println("Key:" + entry.getKey() + "value:" + entry.getValue().toString());
-            RecBlock objblock = new RecBlock();
-    		// get name
-    		objblock.setName(entry.getKey());
-    		objblock.SetBlockText(entry.getValue());
-    		list.add(objblock);
-        }
-		return list;
+
+		return listGetBlocks;
 	}
 
 	@Override
-	public List<Directive> getDirectives() {
+	public List<Directive> getDirectives() throws RemoteException {
 		List<Directive> list = new ArrayList<Directive>();
-		
-		// TODO Auto-generated method stub
+
 		String linetxt = null;
 		String tempdname = null;
 		String tempdtext = null;
@@ -74,13 +68,12 @@ public class RecBlock implements Block,Element {
 					//System.out.println("blname:" + blname);
 					RecDirective objDirective = new RecDirective();
 					objDirective.setName(tempdname);
-					
+					objDirective.SetDirectiveText(tempdtext);
 		    		list.add(objDirective);
 				}
 			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new RemoteException(e.getMessage());
 		}
 		
 		return list;
@@ -134,7 +127,7 @@ public class RecBlock implements Block,Element {
 			return confText;
 		}
 	}
-	
+	 
 	private String GetBlockText(String gBlockName) {
 		int StartLine = 1;
 		return GetBlockText(gBlockName,StartLine);
@@ -144,7 +137,6 @@ public class RecBlock implements Block,Element {
 	 * Get Block Text which Block Name is gBlockName.
 	 * @return Block text.
 	 * */
-//	private String GetBlockText() {
 	public String GetBlockText(String gBlockName,int StartLine) {
 		String blText = null;
 	    String linetxt =null;
@@ -195,29 +187,18 @@ public class RecBlock implements Block,Element {
 	}
 
 	/**
-	 * Check whether the Block contains "{".
-	 * @return if the Text contain Block return true,else return false.
+	 * Get Sub Block.
+	 * @throws RemoteException 
 	 * */
-	private boolean CheckStartBlock(String Text) {
-		if(Text.contains("{")){
-			return true;
-		}
-		else{
-			return false;
-		}
+	private void GetSubBlock() throws RemoteException {
+		GetSubBlocks(blockValue);
 	}
 	
 	/**
-	 * Get Sub Block.
+	 * Get Sub Blocks.
+	 * @throws RemoteException 
 	 * */
-	private void GetSubBlock() {
-		GetSubBlock(blockValue);
-	}
-	
-	/**
-	 * Get Sub Block.
-	 * */
-	private void GetSubBlock(String Text) {
+	private void GetSubBlocks(String Text) throws RemoteException {
 		String tempblname = null;
 		String blname = null;
 		String blText = null;
@@ -229,9 +210,7 @@ public class RecBlock implements Block,Element {
 		try {
 		    BufferedReader br = new BufferedReader(new StringReader(Text));
 		    StringBuilder sb = new StringBuilder();
-		    
-			//blname = GetBlockName(linetxt);
-		    
+		    		    
 			while( (linetxt = br.readLine()) != null) {
 				tempblname = GetBlockName(linetxt);
 				if((null != tempblname)&&(null == blname)){
@@ -252,7 +231,7 @@ public class RecBlock implements Block,Element {
 				
 					if((null != blname) && (nblockstart!=0) && (nblockstart == nblockEnd)){
 						blText = sb.toString();
-						hbMap.put(blname, blText);
+						IhbMap.put(new String(blname), blText);
 						//System.out.println("blname:" + blname + "   blText:" + blText);
 						// close one block text,loop next.
 						bBlock = false;
@@ -261,12 +240,44 @@ public class RecBlock implements Block,Element {
 					}
 				}
 			}
+			
+			//Iterator iter = hbMap.entrySet().iterator();
+		    for (Entry<String, String> entry : IhbMap.entrySet()) {
+	            System.out.println("Key:" + entry.getKey() + "value:" + entry.getValue().toString());
+	            RecBlock objblock = new RecBlock();
+	    		// get name
+	    		objblock.setName(entry.getKey());
+	    		objblock.SetBlockText(entry.getValue());
+	    		listGetBlocks.add(objblock);
+	    		
+	    		if(hasSubBlock(entry.getValue())){
+	    			GetSubBlocks(entry.getValue());//递归
+	    		}
+	        }
 
 		} catch (IOException e) {
-			e.printStackTrace();
+			throw new RemoteException(e.getMessage());
 		}
 	}
 	
+	private boolean hasSubBlock(String value) throws IOException {
+		String linetxt = null;
+		int nBlockNameCount = 0;
+		
+	    BufferedReader br = new BufferedReader(new StringReader(value));
+		while( (linetxt = br.readLine()) != null) {
+			if(HasBlockName(linetxt)){
+				nBlockNameCount++;
+			}
+		}
+		
+		if(nBlockNameCount >= 2){
+			return true;
+		}else{
+			return false;
+		}
+	}
+
 	private String GetBlockName(String linetxt) {
 		String bname = null;
 		boolean bret = IsComment(linetxt);
@@ -282,7 +293,7 @@ public class RecBlock implements Block,Element {
 	}
 
 	/**
-	 * Check the line whether has Block Name or not.
+	 * Check the line whether has Block Name which hBlockName is indicate or not.
 	 * @return Block text.
 	 * */
 	private boolean HasBlockName(String hBlockName,String linetxt) {
@@ -299,7 +310,22 @@ public class RecBlock implements Block,Element {
 		}
 		return bHasBlockName;
 	}
-
+	
+	private boolean HasBlockName(String linetxt) {
+		boolean bHasBlockName=false;
+		boolean bret = IsComment(linetxt);
+		if(bret){
+			return false;
+		}
+		
+		if(null != GetBlockName(linetxt)){
+			bHasBlockName = true;
+		}else{
+			bHasBlockName = false;
+		}
+		return bHasBlockName;
+	}
+	
 	private String GetDirectiveName(String linetxt) {
 		String dName = null;
 		boolean bCret = IsComment(linetxt);
@@ -314,11 +340,6 @@ public class RecBlock implements Block,Element {
 		
 		String[] lineArray=linetxt.trim().split(" ");
 		dName = lineArray[0];
-		
-		if(dName != ""){
-			// Add to array ?
-			// TODO
-		}
 		
 		return dName;
 	}
@@ -351,6 +372,25 @@ public class RecBlock implements Block,Element {
 		else{
 			return true;
 		}
+	}
+
+	/*
+	 * Query all blocks with the specific block name in the block
+	 * */
+	public List<Block> getBlocks(String gBblockName) throws RemoteException{
+		GetSubBlock();
+		
+	    for (Entry<String, String> entry : IhbMap.entrySet()) {
+//            System.out.println("Key:" + entry.getKey() + "value:" + entry.getValue().toString());
+            RecBlock objblock = new RecBlock();
+    		// get name
+            if(gBblockName.equals(entry.getKey())){
+	    		objblock.setName(entry.getKey());
+	    		objblock.SetBlockText(entry.getValue());
+	    		listGetBlocks.add(objblock);
+            }
+	    }
+		return listGetBlocks;
 	}
 
 }

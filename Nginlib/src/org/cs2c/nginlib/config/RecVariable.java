@@ -1,6 +1,6 @@
 package org.cs2c.nginlib.config;
 
-public class RecVariable implements Variable {
+public class RecVariable implements Variable,Parameter {
 	private String VariableName = null;
 	
 	@Override
@@ -11,5 +11,10 @@ public class RecVariable implements Variable {
 	@Override
 	public String getName() {
 		return VariableName;
+	}
+	
+	@Override
+	public String toString(){
+		return "$"+VariableName;
 	}
 }

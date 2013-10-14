@@ -1,6 +1,6 @@
 package org.cs2c.nginlib.config;
 
-public class RecOption implements Option {
+public class RecOption implements Option,Parameter {
 
 	private String optionName = null;
 	private String optionValue = null;
@@ -25,5 +25,9 @@ public class RecOption implements Option {
 	public String getValue() {
 		return optionValue;
 	}
-
+	
+	@Override
+	public String toString(){
+		return optionName +"="+optionValue;
+	}
 }

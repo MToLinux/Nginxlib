@@ -1,6 +1,6 @@
 package org.cs2c.nginlib.config;
 
-public class RecStringParameter implements StringParameter {
+public class RecStringParameter implements StringParameter,Parameter {
 	private String StringParameterValue = null;
 	
 	@Override
@@ -10,6 +10,10 @@ public class RecStringParameter implements StringParameter {
 
 	@Override
 	public String getValue() {
+		return StringParameterValue;
+	}
+	@Override
+	public String toString(){
 		return StringParameterValue;
 	}
 }

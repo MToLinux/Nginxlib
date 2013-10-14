@@ -6,6 +6,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -26,7 +27,6 @@ public class RecRemoteOperator implements RemoteOperator{
 	
 	private RecAuthInfo creauthInfo;
 	private String remoteTargetDirectory;
-//	private Map<String, String> identityMap = new IdentityHashMap<String, String>(); 
 	
 	public RecRemoteOperator()
 	{
@@ -45,31 +45,144 @@ public class RecRemoteOperator implements RemoteOperator{
 	@Override
 	public void append(Element element, String outerBlockNames)
 			throws RemoteException {
-		String nameAndIndex = null;
-		String blname = null;
-	    int nindex = 0;
-	    int nLineCount = 0;
-	    int nblockNameNum = 0;
+		
+	    CheckOuterBlockNames(outerBlockNames);
+	    if((null == element.toString()) || ("" == element.toString())){
+	    	return;
+	    }
+	    
+	    //If there is no index in outerBlockNames, default the first block.
+	    if(!outerBlockNames.contains(":")){
+	    	outerBlockNames += ":0";
+	    }
+
+	    HashMap<String,String> objHashMap=EditCommon(outerBlockNames);
+	    String BlockText = objHashMap.get("blocktext");
+	    int BlockLength = Integer.parseInt(objHashMap.get("blocklength"));
+	    int nblockNameNum = Integer.parseInt(objHashMap.get("nblocknamenum"));
+
+		String newConfText = GetPreBlockText(confText,nblockNameNum)+BlockText+element.toString()
+				+GetSufBlockText(confText,nblockNameNum+BlockLength);
+
+		// write to local conf file
+		WriteConf(newConfText);
+	}
+	
+	@Override
+	public void delete(Element element, String outerBlockNames)
+			throws RemoteException {
+	    
+	    if(CheckOuterBlockNames(outerBlockNames)){
+	    	throw new RemoteException("outerBlockNames is not correct,outerBlockNames ="+outerBlockNames);
+	    }
+	    if((null == element.toString()) || ("" == element.toString())){
+	    	return;
+	    }
+	    
+	    //If there is no index in outerBlockNames, default the first block.
+	    if(!outerBlockNames.contains(":")){
+	    	outerBlockNames += ":0";
+	    }
+
+	    HashMap<String,String> objHashMap=EditCommon(outerBlockNames);
+	    String BlockText = objHashMap.get("blocktext");
+	    int BlockLength = Integer.parseInt(objHashMap.get("blocklength"));
+	    int nblockNameNum = Integer.parseInt(objHashMap.get("nblocknamenum"));
+
+		String editBlockText = BlockDeleteElement(BlockText,element);
+		
+		String newConfText = GetPreBlockText(confText,nblockNameNum)+editBlockText
+				+GetSufBlockText(confText,nblockNameNum+BlockLength);
+
+		// write to local conf file
+		WriteConf(newConfText);
+	}
+	
+	/**
+	 * 删除指定Block内的 Element元素。
+	 * @return Block text which parameter element is deleted.
+	 * */
+	private String BlockDeleteElement(String BlockText,Element element){
+		
+		String strRtn = ReplaceString(BlockText,element.toString(), "");
+		
+		return strRtn;
+	}
+	private String ReplaceString(String strSource, String strFrom, String strTo) {
+		 if (strSource == null) {
+		   return null;
+		 }
+	     int i = 0;
+	     if ((i = strSource.indexOf(strFrom, i)) >= 0) {
+	       char[] cSrc = strSource.toCharArray();
+	       char[] cTo = strTo.toCharArray();
+	       int len = strFrom.length();
+	       StringBuffer buf = new StringBuffer(cSrc.length);
+	       buf.append(cSrc, 0, i).append(cTo);
+	       i += len;
+	       int j = i;
+	       while ((i = strSource.indexOf(strFrom, i)) > 0) {
+		buf.append(cSrc, j, i - j).append(cTo);
+		i += len;
+		j = i;
+	       }
+	       buf.append(cSrc, j, cSrc.length - j);
+	       return buf.toString();
+	     }
+	     return strSource;
+	}
+	@Override
+	public void insertAfter(Element element, Element after,
+			String outerBlockNames) throws RemoteException {
+	    
+	    if(CheckOuterBlockNames(outerBlockNames)){
+	    	throw new RemoteException("outerBlockNames is not correct,outerBlockNames ="+outerBlockNames);
+	    }
+	    
+	    if((null == after.toString()) || ("" == after.toString())){
+	    	return;
+	    }
 	    
 	    //If there is no index in outerBlockNames, default the first block.
 	    if(!outerBlockNames.contains(":")){
 	    	outerBlockNames += ":0";
 	    }
 	    
-	    CheckOuterBlockNames(outerBlockNames);
+	    HashMap<String,String> objHashMap=EditCommon(outerBlockNames);
+	    String BlockText = objHashMap.get("blocktext");
+	    int BlockLength = Integer.parseInt(objHashMap.get("blocklength"));
+	    int nblockNameNum = Integer.parseInt(objHashMap.get("nblocknamenum"));
+
+		String editBlockText = BlockInsertAfter(BlockText,BlockLength,element,after);
+		
+		String newConfText = GetPreBlockText(confText,nblockNameNum)+editBlockText
+				+GetSufBlockText(confText,nblockNameNum+BlockLength);
+
+		// write to local conf file
+		WriteConf(newConfText);
+	}
+	
+	private String BlockInsertAfter(String BlockText,int BlockLength,Element element, Element after) throws RemoteException {
+	    StringBuilder sbtext = new StringBuilder();
 	    
-	    if(null == element.toString()){
-	    	return;
-	    }
+		//找到第一个符合的element文本位置
+		int nelementLocation = BlockText.indexOf(element.toString());
+		sbtext.append(GetPreBlockText(BlockText,nelementLocation));
+		sbtext.append(element.toString());
+		sbtext.append(after.toString());
+		sbtext.append(GetSufBlockText(BlockText,nelementLocation+BlockLength));
 
-	    try {
-			GetRemoteConf(confPathWithName);
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-
-		//ReadConf ok
+		return sbtext.toString();
+	}
+	
+	private HashMap<String,String> EditCommon(String outerBlockNames) throws RemoteException{
+		String nameAndIndex = null;
+		String blname = null;
+	    int nindex = 0;
+	    int nLineCount = 0;
+	    int nblockNameNum = 0;
+	    HashMap<String,String> InfoHashMap = new HashMap<String,String>();
+	    
 		confText = ReadConf();
 		
 		//get location with outerBlockNames
@@ -83,7 +196,6 @@ public class RecRemoteOperator implements RemoteOperator{
 				nindex = Integer.parseInt(lineArray[1]);
 				nLineCount = GetPreBlockLength(blname,nblockNameNum,nindex);
 				nblockNameNum += nLineCount;
-//				System.out.println("nblockNameNum ："+nblockNameNum);
 			}
 		}else{
 			String[] lineArray=outerBlockNames.split(":");
@@ -95,64 +207,77 @@ public class RecRemoteOperator implements RemoteOperator{
 		
 		String BlockText = GetBlockTextWithIndex(blname,nblockNameNum);
 		int BlockLength = GetBlockLenth(BlockText);
-
-		String newConfText = GetPreBlockText(nblockNameNum)+BlockText+element.toString()
-				+GetSufBlockText(nblockNameNum+BlockLength);
-
-		// write to conf file
-		WriteConf(newConfText);
-		try {
-			WriteRemoteConf();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-	
-	@Override
-	public void delete(Element element, String outerBlockNames)
-			throws RemoteException {
-		// TODO Auto-generated method stub
 		
-	}
-
-	@Override
-	public void insertAfter(Element element, Element after,
-			String outerBlockNames) throws RemoteException {
-		// TODO Auto-generated method stub
+		InfoHashMap.put("blocktext", BlockText);
+		InfoHashMap.put("blocklength",Integer.toString(BlockLength));
+		InfoHashMap.put("nblocknamenum", Integer.toString(nblockNameNum));
 		
+		return InfoHashMap;
 	}
 
 	@Override
 	public void replace(Element oldElement, Element newElement,
 			String outerBlockNames) throws RemoteException {
-		// TODO Auto-generated method stub
+		
+	    if(CheckOuterBlockNames(outerBlockNames)){
+	    	throw new RemoteException("outerBlockNames is not correct,outerBlockNames ="+outerBlockNames);
+	    }
+	    
+	    //If there is no index in outerBlockNames, default the first block.
+	    if(!outerBlockNames.contains(":")){
+	    	outerBlockNames += ":0";
+	    }
 
+	    HashMap<String,String> objHashMap=EditCommon(outerBlockNames);
+	    String BlockText = objHashMap.get("blocktext");
+	    int BlockLength = Integer.parseInt(objHashMap.get("blocklength"));
+	    int nblockNameNum = Integer.parseInt(objHashMap.get("nblocknamenum"));
+
+		String editBlockText = BlockReplaceElement(BlockText,oldElement, newElement);
+		
+		String newConfText = GetPreBlockText(confText,nblockNameNum)+editBlockText
+				+GetSufBlockText(confText,nblockNameNum+BlockLength);
+
+		// write to local conf file
+		WriteConf(newConfText);
 	}
-
+	private String BlockReplaceElement(String BlockText,Element oldElement,Element newElement){
+		
+		String strRtn = ReplaceString(BlockText,oldElement.toString(), newElement.toString());
+		
+		return strRtn;
+	}
+	
 	@Override
 	public List<Block> getBlocks(String blockName, String outerBlockNames)
 			throws RemoteException {
-		// TODO Auto-generated method stub
-		Block objblock = new RecBlock();
-		objblock.setName(outerBlockNames);
-		objblock.getBlocks();
+	    CheckOuterBlockNames(outerBlockNames);
+	    if((null == blockName.toString()) || ("" == blockName.toString())){
+	    	return null;
+	    }
+	    //If there is no index in outerBlockNames, default the first block.
+	    if(!outerBlockNames.contains(":")){
+	    	outerBlockNames += ":0";
+	    }
+
+	    HashMap<String,String> objHashMap=EditCommon(outerBlockNames);
+	    String BlockText = objHashMap.get("blocktext");
+
+		RecBlock objRecBlock = new RecBlock();
+		objRecBlock.SetBlockText(BlockText);
+		return objRecBlock.getBlocks(blockName);
 		
-		return null;
 	}
 
-	private void CheckOuterBlockNames(String outerBlockNames) {
-		// TODO Auto-generated method stub
-		// 正则？outerBlockNames = "http:0|server:0|location /:0";
+	private boolean CheckOuterBlockNames(String outerBlockNames) {
+		if( outerBlockNames == null || "".equals(outerBlockNames.trim())){
+			return true;
+		}
+		
+		return false;
 	}
 
-
-//	private int GetPreBlockLength(String blname, int nblockStartLine) {
-//		// TODO Auto-generated method stub
-//		return 0;
-//	}
-
-	private int GetPreBlockLength(String blname,int nStartLine,int nbindex) {
+	private int GetPreBlockLength(String blname,int nStartLine,int nbindex) throws RemoteException {
 		int nRepeat = -1;
 		int nLineCount = -1;
 		int nBlockLineCount = 0;
@@ -179,9 +304,7 @@ public class RecRemoteOperator implements RemoteOperator{
 			}
 			return nBlockLineCount;
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return -1;
+			throw new RemoteException(e.getMessage());
 		}
 	}
 
@@ -203,6 +326,7 @@ public class RecRemoteOperator implements RemoteOperator{
 		}
 		return bHasBlockName;
 	}
+	
 	private String GetBlockName(String linetxt) {
 		String bname = null;
 		boolean bret = IsComment(linetxt);
@@ -228,6 +352,7 @@ public class RecRemoteOperator implements RemoteOperator{
 	
 	/**
 	 * Get the nginx.conf file which nginx.conf fullpath is parameter remoteFile.
+	 * @throws IOException 
 	 * */
 	public void GetRemoteConf(String remoteFile) throws IOException
 	{
@@ -278,8 +403,9 @@ public class RecRemoteOperator implements RemoteOperator{
 	 * Get the conf text which conf path is confPathWithName.
 	 * @param config path with fullname.
 	 * @return config text.
+	 * @throws RemoteException 
 	 * */
-	public String ReadConf(){
+	public String ReadConf() throws RemoteException{
 	    try {
 		    // read conf
 		    File file = new File(confPathWithName);
@@ -296,13 +422,12 @@ public class RecRemoteOperator implements RemoteOperator{
 		    String str = sb.toString();
 		    return str;
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return null;
+			throw new RemoteException(e.getMessage());
 		}
 	}
 
-	public void WriteConf(String wcConftext){
+	//write to local conf file
+	private void WriteConf(String wcConftext) throws RemoteException{
 		try {
 	    	FileWriter fw = null;
 	    	fw = new FileWriter(confPathWithName);
@@ -311,18 +436,16 @@ public class RecRemoteOperator implements RemoteOperator{
 			fw.close();
 
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new RemoteException(e.getMessage());
 		}
 	}
 	
-	private String GetPreBlockText(int Index){
+	private String GetPreBlockText(String Text,int Index) throws RemoteException{
 		String SufBlockText = null;
 	    String linetxt =null;
 	    int nPreCount = 0;
-	    boolean bStartBlock = false;
 	    
-	    BufferedReader br = new BufferedReader(new StringReader(confText));
+	    BufferedReader br = new BufferedReader(new StringReader(Text));
 	    StringBuilder sb = new StringBuilder();
 	    
 		try {
@@ -336,19 +459,18 @@ public class RecRemoteOperator implements RemoteOperator{
 			SufBlockText = sb.toString();
 			
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new RemoteException(e.getMessage());
 		}
 		return SufBlockText;
 	}
 	
-	private String GetSufBlockText(int Index){
+	private String GetSufBlockText(String Text,int Index) throws RemoteException{
 		String SufBlockText = null;
 	    String linetxt =null;
 	    int nPreCount = 0;
 	    boolean bStartBlock = false;
 	    
-	    BufferedReader br = new BufferedReader(new StringReader(confText));
+	    BufferedReader br = new BufferedReader(new StringReader(Text));
 	    StringBuilder sb = new StringBuilder();
 	    
 		try {
@@ -366,8 +488,7 @@ public class RecRemoteOperator implements RemoteOperator{
 			SufBlockText = sb.toString();
 			
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new RemoteException(e.getMessage());
 		}
 		return SufBlockText;
 	}
