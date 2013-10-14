@@ -3,6 +3,7 @@ package org.cs2c.nginlib.ctl;
 import org.cs2c.nginlib.MiddlewareFactory;
 import org.cs2c.nginlib.RemoteException;
 import org.cs2c.nginlib.AuthInfo;
+
 public class TestController {
 
 	public static void main(String[] args) {
@@ -34,7 +35,7 @@ public class TestController {
 				}
 			else
 				try {
-					reccontro.reload();
+					reccontro.start();
 				} catch (RemoteException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
