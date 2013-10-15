@@ -3,6 +3,8 @@
  */
 package org.cs2c.nginlib.config;
 import java.util.*;
+
+import org.cs2c.nginlib.RemoteException;
 /**
  * @author Mikes
  * <P/>Block represents a range of directive with "{}".
@@ -24,13 +26,15 @@ public interface Block extends Element{
 	/**
 	 * Get sub block list with in the instance.
 	 * @return sub blocks with list container. If the block have no sub block, an empty list should be returned.
+	 * @throws RemoteException 
 	 * */
-	List<Block> getBlocks();
+	List<Block> getBlocks() throws RemoteException;
 	/**
 	 * Get all directives directly in the block.
 	 * @return directives with list container. If the block have no directive, an empty list should be returned.
+	 * @throws RemoteException 
 	 * */
-	List<Directive> getDirectives();
+	List<Directive> getDirectives() throws RemoteException;
 	/**
 	 * Add a block in the block end.
 	 * @param block block to be added.

@@ -26,7 +26,7 @@ public interface Option extends Parameter{
 	 * Set the value of the option parameter.
 	 * @param value the part after "=" of the option parameter
 	 * */
-	void setValue();
+	void setValue(String value);
 	/**
 	 * Get the value of the option parameter.
 	 * @return the part after "=" of the option parameter
