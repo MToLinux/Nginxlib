@@ -186,7 +186,12 @@ public class RecRemoteOperator implements RemoteOperator{
 		confText = ReadConf();
 		
 		//get location with outerBlockNames
-		if(outerBlockNames.contains("|")){
+		if("".equals(outerBlockNames.trim())){
+			// when outerBlockNames is "" ,search all nginx.conf file.
+			// TODO blname
+			nblockNameNum = GetPreBlockLength(blname,nblockNameNum,nindex);
+		}
+		else if(outerBlockNames.contains("|")){
 			String[] arrayOuterBNames=outerBlockNames.split("\\|");
 			for(int i=0;i<arrayOuterBNames.length;i++){
 				nameAndIndex = arrayOuterBNames[i];
@@ -270,7 +275,7 @@ public class RecRemoteOperator implements RemoteOperator{
 	}
 
 	private boolean CheckOuterBlockNames(String outerBlockNames) {
-		if( outerBlockNames == null || "".equals(outerBlockNames.trim())){
+		if( outerBlockNames == null){
 			return true;
 		}
 		
