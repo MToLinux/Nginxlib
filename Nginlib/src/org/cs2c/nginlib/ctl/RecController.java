@@ -10,7 +10,6 @@ import org.cs2c.nginlib.AuthInfo;
 import org.cs2c.nginlib.RemoteException;
 import org.cs2c.nginlib.RecAuthInfo;
 
-
 	/**
 	 * @author LiuQin The implement class of AuthInfo
 	 * @see AuthInfo
