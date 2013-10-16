@@ -181,6 +181,9 @@ public class RecRemoteOperator implements RemoteOperator{
 	    int nindex = 0;
 	    int nLineCount = 0;
 	    int nblockNameNum = 0;
+		String BlockText = null;
+		int BlockLength = 0;
+		
 	    HashMap<String,String> InfoHashMap = new HashMap<String,String>();
 	    
 		confText = ReadConf();
@@ -190,6 +193,9 @@ public class RecRemoteOperator implements RemoteOperator{
 			// when outerBlockNames is "" ,search all nginx.conf file.
 			// TODO blname
 			nblockNameNum = GetPreBlockLength(blname,nblockNameNum,nindex);
+			
+			BlockText = confText;
+			BlockLength = GetBlockLenth(BlockText);
 		}
 		else if(outerBlockNames.contains("|")){
 			String[] arrayOuterBNames=outerBlockNames.split("\\|");
@@ -202,16 +208,21 @@ public class RecRemoteOperator implements RemoteOperator{
 				nLineCount = GetPreBlockLength(blname,nblockNameNum,nindex);
 				nblockNameNum += nLineCount;
 			}
+			
+			BlockText = GetBlockTextWithIndex(blname,nblockNameNum);
+			BlockLength = GetBlockLenth(BlockText);
 		}else{
 			String[] lineArray=outerBlockNames.split(":");
 			blname = lineArray[0];
 			nindex = Integer.parseInt(lineArray[1]);
 			nLineCount = GetPreBlockLength(blname,nblockNameNum,nindex);
 			nblockNameNum += nLineCount;
+			
+			BlockText = GetBlockTextWithIndex(blname,nblockNameNum);
+			BlockLength = GetBlockLenth(BlockText);
 		}
 		
-		String BlockText = GetBlockTextWithIndex(blname,nblockNameNum);
-		int BlockLength = GetBlockLenth(BlockText);
+
 		
 		InfoHashMap.put("blocktext", BlockText);
 		InfoHashMap.put("blocklength",Integer.toString(BlockLength));
