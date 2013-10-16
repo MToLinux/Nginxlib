@@ -189,15 +189,7 @@ public class RecRemoteOperator implements RemoteOperator{
 		confText = ReadConf();
 		
 		//get location with outerBlockNames
-		if("".equals(outerBlockNames.trim())){
-			// when outerBlockNames is "" ,search all nginx.conf file.
-			// TODO blname
-			nblockNameNum = GetPreBlockLength(blname,nblockNameNum,nindex);
-			
-			BlockText = confText;
-			BlockLength = GetBlockLenth(BlockText);
-		}
-		else if(outerBlockNames.contains("|")){
+		if(outerBlockNames.contains("|")){
 			String[] arrayOuterBNames=outerBlockNames.split("\\|");
 			for(int i=0;i<arrayOuterBNames.length;i++){
 				nameAndIndex = arrayOuterBNames[i];
@@ -267,18 +259,29 @@ public class RecRemoteOperator implements RemoteOperator{
 	@Override
 	public List<Block> getBlocks(String blockName, String outerBlockNames)
 			throws RemoteException {
-	    CheckOuterBlockNames(outerBlockNames);
+		String BlockText = null;
+		
+		if( outerBlockNames == null){
+			return null;
+		}
+		
 	    if((null == blockName.toString()) || ("" == blockName.toString())){
 	    	return null;
 	    }
-	    //If there is no index in outerBlockNames, default the first block.
-	    if(!outerBlockNames.contains(":")){
-	    	outerBlockNames += ":0";
-	    }
-
-	    HashMap<String,String> objHashMap=EditCommon(outerBlockNames);
-	    String BlockText = objHashMap.get("blocktext");
-
+	    
+		if("".equals(outerBlockNames.trim())){
+			// when outerBlockNames is "" ,search all nginx.conf file.
+			BlockText = confText;
+		}
+		else{
+		    //If there is no index in outerBlockNames, default the first block.
+		    if(!outerBlockNames.contains(":")){
+		    	outerBlockNames += ":0";
+		    }
+		    HashMap<String,String> objHashMap=EditCommon(outerBlockNames);
+		    BlockText = objHashMap.get("blocktext");
+		}
+		
 		RecBlock objRecBlock = new RecBlock();
 		objRecBlock.SetBlockText(BlockText);
 		return objRecBlock.getBlocks(blockName);
@@ -286,7 +289,7 @@ public class RecRemoteOperator implements RemoteOperator{
 	}
 
 	private boolean CheckOuterBlockNames(String outerBlockNames) {
-		if( outerBlockNames == null){
+		if( outerBlockNames == null || "".equals(outerBlockNames.trim())){
 			return true;
 		}
 		
