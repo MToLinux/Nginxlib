@@ -2,15 +2,14 @@ package org.cs2c.nginlib.monitor;
 
 public class RecNetworkStatus implements NetworkStatus {
 	
-	float InputKbPerSec = 0;
-	float OutputPerSec = 0;
+	private float InputKbPerSec = 0;
+	private float OutputPerSec = 0;
 
 	public void setInputKbPerSec(float InputKbPerSec) {
 		this.InputKbPerSec = InputKbPerSec;
 	}
 	@Override
 	public float getInputKbPerSec() {
-		// TODO Auto-generated method stub
 		return InputKbPerSec;
 	}
 
@@ -19,7 +18,6 @@ public class RecNetworkStatus implements NetworkStatus {
 	}
 	@Override
 	public float getOutputPerSec() {
-		// TODO Auto-generated method stub
 		return OutputPerSec;
 	}
 

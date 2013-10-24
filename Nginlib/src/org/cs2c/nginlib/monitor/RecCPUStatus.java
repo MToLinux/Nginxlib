@@ -2,21 +2,20 @@ package org.cs2c.nginlib.monitor;
 
 public class RecCPUStatus implements CPUStatus {
 	
-	int RunningNum = 0;
-	int BlockingNum = 0;
-	int InterruptNum = 0;
-	int ContextSwitchNum = 0;
-	float UserPercent = 0;
-	float SystemPercent = 0;
-	float IdlePercent = 0;
-	float IOWaitPercent = 0;
+	private int RunningNum = 0;
+	private int BlockingNum = 0;
+	private int InterruptNum = 0;
+	private int ContextSwitchNum = 0;
+	private float UserPercent = 0;
+	private float SystemPercent = 0;
+	private float IdlePercent = 0;
+	private float IOWaitPercent = 0;
 
 	public void setRunningNum(int RunningNum) {
 		this.RunningNum = RunningNum;
 	}
 	@Override
 	public int getRunningNum() {
-		// TODO Auto-generated method stub
 		return RunningNum;
 	}
 
@@ -25,7 +24,6 @@ public class RecCPUStatus implements CPUStatus {
 	}
 	@Override
 	public int getBlockingNum() {
-		// TODO Auto-generated method stub
 		return BlockingNum;
 	}
 
@@ -34,7 +32,6 @@ public class RecCPUStatus implements CPUStatus {
 	}
 	@Override
 	public int getInterruptNum() {
-		// TODO Auto-generated method stub
 		return InterruptNum;
 	}
 
@@ -43,7 +40,6 @@ public class RecCPUStatus implements CPUStatus {
 	}
 	@Override
 	public int getContextSwitchNum() {
-		// TODO Auto-generated method stub
 		return ContextSwitchNum;
 	}
 
@@ -52,7 +48,6 @@ public class RecCPUStatus implements CPUStatus {
 	}
 	@Override
 	public float getUserPercent() {
-		// TODO Auto-generated method stub
 		return UserPercent;
 	}
 
@@ -61,7 +56,6 @@ public class RecCPUStatus implements CPUStatus {
 	}
 	@Override
 	public float getSystemPercent() {
-		// TODO Auto-generated method stub
 		return SystemPercent;
 	}
 
@@ -70,7 +64,6 @@ public class RecCPUStatus implements CPUStatus {
 	}
 	@Override
 	public float getIdlePercent() {
-		// TODO Auto-generated method stub
 		return IdlePercent;
 	}
 
@@ -79,7 +72,6 @@ public class RecCPUStatus implements CPUStatus {
 	}
 	@Override
 	public float getIOWaitPercent() {
-		// TODO Auto-generated method stub
 		return IOWaitPercent;
 	}
 }

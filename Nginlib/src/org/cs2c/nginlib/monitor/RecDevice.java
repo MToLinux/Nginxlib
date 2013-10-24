@@ -2,19 +2,18 @@ package org.cs2c.nginlib.monitor;
 
 public class RecDevice implements Device {
 	
-	String Name = "";
-	float BlockWritenPerSec = 0;
-	float BlockReadPerSec = 0;
-	long BlockWriten = 0;
-	long BlockRead = 0;
-	float TPS = 0;
+	private String Name = "";
+	private float BlockWritenPerSec = 0;
+	private float BlockReadPerSec = 0;
+	private long BlockWriten = 0;
+	private long BlockRead = 0;
+	private float TPS = 0;
 
 	public void setName(String Name) {
 		this.Name = Name;
 	}
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
 		return Name;
 	}
 
@@ -23,7 +22,6 @@ public class RecDevice implements Device {
 	}
 	@Override
 	public float getBlockWritenPerSec() {
-		// TODO Auto-generated method stub
 		return BlockWritenPerSec;
 	}
 
@@ -32,7 +30,6 @@ public class RecDevice implements Device {
 	}
 	@Override
 	public float getBlockReadPerSec() {
-		// TODO Auto-generated method stub
 		return BlockReadPerSec;
 	}
 
@@ -41,7 +38,6 @@ public class RecDevice implements Device {
 	}
 	@Override
 	public long getBlockWriten() {
-		// TODO Auto-generated method stub
 		return BlockWriten;
 	}
 
@@ -50,7 +46,6 @@ public class RecDevice implements Device {
 	}
 	@Override
 	public long getBlockRead() {
-		// TODO Auto-generated method stub
 		return BlockRead;
 	}
 
@@ -59,7 +54,6 @@ public class RecDevice implements Device {
 	}
 	@Override
 	public float getTPS() {
-		// TODO Auto-generated method stub
 		return TPS;
 	}
 

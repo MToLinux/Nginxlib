@@ -20,8 +20,8 @@ public class RecMonitor implements Monitor {
 	private String username = "root";
 	private String password = "qwer1234";
 	private int port = 22;
-	Connection conn;
-	Session sess;
+	private Connection conn = null;
+	private Session sess = null;
 	
 	/* Constructor */
 	public RecMonitor()
@@ -66,53 +66,33 @@ public class RecMonitor implements Monitor {
 		return password;
 	}
 	
-	public boolean establishConnection()
+	public void establishConnection() throws IOException
 	{
-		try
-		{
-			/* Create a connection instance */
-			conn = new Connection(hostname, port);
-			
-			/* Now connect */
-			conn.connect();
+		/* Create a connection instance */
+		conn = new Connection(hostname, port);
+		
+		/* Connect */
+		conn.connect();
 
-			/* Authenticate. */
-			boolean isAuthenticated = conn.authenticateWithPassword(username, password);
-			if (isAuthenticated == false)
-				throw new IOException("Authentication failed.");
-		}
-		catch (IOException e)
-		{
-			e.printStackTrace(System.err);
-			System.exit(2);
-		}
-		return true;
+		/* Authenticate. */
+		boolean isAuthenticated = 
+		conn.authenticateWithPassword(username, password);
+		if (isAuthenticated == false)
+			throw new IOException("Authentication failed.");
 	}
 	
-	public boolean establishSession()
+	public void establishSession() throws IOException
 	{
-		try
-		{
-			/* Create a session */
-			sess = conn.openSession();
-		}
-		catch (IOException e)
-		{
-			e.printStackTrace(System.err);
-			System.exit(2);
-		}
-		return true;
+		sess = conn.openSession();
 	}
 	
 	public void closeSession()
 	{
-		/* Close this session */
 		sess.close();
 	}
 	
 	public void closeConnection()
 	{
-		/* Close the connection */
 		conn.close();
 	}
 
@@ -172,7 +152,6 @@ public class RecMonitor implements Monitor {
 
 	@Override
 	public CPUStatus getCPUStatus() throws RemoteException {
-
 		try
 		{
 			/* Connect to the remote host and establish a Session */
@@ -190,18 +169,27 @@ public class RecMonitor implements Monitor {
 			InputStream stdout;
 			BufferedReader br;
 			
+			int linenum = 0;
+			boolean cmdflag = true;
+			
 			/* Execute a command */
 			sess.execCommand("vmstat");
 
 			stdout = new StreamGobbler(sess.getStdout());
 			br = new BufferedReader(new InputStreamReader(stdout));
+			linenum = 0;
 			while (true)
 			{
 				String linein = br.readLine();
 				if (linein == null)
 				{
+					if(linenum == 0)
+					{
+						cmdflag = false;
+					}
 					break;
 				}
+				linenum++;
 				String line = null;
 				if(linein.length() >= 1)
 				{
@@ -223,7 +211,7 @@ public class RecMonitor implements Monitor {
 			}
 			stdout.close();
 			br.close();
-			
+
 			/* RecCPUStatus */
 			RecCPUStatus cpusta = new RecCPUStatus();
 			cpusta.setBlockingNum(BlockingNum);
@@ -239,21 +227,21 @@ public class RecMonitor implements Monitor {
 			closeSession();
 			closeConnection();
 			
+			if(cmdflag == false)
+			{
+				throw new IOException("Command vmstat Execution failed.");
+			}
+			
 			return cpusta;
 		}
 		catch (IOException e)
 		{
-			e.printStackTrace(System.err);
-			System.exit(2);
+			throw new RemoteException(e.getMessage());
 		}
-		
-		return null;
 	}
 	
-
 	@Override
 	public IOStatus getIOStatus() throws RemoteException {
-
 		try
 		{
 			/* Connect to the remote host and establish a Session */
@@ -266,18 +254,27 @@ public class RecMonitor implements Monitor {
 			InputStream stdout;
 			BufferedReader br;
 			
+			int linenum = 0;
+			boolean cmdflag = true;
+			
 			/* Execute a command */
 			sess.execCommand("vmstat");
 
 			stdout = new StreamGobbler(sess.getStdout());
 			br = new BufferedReader(new InputStreamReader(stdout));
+			linenum = 0;
 			while (true)
 			{
 				String linein = br.readLine();
 				if (linein == null)
 				{
+					if(linenum == 0)
+					{
+						cmdflag = false;
+					}
 					break;
 				}
+				linenum++;
 				String line = null;
 				if(linein.length() >= 1)
 				{
@@ -287,7 +284,7 @@ public class RecMonitor implements Monitor {
 				{
 					continue;
 				}
-				//System.out.println(line);
+
 				String linesplit[] = line.split(" ");
 				BlockInPerSec = Float.parseFloat(linesplit[8]);
 				BlockOutPerSec = Float.parseFloat(linesplit[9]);
@@ -296,6 +293,12 @@ public class RecMonitor implements Monitor {
 			br.close();
 			
 			closeSession();
+			
+			if(cmdflag == false)
+			{
+				throw new IOException("Command vmstat Execution failed.");
+			}
+			
 			establishSession();
 
 			/* Devices */
@@ -305,13 +308,19 @@ public class RecMonitor implements Monitor {
 			stdout = new StreamGobbler(sess.getStdout());
 			br = new BufferedReader(new InputStreamReader(stdout));
 			/* Skip the first serveral lines */
+			linenum = 0;
 			while (true)
 			{
 				String linein = br.readLine();
 				if(linein == null)
 				{
+					if(linenum == 0)
+					{
+						cmdflag = false;
+					}
 					break;
 				}
+				linenum++;
 				
 				if (linein.length() >= 7)
 				{
@@ -326,13 +335,19 @@ public class RecMonitor implements Monitor {
 					}
 				}
 			}
+			linenum = 0;
 			while (true)
 			{
 				String linein = br.readLine();
-				if (linein == null)
+				if(linein == null)
 				{
+					if(linenum == 0)
+					{
+						cmdflag = false;
+					}
 					break;
 				}
+				linenum++;
 				String line = null;
 				if(linein.length()>=1)
 				{
@@ -378,25 +393,21 @@ public class RecMonitor implements Monitor {
 			closeSession();
 			closeConnection();
 			
+			if(cmdflag == false)
+			{
+				throw new IOException("Command iostat Execution failed.");
+			}
+			
 			return iosta;
 		}
 		catch (IOException e)
 		{
-			e.printStackTrace(System.err);
-			System.exit(2);
+			throw new RemoteException(e.getMessage());
 		}
-		
-		return null;
-	}
-	
-	public static boolean isNumeric(String str)
-	{
-		return str.matches("^[-+]?(([0-9]+)([.]([0-9]+))?|([.]([0-9]+))?)$");
 	}
 
 	@Override
 	public NetworkStatus getNetworkStatus() throws RemoteException {
-
 		try
 		{
 			/* Connect to the remote host and establish a Session */
@@ -410,27 +421,24 @@ public class RecMonitor implements Monitor {
 			
 			/* Execute a command */
 			sess.execCommand("ifstat -T");
-			
-			/*
-			 * 
-[root@server1 ~]# ifstat
-bash: ifstat: command not found
-[root@server1 ~]# 
-			 */
 
 			stdout = new StreamGobbler(sess.getStdout());
 			br = new BufferedReader(new InputStreamReader(stdout));
 			int linenum = 0;
 			int eth_num = 0;
+			boolean cmdflag = true;
 			while (true)
 			{
 				String linein = br.readLine();
 				String line = null;
 				if (linein == null)
 				{
+					if(linenum == 0)
+					{
+						cmdflag = false;
+					}
 					break;
 				}
-				//System.out.println(linein);
 				linenum++;
 				if(linenum == 1)
 				{
@@ -475,49 +483,59 @@ bash: ifstat: command not found
 			closeSession();
 			closeConnection();
 			
+			if(cmdflag == false)
+			{
+				throw new IOException("Command ifstat Execution failed.");
+			}
+			
 			return nwsta;
 		}
 		catch (IOException e)
 		{
-			e.printStackTrace(System.err);
-			System.exit(2);
+			throw new RemoteException(e.getMessage());
 		}
-		
-		return null;
 	}
 
 	@Override
 	public MemoryStatus getMemoryStatus() throws RemoteException {
-		
 		try
 		{
 			/* Connect to the remote host and establish a Session */
 			establishConnection();
 			establishSession();
 			
-			int UsedSwap = 0;//free 2
-			int SwapIn = 0;//vmstat 6
-			int SwapOut = 0;//vmstat 7
-			int Free = 0;//free 3
-			int Buffers = 0;//free 5
-			int Shared = 0;//free 4
-			int Cached = 0;//free 6
-			int Used = 0;//free 2
+			int UsedSwap = 0;
+			int SwapIn = 0;
+			int SwapOut = 0;
+			int Free = 0;
+			int Buffers = 0;
+			int Shared = 0;
+			int Cached = 0;
+			int Used = 0;
 			InputStream stdout;
 			BufferedReader br;
+			
+			int linenum = 0;
+			boolean cmdflag = true;
 			
 			/* Execute a command */
 			sess.execCommand("vmstat");
 
 			stdout = new StreamGobbler(sess.getStdout());
 			br = new BufferedReader(new InputStreamReader(stdout));
+			linenum = 0;
 			while (true)
 			{
 				String linein = br.readLine();
 				if (linein == null)
 				{
+					if(linenum == 0)
+					{
+						cmdflag = false;
+					}
 					break;
 				}
+				linenum++;
 				String line = null;
 				if(linein.length() >= 1)
 				{
@@ -535,6 +553,13 @@ bash: ifstat: command not found
 			br.close();
 			
 			closeSession();
+			
+			if(cmdflag == false)
+			{
+				closeConnection();
+				throw new IOException("Command vmstat Execution failed.");
+			}
+
 			establishSession();
 
 			/* Execute a command */
@@ -542,13 +567,19 @@ bash: ifstat: command not found
 
 			stdout = new StreamGobbler(sess.getStdout());
 			br = new BufferedReader(new InputStreamReader(stdout));
+			linenum = 0;
 			while (true)
 			{
 				String linein = br.readLine();
 				if (linein == null)
 				{
+					if(linenum == 0)
+					{
+						cmdflag = false;
+					}
 					break;
 				}
+				linenum++;
 				String line = null;
 				if(linein.length()>=1)
 				{
@@ -598,43 +629,337 @@ bash: ifstat: command not found
 			closeSession();
 			closeConnection();
 			
+			if(cmdflag == false)
+			{
+				throw new IOException("Command free Execution failed.");
+			}
+			
 			return memsta;
 		}
 		catch (IOException e)
 		{
-			e.printStackTrace(System.err);
-			System.exit(2);
+			throw new RemoteException(e.getMessage());
 		}
-		
-		return null;
 	}
 
 	@Override
-	public MiddlewareStatus getMiddlewareStatus(int flag) throws RemoteException {
-		try{
-			RecMiddlewareStatus mwstat = new RecMiddlewareStatus();
-			if(flag == 0)//nginx
+	public MiddlewareStatus getMiddlewareStatus() throws RemoteException {
+		RecMiddlewareStatus mwstat = new RecMiddlewareStatus();
+		return mwstat;
+	}
+	
+	@Override
+	public NginxStatus getNginxStatus(String nginx_path, String nginx_statuspath, String nginx_username, String nginx_password) throws RemoteException {
+		RecNginxStatus ngsta = new RecNginxStatus(nginx_path, nginx_statuspath, nginx_username, nginx_password);
+		try
+		{
+			String nginxStatusCommond = "GET http://" + getHostname() +  "/" + ngsta.getNginxStatusPath();
+			if(nginx_username!=null && nginx_password!=null)
 			{
-				//RecNginxStatus nginxstat = new RecNginxStatus();
-				//nginxstat = 
-				mwstat.getNginxStatusValue(this);
-				
-				/* RecNginxStatus into MiddlewareStatus */
-//				mwstat.setNginxStatus(nginxstat);
+				String struserps = " -C " + nginx_username + ":" + nginx_password;
+				nginxStatusCommond += struserps;
 			}
-			else if(flag == 1)
+			
+			/* Connect to the remote host and establish a Session */
+			establishConnection();
+			establishSession();
+			
+			int ActiveConnections = 0;
+			int ServerAccepts = 0;
+			int ServerHandled = 0;
+			int ServerRequests = 0;
+			int NginxReading = 0;
+			int NginxWriting = 0;
+			int KeepAliveConnections = 0;
+			List<RecProcessStatus> listNginxPS = new LinkedList<RecProcessStatus>();
+			String p_USER = null;
+			int p_PID = -1;
+			float p_CPU = 0;
+			float p_MEM = 0;
+			int p_VSZ = 0;
+			int p_RSS = 0;
+			String p_TTY = null;
+			String p_STAT = null;
+			String p_START = null;
+			String p_TIME = null;
+			String p_COMMAND = null;
+			List<String> listNginxCA = new LinkedList<String>();
+			InputStream stdout = null;
+			InputStream stderr = null;
+			BufferedReader br = null;
+			
+			int linenum = 0;
+			boolean nginxflag = true;
+			boolean cmdflag = true;
+			boolean pscmdflag = true;
+			
+			/* Execute a command */
+			sess.execCommand(nginxStatusCommond);
+			
+			stdout = new StreamGobbler(sess.getStdout());
+			br = new BufferedReader(new InputStreamReader(stdout));
+			linenum = 0;
+			while (true)
 			{
-				;
+				String linein = br.readLine();
+				String line = null;
+				if (linein == null)
+				{
+					if(linenum == 0)
+					{
+						cmdflag = false;
+					}
+					break;
+				}
+				linenum++;
+				if(linenum == 1)
+				{
+					if(linein.length()>=1)
+					{
+						line = deleteExtraSpace(linein);
+					}
+					if(line == null || line.length()<3)
+					{
+						linenum--;
+						continue;
+					}
+					String linesplit[] = line.split(":");
+					String actconn = deleteExtraSpace(linesplit[0]);
+					if(!actconn.equals("Active connections"))
+					{
+						nginxflag = false;
+						break;
+					}
+					ActiveConnections = Integer.parseInt(deleteExtraSpace(linesplit[linesplit.length-1]));
+				}
+				else if(linenum==3)
+				{
+					if(linein.length()>=1)
+					{
+						line = deleteExtraSpace(linein);
+					}
+					if(line == null || line.length()<3)
+					{
+						linenum--;
+						continue;
+					}
+					String linesplit[] = line.split(" ");
+
+					ServerAccepts = Integer.parseInt(linesplit[0]);
+					ServerHandled = Integer.parseInt(linesplit[1]);
+					ServerRequests = Integer.parseInt(linesplit[2]);
+				}
+				else if(linenum==4)
+				{
+					if(linein.length()>=1)
+					{
+						linein = linein.replace(":", " ");
+						line = deleteExtraSpace(linein);
+					}
+					if(line == null || line.length()<3)
+					{
+						linenum--;
+						continue;
+					}
+					String linesplit[] = line.split(" ");
+					NginxReading = Integer.parseInt(deleteExtraSpace(linesplit[1]));
+					NginxWriting = Integer.parseInt(deleteExtraSpace(linesplit[3]));
+					KeepAliveConnections = Integer.parseInt(deleteExtraSpace(linesplit[5]));
+				}
+			}
+			stdout.close();
+			br.close();
+			
+			/* Execute a command: nginx ps cmd */
+			closeSession();
+			establishSession();
+			sess.execCommand("ps -aux|grep nginx");
+			
+			stdout = new StreamGobbler(sess.getStdout());
+			br = new BufferedReader(new InputStreamReader(stdout));
+			linenum = 0;
+			while (true)
+			{
+				String linein = br.readLine();
+				String line = null;
+				RecProcessStatus nps = new RecProcessStatus();
+				
+				if (linein == null)
+				{
+					if(linenum == 0)
+					{
+						pscmdflag = false;
+					}
+					break;
+				}
+				linenum++;
+
+				//Parse
+				if(linein.length()>=1)
+				{
+					line = deleteExtraSpace(linein);
+				}
+				if(line == null || line.length()<3)
+				{
+					linenum--;
+					continue;
+				}
+				String linesplit[] = line.split(" ");
+				if(linesplit[10].length() < 6)
+				{
+					continue;
+				}
+				String ps_nginx_flag = (deleteExtraSpace(linesplit[10])).substring(0, 5);
+				if(!(ps_nginx_flag.equals("nginx")))
+				{
+					continue;
+				}
+				else
+				{
+					p_USER = null;
+					p_PID = 0;
+					p_CPU = 0;
+					p_MEM = 0;
+					p_VSZ = 0;
+					p_RSS = 0;
+					p_TTY = null;
+					p_STAT = null;
+					p_START = null;
+					p_TIME = null;
+					p_COMMAND = null;
+					
+					p_USER = linesplit[0];
+					p_PID = Integer.parseInt(deleteExtraSpace(linesplit[1]));
+					p_CPU = Float.parseFloat(deleteExtraSpace(linesplit[2]));
+					p_MEM = Float.parseFloat(deleteExtraSpace(linesplit[3]));
+					p_VSZ = Integer.parseInt(deleteExtraSpace(linesplit[4]));
+					p_RSS = Integer.parseInt(deleteExtraSpace(linesplit[5]));
+					p_TTY = deleteExtraSpace(linesplit[6]);
+					p_STAT = deleteExtraSpace(linesplit[7]);
+					p_START = deleteExtraSpace(linesplit[8]);
+					p_TIME = deleteExtraSpace(linesplit[9]);
+					int index = 10;
+					p_COMMAND = "";
+					while(index < linesplit.length)
+					{
+						p_COMMAND += " ";
+						String str = deleteExtraSpace(linesplit[index]);
+						p_COMMAND += str;
+						index++;
+					}
+					p_COMMAND = deleteExtraSpace(p_COMMAND);
+					
+					nps.setProcessUser(p_USER);
+					nps.setProcessID(p_PID);
+					nps.setProcessCPU(p_CPU);
+					nps.setProcessMem(p_MEM);
+					nps.setProcessVSZ(p_VSZ);
+					nps.setProcessRSS(p_RSS);
+					nps.setProcessTTY(p_TTY);
+					nps.setProcessSTAT(p_STAT);
+					nps.setProcessSTART(p_START);
+					nps.setProcessTIME(p_TIME);
+					nps.setProcessCmd(p_COMMAND);
+					listNginxPS.add(nps);
+				}
+			}
+			stdout.close();
+			br.close();
+			
+			/* Execute a command: nginx -V */
+			closeSession();
+			establishSession();
+			String ngpath = ngsta.getNginxPath();
+			String ngVcm = null;
+			if(ngpath.charAt(ngpath.length()-1) == '/')
+			{
+				ngVcm = ngpath+"sbin/nginx -V";
 			}
 			else
 			{
-				;
+				ngVcm = ngpath+"/sbin/nginx -V";
 			}
-			return mwstat;
+			sess.execCommand(ngVcm);
+			
+			stderr = new StreamGobbler(sess.getStderr());
+			br = new BufferedReader(new InputStreamReader(stderr));
+			linenum = 0;
+			while (true)
+			{
+				String linein = br.readLine();
+				String line = null;
+				
+				if (linein == null)
+				{
+					if(linenum == 0)
+					{
+						nginxflag = false;
+					}
+					break;
+				}
+				linenum++;
+
+				//Parse
+				if(linein.length()>=1)
+				{
+					line = deleteExtraSpace(linein);
+				}
+				if(line == null || line.length()<3)
+				{
+					linenum--;
+					continue;
+				}
+				String linesplit[] = line.split(" ");
+				if(!linesplit[0].equals("configure"))
+				{
+					continue;
+				}
+				else
+				{
+					int index = 2;
+					while(index < linesplit.length)
+					{
+						listNginxCA.add(linesplit[index]);
+						index++;
+					}
+				}
+			}
+			stdout.close();
+			br.close();
+
+			/* RecNginxStatus */
+			ngsta.setActiveConnections(ActiveConnections);
+			ngsta.setKeepAliveConnections(KeepAliveConnections);
+			ngsta.setNginxReading(NginxReading);
+			ngsta.setNginxWriting(NginxWriting);
+			ngsta.setServerAccepts(ServerAccepts);
+			ngsta.setServerHandled(ServerHandled);
+			ngsta.setServerRequests(ServerRequests);
+			ngsta.setNginxPSList(listNginxPS);
+			ngsta.setNginxCAList(listNginxCA);
+			
+			/* Close the session and disconnect to the remote host */
+			closeSession();
+			closeConnection();
+			
+			if(false == nginxflag)
+			{
+				throw new RemoteException("Nginx status command Execution failed.");
+			}
+			else if(cmdflag == false)
+			{
+				throw new IOException("Command \"GET http://\" Execution failed.");
+			}
+			else if(pscmdflag == false)
+			{
+				throw new IOException("Command ps Execution failed.");
+			}
+			
+			return ngsta;
 		}
-		catch(RemoteException e)
+		catch (IOException e)
 		{
+			throw new RemoteException(e.getMessage());
 		}
-		return null;
 	}
 }

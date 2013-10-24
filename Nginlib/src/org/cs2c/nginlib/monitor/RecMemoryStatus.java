@@ -2,14 +2,14 @@ package org.cs2c.nginlib.monitor;
 
 public class RecMemoryStatus implements MemoryStatus {
 
-	int UsedSwap = 0;
-	int SwapIn = 0;
-	int SwapOut = 0;
-	int Free = 0;
-	int Buffers = 0;
-	int Shared = 0;
-	int Cached = 0;
-	int Used = 0;
+	private int UsedSwap = 0;
+	private int SwapIn = 0;
+	private int SwapOut = 0;
+	private int Free = 0;
+	private int Buffers = 0;
+	private int Shared = 0;
+	private int Cached = 0;
+	private int Used = 0;
 	
 	public void setUsedSwap(int UsedSwap)
 	{
@@ -17,7 +17,6 @@ public class RecMemoryStatus implements MemoryStatus {
 	}
 	@Override
 	public int getUsedSwap() {
-		// TODO Auto-generated method stub
 		return UsedSwap;
 	}
 
@@ -27,7 +26,6 @@ public class RecMemoryStatus implements MemoryStatus {
 	}
 	@Override
 	public int getSwapIn() {
-		// TODO Auto-generated method stub
 		return SwapIn;
 	}
 
@@ -37,7 +35,6 @@ public class RecMemoryStatus implements MemoryStatus {
 	}
 	@Override
 	public int getSwapOut() {
-		// TODO Auto-generated method stub
 		return SwapOut;
 	}
 
@@ -47,7 +44,6 @@ public class RecMemoryStatus implements MemoryStatus {
 	}
 	@Override
 	public int getFree() {
-		// TODO Auto-generated method stub
 		return Free;
 	}
 
@@ -57,7 +53,6 @@ public class RecMemoryStatus implements MemoryStatus {
 	}
 	@Override
 	public int getBuffers() {
-		// TODO Auto-generated method stub
 		return Buffers;
 	}
 
@@ -67,7 +62,6 @@ public class RecMemoryStatus implements MemoryStatus {
 	}
 	@Override
 	public int getShared() {
-		// TODO Auto-generated method stub
 		return Shared;
 	}
 
@@ -77,7 +71,6 @@ public class RecMemoryStatus implements MemoryStatus {
 	}
 	@Override
 	public int getCached() {
-		// TODO Auto-generated method stub
 		return Cached;
 	}
 
@@ -87,7 +80,6 @@ public class RecMemoryStatus implements MemoryStatus {
 	}
 	@Override
 	public int getUsed() {
-		// TODO Auto-generated method stub
 		return Used;
 	}
 

@@ -4,16 +4,15 @@ import java.util.List;
 
 public class RecIOStatus implements IOStatus {
 	
-	float BlockInPerSec = 0;
-	float BlockOutPerSec = 0;
-	List<Device> Devices = null;
+	private float BlockInPerSec = 0;
+	private float BlockOutPerSec = 0;
+	private List<Device> Devices = null;
 
 	public void setBlockInPerSec(float BlockInPerSec) {
 		this.BlockInPerSec = BlockInPerSec;
 	}
 	@Override
 	public float getBlockInPerSec() {
-		// TODO Auto-generated method stub
 		return BlockInPerSec;
 	}
 
@@ -22,7 +21,6 @@ public class RecIOStatus implements IOStatus {
 	}
 	@Override
 	public float getBlockOutPerSec() {
-		// TODO Auto-generated method stub
 		return BlockOutPerSec;
 	}
 
@@ -31,7 +29,6 @@ public class RecIOStatus implements IOStatus {
 	}
 	@Override
 	public List<Device> getDevices() {
-		// TODO Auto-generated method stub
 		return Devices;
 	}
 
