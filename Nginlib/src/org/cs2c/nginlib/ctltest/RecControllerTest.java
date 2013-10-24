@@ -1,8 +1,12 @@
-package test;
+package org.cs2c.nginlib.ctltest;
+
+import java.io.File;
+import java.io.IOException;
 
 import org.cs2c.nginlib.AuthInfo;
 import org.cs2c.nginlib.MiddlewareFactory;
 import org.cs2c.nginlib.RecAuthInfo;
+import org.cs2c.nginlib.RemoteException;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -23,39 +27,32 @@ public class RecControllerTest extends TestCase {
 
 	}
 	@Test
-	public void testStart() {
-		fail("Not yet implemented");
+	public void testStart() throws RemoteException {
+		testController.start();
 	}
 
 	@Test
-	public void testShutdown() {
-		fail("Not yet implemented");
+	public void testShutdown() throws RemoteException {
+		testController.shutdown();
 	}
 
 	@Test
-	public void testRestart() {
-		fail("Not yet implemented");
+	public void testRestart() throws RemoteException {
+		testController.restart();
 	}
 
 	@Test
-	public void testReload() {
-		fail("Not yet implemented");
+	public void testReload() throws RemoteException {
+		testController.reload();
 	}
 
 	@Test
-	public void testDeploy() {
-		fail("Not yet implemented");
+	public void testDeploy() throws IOException, RemoteException {
+		File gzFile=new File("d:/Server.zip");
+		testController.deploy(gzFile, "/root/");
 	}
 
-	@Test
-	public void testIsRunning(){
-		//testController.start();
-		//Assert.assertEquals(true, testController.isRunning());
-		//Assert.assertTrue(testController.isRunning());
-		//testController.shutdown();
-		Assert.assertEquals(false, testController.isRunning());
-		//Assert.assertFalse(testController.isRunning());
-	}
+	
 	public void tearDown() throws Exception {
 		super.tearDown();
     }
