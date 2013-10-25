@@ -10,4 +10,5 @@ package org.cs2c.nginlib.monitor;
 public interface MiddlewareStatus {
 	// TODO
 	//find some useful mid-ware status info, and get it!
+
 }
