@@ -14,6 +14,12 @@ import org.cs2c.nginlib.*;
  * @see MiddlewareStatus
  */
 public interface Monitor {
+	
+	String hostname = "127.0.0.1";
+	String username = "root";
+	String password = "qwer1234";
+	String middlewarePath = "/usr/local/nginx";
+	
 	/**
 	 * Remotely fetch the CPU status info, and return a CPUStatus handler by which to get the info already fetched.
 	 * The command can be "vmstat" on the remote host.
@@ -48,4 +54,6 @@ public interface Monitor {
 	 * @throws RemoteException When this remote operation fails for any non-local reason.
 	 * */
 	MiddlewareStatus getMiddlewareStatus() throws RemoteException;
+	
+	NginxStatus getNginxStatus(String nginx_path, String nginx_statuspath, String nginx_username, String nginx_password) throws RemoteException;
 }
