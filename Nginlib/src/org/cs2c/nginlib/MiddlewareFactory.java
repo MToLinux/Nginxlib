@@ -168,4 +168,20 @@ public abstract class MiddlewareFactory {
 		 RecAuthInfo recauthinfo=new RecAuthInfo();
 			return recauthinfo;
 	}
+	static public void main(String[] args){
+		AuthInfo authInfo=MiddlewareFactory.newAuthInfo();
+		authInfo.setHost("10.1.50.4");
+		authInfo.setUsername("git");
+		authInfo.setPassword("qwer1234");
+		try{
+			MiddlewareFactory middleware=MiddlewareFactory.getInstance(authInfo, "/usr/local/nginx/");
+			Monitor monitor=middleware.getMonitor();
+			CPUStatus cpu=monitor.getCPUStatus();
+			int num=cpu.getBlockingNum();
+			System.out.println(num);
+		}
+		catch(Exception e){
+			e.printStackTrace();
+		}
+	}
 }
