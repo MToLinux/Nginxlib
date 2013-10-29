@@ -67,6 +67,7 @@ public abstract class MiddlewareFactory {
 			//if result is empty throw the RemoteException
 			if(!errorResult.isEmpty())
 			{
+				System.out.println("debug location 1");
 				throw new RemoteException(errorResult.toString());
 			}
 			
@@ -79,6 +80,7 @@ public abstract class MiddlewareFactory {
 				errorResult.clear();
 				
 				//get the compile option from the parameter modules
+				/** have no model
 				List<String> optionList=new ArrayList<String>(0) ;
 				for(int i=0;i<modules.size();i++)
 				{
@@ -87,7 +89,10 @@ public abstract class MiddlewareFactory {
 				//optionList.add("--with-"+s1.substring(4)+" --with-"+s2.substring(4));
 				
 				//configure the middleware src
+				
 				cmd="cd "+targetPath+gzFile.getName().substring(0,gzFile.getName().indexOf(".tar.gz"))+" && ./configure --prefix="+targetPath+" "+optionList.toString().substring(optionList.toString().indexOf('[')+1, optionList.toString().indexOf(']'));
+				*/
+				cmd="cd "+targetPath+gzFile.getName().substring(0,gzFile.getName().indexOf(".tar.gz"))+" && ./configure --prefix="+targetPath;
 				recAuthInfo.execCommand(cmd,result,errorResult);
 				//if having error throw the exception
 				if(result.toString().indexOf("configure: error:")==-1)
@@ -97,15 +102,31 @@ public abstract class MiddlewareFactory {
 					result.clear();
 					errorResult.clear();
 					recAuthInfo.execCommand(cmd,result,errorResult);
-					if(result.toString().indexOf("error")==-1)
+					
+					if(result.toString().indexOf("error:")==-1)
 					{
 						if(errorResult.isEmpty())
-							System.out.println("Nginx is installed successfully");
+							System.out.println("Nginx is installed successfully1");
 						else 
+						{
+							
 							throw new RemoteException(errorResult.toString());
+						}
 					}
 					else
-						throw new RemoteException(result.toString());
+					{
+						cmd="cd "+targetPath+"sbin && ls | grep nginx";
+						result.clear();
+						errorResult.clear();
+						recAuthInfo.execCommand(cmd,result,errorResult);
+						if(result.toString().isEmpty())
+							throw new RemoteException(result.toString());
+						else
+							System.out.println("Nginx is installed successfully2");
+						
+					}
+					
+					
 				}
 				else
 				{

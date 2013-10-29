@@ -33,7 +33,7 @@ public class RecAuthInfo implements AuthInfo {
 	private String line;
 	private BufferedReader errorbr;
 	private String errorline;
-
+	
 	@Override
 	public void setHost(String hostName) {
 		// TODO Auto-generated method stub
