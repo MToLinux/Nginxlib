@@ -41,9 +41,9 @@ public class MonitorTest {
 	@Before
 	public void setUp() throws Exception {
 		
-		hostname = "127.0.0.1";
+		hostname = "10.1.50.4";
 		username = "root";
-		password = "qwer1234";
+		password = "cs2csolutions";
 		
 		monitor = new RecMonitor(hostname, username, password);
 		
@@ -220,8 +220,6 @@ public class MonitorTest {
 
 	@Test(timeout=10000)
 	public void testGetMiddlewareStatus() throws RemoteException {
-
-		monitor.getMiddlewareStatus();
 
 	}
 
