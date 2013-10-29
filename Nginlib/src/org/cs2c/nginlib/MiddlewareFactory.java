@@ -25,7 +25,7 @@ public abstract class MiddlewareFactory {
 	 * */
 	static public MiddlewareFactory getInstance(AuthInfo authInfo, String middlewareHome) throws RemoteException{
 		// TODO
-		RecMiddlewareFactory recmiddleware=new RecMiddlewareFactory(authInfo,middlewareHome);
+		RecMiddlewareFactory recmiddleware=new RecMiddlewareFactory(authInfo,pathStrConvert(middlewareHome));
 		return recmiddleware;
 	}
 	/**
@@ -44,6 +44,7 @@ public abstract class MiddlewareFactory {
 	//static public MiddlewareFactory install(AuthInfo authInfo, File gzFile, String targetPath, String s1,String s2) 
 	//		throws IOException, RemoteException{
 		// TODO
+		targetPath=pathStrConvert(targetPath);
 		//result:Used to store the result information of the command execution
 		ArrayList<String> result=new ArrayList<String>(0);	
 		//errorResult:Used to store the error information of the command execution
@@ -183,5 +184,15 @@ public abstract class MiddlewareFactory {
 		catch(Exception e){
 			e.printStackTrace();
 		}
+	}
+	public static String pathStrConvert(String pathstr)
+	{
+		String pathstrend = pathstr;
+		if(pathstr.charAt(pathstr.length()-1) != '/')
+		{
+			pathstrend=pathstr+"/";
+		}
+		System.out.println(pathstrend);
+		return pathstrend;
 	}
 }

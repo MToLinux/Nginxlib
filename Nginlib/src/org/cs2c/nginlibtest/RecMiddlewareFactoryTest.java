@@ -39,7 +39,7 @@ public class RecMiddlewareFactoryTest extends TestCase {
 		authInfo.setUsername("root");
 		authInfo.setPassword("cs2csolutions");
 		
-		instance = MiddlewareFactory.getInstance(authInfo, "/usr/local/nginx/");
+		instance = MiddlewareFactory.getInstance(authInfo, "/usr/local/nginx");
 		
 	}
 
@@ -51,23 +51,23 @@ public class RecMiddlewareFactoryTest extends TestCase {
 	@SuppressWarnings("deprecation")
 	@Test
 	public void testGetController() {
-		Controller reccontroller=new RecController(authInfo, "/usr/local/nginx/");
-		reccontroller=instance.getController();
-		Assert.assertNotNull(reccontroller);
+		Controller rcontroller=new RecController(authInfo, "/usr/local/nginx");
+		rcontroller=instance.getController();
+		Assert.assertNotNull(rcontroller);
 	}
 
 	@Test
 	public void testGetConfigurator() {
-		Configurator recconfigurator=new RecConfigurator(authInfo,"/usr/local/nginx/");
-		recconfigurator=instance.getConfigurator();
-		Assert.assertNotNull(recconfigurator);
+		Configurator rconfigurator=new RecConfigurator(authInfo,"/usr/local/nginx");
+		rconfigurator=instance.getConfigurator();
+		Assert.assertNotNull(rconfigurator);
 	}
 
 	@Test
 	public void testGetMonitor() {
-	//	Monitor recmonitor=new RecMonitor(authInfo);
-	//	recmonitor=instance.getMonitor()();
-	//	Assert.assertNotNull(recmonitor);
+		RecMonitor rmonitor=new RecMonitor(authInfo,"/usr/local/nginx");
+		rmonitor=(RecMonitor)instance.getMonitor();
+		Assert.assertNotNull(rmonitor);
 	}
 
 
@@ -75,7 +75,7 @@ public class RecMiddlewareFactoryTest extends TestCase {
 	
 	@Test
 	public void testGetInstance() throws RemoteException  {
-		Assert.assertNotNull(instance.getInstance(authInfo, "/usr/local/nginx/"));
+		Assert.assertNotNull(instance.getInstance(authInfo, "/usr/local/nginx"));
 
 	}
 

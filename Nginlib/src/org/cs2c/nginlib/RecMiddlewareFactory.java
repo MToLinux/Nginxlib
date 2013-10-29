@@ -24,7 +24,7 @@ public class RecMiddlewareFactory extends MiddlewareFactory{
 	public  RecMiddlewareFactory(AuthInfo authInfo, String middlewareHome)
 	{
 		this.authInfo=(RecAuthInfo)authInfo;
-		this.midwarePath=middlewareHome;	
+		this.midwarePath=pathStrConvert(middlewareHome);	
 	}
 	
 	@Override
@@ -43,9 +43,10 @@ public class RecMiddlewareFactory extends MiddlewareFactory{
 	@Override
 	public Monitor getMonitor() {
 		// TODO Auto-generated method stub
-		//monitor=new RecMonitor(authInfo);
-		//return this.monitor;
-		return null;
+		monitor=new RecMonitor(authInfo,midwarePath);
+		return monitor;
+		
 	}
+
 
 }
