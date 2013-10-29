@@ -46,7 +46,9 @@ public class RecRemoteOperator implements RemoteOperator{
 	public void append(Element element, String outerBlockNames)
 			throws RemoteException {
 		
-	    CheckOuterBlockNames(outerBlockNames);
+	    if(CheckOuterBlockNames(outerBlockNames)){
+	    	throw new RemoteException("outerBlockNames is not correct,outerBlockNames ="+outerBlockNames);
+	    }
 	    if((null == element.toString()) || ("" == element.toString())){
 	    	return;
 	    }
@@ -71,31 +73,40 @@ public class RecRemoteOperator implements RemoteOperator{
 	@Override
 	public void delete(Element element, String outerBlockNames)
 			throws RemoteException {
-	    
-	    if(CheckOuterBlockNames(outerBlockNames)){
-	    	throw new RemoteException("outerBlockNames is not correct,outerBlockNames ="+outerBlockNames);
-	    }
 	    if((null == element.toString()) || ("" == element.toString())){
 	    	return;
 	    }
 	    
-	    //If there is no index in outerBlockNames, default the first block.
-	    if(!outerBlockNames.contains(":")){
-	    	outerBlockNames += ":0";
+	    // outerBlockNames is "" search all conf
+	    if("".equals(outerBlockNames.trim())){
+	    	confText = ReadConf();
+			String editconfText = BlockDeleteElement(confText,element);
+			// write to local conf file
+			WriteConf(editconfText);
 	    }
-
-	    HashMap<String,String> objHashMap=EditCommon(outerBlockNames);
-	    String BlockText = objHashMap.get("blocktext");
-	    int BlockLength = Integer.parseInt(objHashMap.get("blocklength"));
-	    int nblockNameNum = Integer.parseInt(objHashMap.get("nblocknamenum"));
-
-		String editBlockText = BlockDeleteElement(BlockText,element);
-		
-		String newConfText = GetPreBlockText(confText,nblockNameNum)+editBlockText
-				+GetSufBlockText(confText,nblockNameNum+BlockLength);
-
-		// write to local conf file
-		WriteConf(newConfText);
+	    else{
+		    if(CheckOuterBlockNames(outerBlockNames)){
+		    	throw new RemoteException("outerBlockNames is not correct,outerBlockNames ="+outerBlockNames);
+		    }
+		    
+		    //If there is no index in outerBlockNames, default the first block.
+		    if(!outerBlockNames.contains(":")){
+		    	outerBlockNames += ":0";
+		    }
+	
+		    HashMap<String,String> objHashMap=EditCommon(outerBlockNames);
+		    String BlockText = objHashMap.get("blocktext");
+		    int BlockLength = Integer.parseInt(objHashMap.get("blocklength"));
+		    int nblockNameNum = Integer.parseInt(objHashMap.get("nblocknamenum"));
+	
+			String editBlockText = BlockDeleteElement(BlockText,element);
+			
+			String newConfText = GetPreBlockText(confText,nblockNameNum)+editBlockText
+					+GetSufBlockText(confText,nblockNameNum+BlockLength);
+	
+			// write to local conf file
+			WriteConf(newConfText);
+	    }
 	}
 	
 	/**
@@ -271,6 +282,9 @@ public class RecRemoteOperator implements RemoteOperator{
 	    
 		if("".equals(outerBlockNames.trim())){
 			// when outerBlockNames is "" ,search all nginx.conf file.
+			if((null==confText) ||(""==confText) ){
+				confText = ReadConf();				
+			}
 			BlockText = confText;
 		}
 		else{
@@ -375,7 +389,7 @@ public class RecRemoteOperator implements RemoteOperator{
 	 * */
 	public void GetRemoteConf(String remoteFile) throws IOException
 	{
-		String localTargetDirectory = "D:\\eclipseWorkspace\\confpath";
+		String localTargetDirectory = "D:\\confpath";
 
 		Connection conn = new Connection(this.creauthInfo.getHostname());
 		/* Now connect */

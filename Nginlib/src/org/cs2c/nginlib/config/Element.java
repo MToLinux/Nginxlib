@@ -3,6 +3,8 @@
  */
 package org.cs2c.nginlib.config;
 
+import org.cs2c.nginlib.RemoteException;
+
 /**
  * @author Mikes
  * <P/>Element represents a part of nginx's configuration file. There are two kinds of Element: Block and Directive.
@@ -33,5 +35,5 @@ public interface Element extends Cloneable {
 	 * Override Cloneable.clone(). The method need to be implemented using a deep copy.
 	 * @return the cloned instance with a deep copy.
 	 * */
-	Element clone();
+	Element clone() throws CloneNotSupportedException;
 }

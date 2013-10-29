@@ -22,7 +22,7 @@ public class RecBlock implements Block,Element {
 	private String confText = null;
 	
 	List<Block> listGetBlocks = new ArrayList<Block>();
-	private Map<String,String> IhbMap=new IdentityHashMap<String,String>();
+//	private Map<String,String> IhbMap=new IdentityHashMap<String,String>();
     
 	@Override
 	public void setName(String name) {
@@ -82,10 +82,11 @@ public class RecBlock implements Block,Element {
 	@Override
 	public void addBlock(Block block) {
 		StringBuilder sb = new StringBuilder();
-		String bltext = blockValue.substring(0, blockValue.length()-1);
+		String bltext = blockValue.substring(0, blockValue.length()-2);
+		String blEndtext = blockValue.substring(blockValue.length()-2, blockValue.length()-1);
 		sb.append(bltext + "\n");
 		sb.append(block.toString());
-		sb.append("}");
+		sb.append(blEndtext);
 		// set blockValue
 		SetBlockText(sb.toString());
 	}
@@ -93,25 +94,19 @@ public class RecBlock implements Block,Element {
 	@Override
 	public void addDirective(Directive directive) {
 		StringBuilder sb = new StringBuilder();
-		String bltext = blockValue.substring(0, blockValue.length()-1);
+		String bltext = blockValue.substring(0, blockValue.length()-2);
+		String blEndtext = blockValue.substring(blockValue.length()-2, blockValue.length()-1);
 		sb.append(bltext + "\n");
-		sb.append(directive.toString());
-		sb.append("}");
+		sb.append(directive.toString()+ "\n");
+		sb.append(blEndtext);
 		// set blockValue
 		SetBlockText(sb.toString());
 	}
 	
 	@Override
-	public Element clone(){
-		Element obj=null;
-		try{
-			obj=(Element)super.clone();
-		}
-		catch (CloneNotSupportedException ex) {
-			ex.printStackTrace(); 
-		}
-		//obj.setBegin((Date)this.getBegin().clone());
-		// TODO test
+	public Element clone() throws CloneNotSupportedException{
+		RecBlock obj = null;
+		obj=(RecBlock) super.clone();
 		return obj;
 	}
 	
@@ -134,8 +129,9 @@ public class RecBlock implements Block,Element {
 	}
 	
 	/**
-	 * Get Block Text which Block Name is gBlockName.
-	 * @return Block text.
+	 * Get Block Text which Block Name is gBlockName.before GetBlockText you must set conf text.
+	 * @param gBlockName Block name to be search.
+	 * @return make sure StartLine's value > 0.
 	 * */
 	public String GetBlockText(String gBlockName,int StartLine) {
 		String blText = null;
@@ -231,35 +227,72 @@ public class RecBlock implements Block,Element {
 				
 					if((null != blname) && (nblockstart!=0) && (nblockstart == nblockEnd)){
 						blText = sb.toString();
-						IhbMap.put(new String(blname), blText);
-						//System.out.println("blname:" + blname + "   blText:" + blText);
+			            RecBlock objblock = new RecBlock();
+			    		// get name
+			    		objblock.setName(blname);
+			    		objblock.SetBlockText(blText);
+			    		listGetBlocks.add(objblock);
+//						IhbMap.put(new String(blname), blText);
+//						System.out.println("blname:" + blname + "   blText:" + blText+"\n");
 						// close one block text,loop next.
 						bBlock = false;
 						blname = null;
 						sb.delete(0, sb.length());
+						
+						//递归SubBlock
+						String blockcontent = GetBlockContent(blText);
+			    		if(hasSubBlock(blockcontent)){
+			    			GetSubBlocks(blockcontent);//递归
+			    		}
 					}
 				}
 			}
-			
-			//Iterator iter = hbMap.entrySet().iterator();
-		    for (Entry<String, String> entry : IhbMap.entrySet()) {
-	            System.out.println("Key:" + entry.getKey() + "value:" + entry.getValue().toString());
-	            RecBlock objblock = new RecBlock();
-	    		// get name
-	    		objblock.setName(entry.getKey());
-	    		objblock.SetBlockText(entry.getValue());
-	    		listGetBlocks.add(objblock);
-	    		
-	    		if(hasSubBlock(entry.getValue())){
-	    			GetSubBlocks(entry.getValue());//递归
-	    		}
-	        }
 
 		} catch (IOException e) {
 			throw new RemoteException(e.getMessage());
 		}
 	}
 	
+	private String GetBlockContent(String blText) throws IOException {
+		String linetxt = null;
+		int nBlockRowCount = 0;
+		int nBlockRowLength = 0;
+	    StringBuilder sb = new StringBuilder();
+	    
+	    BufferedReader br = new BufferedReader(new StringReader(blText));
+	    
+		nBlockRowLength = GetBlockLenth(blText);
+		
+		while( (linetxt = br.readLine()) != null) {
+			nBlockRowCount++;
+			if(1 == nBlockRowCount){
+				continue;
+			}
+			if(nBlockRowLength == nBlockRowCount){
+				continue;
+			}
+
+		    sb.append(linetxt + "\n");
+		}
+		return sb.toString();
+	}
+	
+	private int GetBlockLenth(String BlockText) {
+	    int nBlockLineCount = 0;
+
+		try {
+		    BufferedReader br = new BufferedReader(new StringReader(BlockText));
+		    
+			while( br.readLine() != null) {
+				nBlockLineCount++;
+			}
+
+			return nBlockLineCount;
+		} catch (IOException e) {
+			e.printStackTrace();
+			return 0;
+		}
+	}
 	private boolean hasSubBlock(String value) throws IOException {
 		String linetxt = null;
 		int nBlockNameCount = 0;
@@ -271,7 +304,7 @@ public class RecBlock implements Block,Element {
 			}
 		}
 		
-		if(nBlockNameCount >= 2){
+		if(nBlockNameCount >= 1){
 			return true;
 		}else{
 			return false;
@@ -379,18 +412,19 @@ public class RecBlock implements Block,Element {
 	 * */
 	public List<Block> getBlocks(String gBblockName) throws RemoteException{
 		GetSubBlock();
+		List<Block> listBlWithBName = new ArrayList<Block>();
 		
-	    for (Entry<String, String> entry : IhbMap.entrySet()) {
-//            System.out.println("Key:" + entry.getKey() + "value:" + entry.getValue().toString());
+	    for (int i = 0;i<listGetBlocks.size();i++) {
             RecBlock objblock = new RecBlock();
+            
     		// get name
-            if(gBblockName.equals(entry.getKey())){
-	    		objblock.setName(entry.getKey());
-	    		objblock.SetBlockText(entry.getValue());
-	    		listGetBlocks.add(objblock);
+            if(gBblockName.equals(listGetBlocks.get(i).getName())){
+	    		objblock = (RecBlock) listGetBlocks.get(i);
+//	            System.out.println("objblock:" + objblock);
+	            listBlWithBName.add(objblock);
             }
 	    }
-		return listGetBlocks;
+		return listBlWithBName;
 	}
 
 }

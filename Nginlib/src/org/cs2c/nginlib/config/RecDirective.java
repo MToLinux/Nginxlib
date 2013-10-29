@@ -64,16 +64,9 @@ public class RecDirective implements Directive,Element{
 	}
 	
 	@Override
-	public Element clone(){
-		Element obj=null;
-		try{
-			obj=(Element)super.clone();
-		}
-		catch (CloneNotSupportedException ex) {
-			ex.printStackTrace(); 
-		}
-		//obj.setBegin((Date)this.getBegin().clone());
-		// TODO
+	public Element clone() throws CloneNotSupportedException{
+		RecDirective obj=null;
+		obj=(RecDirective) super.clone();
 		return obj;
 	}
 
