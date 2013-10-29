@@ -641,12 +641,6 @@ public class RecMonitor implements Monitor {
 			throw new RemoteException(e.getMessage());
 		}
 	}
-
-	@Override
-	public MiddlewareStatus getMiddlewareStatus() throws RemoteException {
-		RecMiddlewareStatus mwstat = new RecMiddlewareStatus();
-		return mwstat;
-	}
 	
 	@Override
 	public NginxStatus getNginxStatus(String nginx_path, String nginx_statuspath, String nginx_username, String nginx_password) throws RemoteException {
