@@ -23,6 +23,7 @@ public class RecMonitor implements Monitor {
 	private int port = 22;
 	private Connection conn = null;
 	private Session sess = null;
+	private String nginxpath = "/usr/local/nginx/";
 	
 	/* Constructor */
 	public RecMonitor()
@@ -31,6 +32,7 @@ public class RecMonitor implements Monitor {
 		this.username = "root";
 		this.password = "qwer1234";
 		this.port = 22;
+		this.nginxpath = "/usr/local/nginx/";
 	}
 	public RecMonitor(String hostname)
 	{
@@ -38,6 +40,7 @@ public class RecMonitor implements Monitor {
 		this.username = "root";
 		this.password = "qwer1234";
 		this.port = 22;
+		this.nginxpath = "/usr/local/nginx/";
 	}
 	public RecMonitor(String hostname, String username, String password)
 	{
@@ -45,6 +48,7 @@ public class RecMonitor implements Monitor {
 		this.username = username;
 		this.password = password;
 		this.port = 22;
+		this.nginxpath = "/usr/local/nginx/";
 	}
 	public RecMonitor(String hostname, String username, String password, int port)
 	{
@@ -52,13 +56,31 @@ public class RecMonitor implements Monitor {
 		this.username = username;
 		this.password = password;
 		this.port = port;
+		this.nginxpath = "/usr/local/nginx/";
 	}
-	public RecMonitor(RecAuthInfo ainfo)
+	public RecMonitor(String hostname, String username, String password, String nginxpath)
+	{
+		this.hostname = hostname;
+		this.username = username;
+		this.password = password;
+		this.port = 22;
+		this.nginxpath = nginxpath;
+	}
+	public RecMonitor(String hostname, String username, String password, int port, String nginxpath)
+	{
+		this.hostname = hostname;
+		this.username = username;
+		this.password = password;
+		this.port = port;
+		this.nginxpath = nginxpath;
+	}
+	public RecMonitor(RecAuthInfo ainfo, String nginxpath)
 	{
 		this.hostname = ainfo.getHostname();
 		this.username = ainfo.getUsername();
 		this.password = ainfo.getPassword();
 		this.port = 22;
+		this.nginxpath = nginxpath;
 	}
 	
 	public String getHostname()
@@ -651,8 +673,8 @@ public class RecMonitor implements Monitor {
 	}
 	
 	@Override
-	public NginxStatus getNginxStatus(String nginx_path, String nginx_statuspath, String nginx_username, String nginx_password) throws RemoteException {
-		RecNginxStatus ngsta = new RecNginxStatus(nginx_path, nginx_statuspath, nginx_username, nginx_password);
+	public NginxStatus getNginxStatus(/*String nginx_path, */String nginx_statuspath, String nginx_username, String nginx_password) throws RemoteException {
+		RecNginxStatus ngsta = new RecNginxStatus(this.nginxpath, nginx_statuspath, nginx_username, nginx_password);
 		try
 		{
 			String nginxStatusCommond = "GET http://" + getHostname() +  "/" + ngsta.getNginxStatusPath();
@@ -871,7 +893,7 @@ public class RecMonitor implements Monitor {
 			/* Execute a command: nginx -V */
 			closeSession();
 			establishSession();
-			String ngpath = ngsta.getNginxPath();
+			String ngpath = ngsta.getNginxPath(); //String ngpath = this.nginxpath;
 			String ngVcm = null;
 			if(ngpath.charAt(ngpath.length()-1) == '/')
 			{

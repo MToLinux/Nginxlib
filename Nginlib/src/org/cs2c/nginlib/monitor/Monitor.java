@@ -11,14 +11,14 @@ import org.cs2c.nginlib.*;
  * @see IOStatus
  * @see NetworkStatus
  * @see MemoryStatus
- * @see MiddlewareStatus
+ * @see MiddlewareStatus(NginxStatus)
  */
 public interface Monitor {
 	
 	String hostname = "127.0.0.1";
 	String username = "root";
 	String password = "qwer1234";
-	String middlewarePath = "/usr/local/nginx";
+	String nginxpath = "/usr/local/nginx/";
 	
 	/**
 	 * Remotely fetch the CPU status info, and return a CPUStatus handler by which to get the info already fetched.
@@ -48,11 +48,11 @@ public interface Monitor {
 	 * @throws RemoteException When this remote operation fails for any non-local reason.
 	 * */
 	MemoryStatus getMemoryStatus() throws RemoteException;
+	
 	/**
-	 * Remotely fetch the mid-ware status info, and return a MiddlewareStatus handler by which to get the info already fetched.
-	 * @return A MiddlewareStatus handler by which to get the info already fetched.
+	 * Remotely fetch the mid-ware(nginx) status info, and return a MiddlewareStatus(NginxStatus) handler by which to get the info already fetched.
+	 * @return A MiddlewareStatus(NginxStatus) handler by which to get the info already fetched.
 	 * @throws RemoteException When this remote operation fails for any non-local reason.
 	 * */
-	
-	NginxStatus getNginxStatus(String nginx_path, String nginx_statuspath, String nginx_username, String nginx_password) throws RemoteException;
+	NginxStatus getNginxStatus(String nginx_statuspath, String nginx_username, String nginx_password) throws RemoteException;
 }
