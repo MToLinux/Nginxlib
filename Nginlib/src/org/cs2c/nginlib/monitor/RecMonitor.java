@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.cs2c.nginlib.RecAuthInfo;
 import org.cs2c.nginlib.RemoteException;
 import org.cs2c.nginlib.monitor.RecCPUStatus;
 
@@ -51,6 +52,13 @@ public class RecMonitor implements Monitor {
 		this.username = username;
 		this.password = password;
 		this.port = port;
+	}
+	public RecMonitor(RecAuthInfo ainfo)
+	{
+		this.hostname = ainfo.getHostname();
+		this.username = ainfo.getUsername();
+		this.password = ainfo.getPassword();
+		this.port = 22;
 	}
 	
 	public String getHostname()
