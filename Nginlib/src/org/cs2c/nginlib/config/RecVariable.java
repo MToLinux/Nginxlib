@@ -15,6 +15,11 @@ public class RecVariable implements Variable,Parameter {
 	
 	@Override
 	public String toString(){
-		return "$"+VariableName;
+		if(null == VariableName)
+		{
+			return null;
+		}else{
+			return "$"+VariableName;
+		}
 	}
 }

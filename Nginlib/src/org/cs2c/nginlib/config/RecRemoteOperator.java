@@ -38,6 +38,7 @@ public class RecRemoteOperator implements RemoteOperator{
 		this.remoteTargetDirectory=midwarePath;
 	}
 	
+	//Set local Confpath With full Name
 	public void SetConfpathWithName(String PathWithName){
 		confPathWithName = PathWithName;
 	}
@@ -80,6 +81,7 @@ public class RecRemoteOperator implements RemoteOperator{
 	    // outerBlockNames is "" search all conf
 	    if("".equals(outerBlockNames.trim())){
 	    	confText = ReadConf();
+	    	//confText not contains element, return @
 			String editconfText = BlockDeleteElement(confText,element);
 			// write to local conf file
 			WriteConf(editconfText);
@@ -99,7 +101,8 @@ public class RecRemoteOperator implements RemoteOperator{
 		    int BlockLength = Integer.parseInt(objHashMap.get("blocklength"));
 		    int nblockNameNum = Integer.parseInt(objHashMap.get("nblocknamenum"));
 	
-			String editBlockText = BlockDeleteElement(BlockText,element);
+	    	//BlockText not contains element, return @
+		    String editBlockText = BlockDeleteElement(BlockText,element);
 			
 			String newConfText = GetPreBlockText(confText,nblockNameNum)+editBlockText
 					+GetSufBlockText(confText,nblockNameNum+BlockLength);
@@ -163,26 +166,34 @@ public class RecRemoteOperator implements RemoteOperator{
 	    String BlockText = objHashMap.get("blocktext");
 	    int BlockLength = Integer.parseInt(objHashMap.get("blocklength"));
 	    int nblockNameNum = Integer.parseInt(objHashMap.get("nblocknamenum"));
-
+	    
 		String editBlockText = BlockInsertAfter(BlockText,BlockLength,element,after);
 		
 		String newConfText = GetPreBlockText(confText,nblockNameNum)+editBlockText
 				+GetSufBlockText(confText,nblockNameNum+BlockLength);
-
+		
+//		System.out.println(editBlockText);
 		// write to local conf file
 		WriteConf(newConfText);
 	}
 	
+	// 把 after 放于BlockText的子元素element之后，
 	private String BlockInsertAfter(String BlockText,int BlockLength,Element element, Element after) throws RemoteException {
 	    StringBuilder sbtext = new StringBuilder();
 	    
 		//找到第一个符合的element文本位置
 		int nelementLocation = BlockText.indexOf(element.toString());
-		sbtext.append(GetPreBlockText(BlockText,nelementLocation));
+		if(-1 == nelementLocation){
+			// 无符合的位置（无子元素element时）。
+			return BlockText;
+		}
+		
+		sbtext.append(BlockText.substring(0, nelementLocation));
 		sbtext.append(element.toString());
+//		sbtext.append("\n");
 		sbtext.append(after.toString());
-		sbtext.append(GetSufBlockText(BlockText,nelementLocation+BlockLength));
-
+		sbtext.append("\n");
+		sbtext.append(BlockText.substring(nelementLocation+element.toString().length()));
 		return sbtext.toString();
 	}
 	
@@ -387,17 +398,21 @@ public class RecRemoteOperator implements RemoteOperator{
 	 * Get the nginx.conf file which nginx.conf fullpath is parameter remoteFile.
 	 * @throws IOException 
 	 * */
-	public void GetRemoteConf(String remoteFile) throws IOException
+	public void GetRemoteConf(String remoteFile) throws RemoteException, IOException
 	{
-		String localTargetDirectory = "D:\\confpath";
-
+        if(null == confPathWithName || "" == confPathWithName){
+        	throw new RemoteException("local confPathWithName is not correct.please set SetConfpathWithName()");
+        }
+		String localTargetDirectory = confPathWithName.substring(0,
+				confPathWithName.lastIndexOf(File.separator));
+		
 		Connection conn = new Connection(this.creauthInfo.getHostname());
 		/* Now connect */
 		conn.connect();
 		boolean isAuthenticated = conn.authenticateWithPassword(
 				this.creauthInfo.getUsername(), this.creauthInfo.getPassword());
 		if (isAuthenticated == false)
-			throw new IOException("Authentication failed.");
+			throw new RemoteException("Authentication failed.");
 		
 		SCPClient scpc=conn.createSCPClient();
 		
@@ -408,8 +423,13 @@ public class RecRemoteOperator implements RemoteOperator{
 	
 	/**
 	 * Write the Remote nginx.conf file which is select.
+	 * @throws RemoteException 
 	 * */
-	public void WriteRemoteConf() throws IOException{
+	public void WriteRemoteConf() throws IOException, RemoteException{
+        if(null == confPathWithName || "" == confPathWithName){
+        	throw new RemoteException("local confPathWithName is not correct.please set SetConfpathWithName()");
+        }
+        
 		Connection conn = new Connection(this.creauthInfo.getHostname());
 		/* Now connect */
 		conn.connect();
@@ -419,9 +439,7 @@ public class RecRemoteOperator implements RemoteOperator{
 			throw new IOException("Authentication failed.");
 		
 		SCPClient scpc=conn.createSCPClient();
-//		Session sess = conn.openSession();
-		
-		System.out.println("Here is some information about the remote host:");
+//		Session sess = conn.openSession();		
 		
 		String localFile = confPathWithName;
 		scpc.put(localFile, remoteTargetDirectory);

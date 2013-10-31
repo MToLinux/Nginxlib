@@ -39,6 +39,8 @@ public class RecDirective implements Directive,Element{
 				RecVariable objVariable = new RecVariable();
 				objVariable.setName(lineArray[i].substring(1, lineArray[i].length()-1));
 				listParam.add(objVariable);
+			}else if(lineArray[i].length() == 0){
+
 			}else{
 				RecStringParameter objStringParameter = new RecStringParameter();
 				objStringParameter.setValue(lineArray[i]);
@@ -57,9 +59,9 @@ public class RecDirective implements Directive,Element{
 	@Override
 	public void addParameter(Parameter parameter) {
 		StringBuilder sb = new StringBuilder();
-		sb.append(directiveValue.substring(0, directiveValue.length()-1));
+		sb.append(directiveValue.substring(0, directiveValue.length()-1)+" ");
 		sb.append(parameter.toString());
-		sb.append(";");
+		sb.append(directiveValue.substring(directiveValue.length()-1, directiveValue.length()));
 		directiveValue = sb.toString();
 	}
 	

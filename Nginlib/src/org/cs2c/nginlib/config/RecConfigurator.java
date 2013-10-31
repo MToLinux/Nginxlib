@@ -1,12 +1,6 @@
 package org.cs2c.nginlib.config;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.List;
-
-import com.trilead.ssh2.Connection;
-import com.trilead.ssh2.SCPClient;
-import com.trilead.ssh2.Session;
 
 import org.cs2c.nginlib.RemoteException;
 import org.cs2c.nginlib.AuthInfo;
@@ -28,6 +22,11 @@ public class RecConfigurator implements Configurator {
 		this.remoteTargetDirectory=midwarePath;
 	}
 	
+	//set local Conf File With full Name.
+	/**
+	 * Set the name of the local Conf File.
+	 * @param PathWithName : Path With full nginx.conf Name.
+	 * */
 	public void SetConfpathWithName(String PathWithName){
 		confPathWithName = PathWithName;
 	}

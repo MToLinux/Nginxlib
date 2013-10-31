@@ -1,4 +1,4 @@
-package org.cs2c.nginlib.Junit;
+package org.cs2c.nginlib.configtest;
 
 import static org.junit.Assert.*;
 

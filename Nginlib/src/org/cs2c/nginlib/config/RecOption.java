@@ -28,6 +28,11 @@ public class RecOption implements Option,Parameter {
 	
 	@Override
 	public String toString(){
-		return optionName +"="+optionValue;
+		if((null == optionName)&&(null == optionValue))
+		{
+			return null;
+		}else{
+			return optionName +"="+optionValue;
+		}
 	}
 }
