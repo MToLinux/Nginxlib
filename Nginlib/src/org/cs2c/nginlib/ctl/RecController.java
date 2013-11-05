@@ -2,6 +2,7 @@ package org.cs2c.nginlib.ctl;
 
 import com.trilead.ssh2.Connection;
 import com.trilead.ssh2.SCPClient;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -26,7 +27,7 @@ public class RecController implements Controller {
 	/** Construct a RecController with specified properties */
 	public RecController(RecAuthInfo reauthInfo, String midwarePath) {
 		this.reauthInfo = reauthInfo;
-		this.midwarePath = midwarePath;
+		this.midwarePath = pathStrConvert(midwarePath);
 		this.confFile = "nginx.conf";
 		this.serverName = "nginx";
 	}
@@ -35,7 +36,7 @@ public class RecController implements Controller {
 	public RecController(RecAuthInfo reauthInfo, String midwarePath,
 			String serverName, String confFile) {
 		this.reauthInfo = reauthInfo;
-		this.midwarePath = midwarePath;
+		this.midwarePath = pathStrConvert(midwarePath);
 		this.confFile = confFile;
 		this.serverName = serverName;
 	}
@@ -46,12 +47,12 @@ public class RecController implements Controller {
 		// determine the configure file is existed or not
 		
 		if (isExistedFile(midwarePath + "conf", confFile) == false) {
-			flag=1;
+			
 			throw new RemoteException("There is no " + confFile);
 		}
 		// determine the server is running or not
 		if (isRunning() == true) {
-			flag=2;
+			
 			throw new RemoteException("The " + serverName
 					+ " is running already. ");
 		}
@@ -73,18 +74,18 @@ public class RecController implements Controller {
 		if (result.isEmpty()) {
 			if (!errorResult.isEmpty())
 			{
-				flag=3;
+				
 				throw new RemoteException(errorResult.toString());
 			}
 			else
 			{
-				flag=4;
+				
 				System.out.println("The Nginx start successfully");
 			}
 		} 
 		else
 		{
-			flag=5;
+			
 			System.out.println(result.toString());
 		}
 	}
@@ -169,34 +170,45 @@ public class RecController implements Controller {
 	public void deploy(File zipFile, String targetPath) throws IOException,
 			RemoteException {
 		// TODO Auto-generated method stub
-
+		targetPath=pathStrConvert(targetPath);
 		ArrayList<String> result = new ArrayList<String>(0);
 		ArrayList<String> errorResult = new ArrayList<String>(0);
 
 		// copy the local file zipFile to targetPath of remote host
 		if (this.scopy(zipFile, targetPath) == true) {
-			if (reDirName(
+			
+			System.out.println(targetPath+zipFile.getName().substring(0,
+					zipFile.getName().toString().indexOf(".zip")));
+			if(isExistedDirectory(targetPath,zipFile.getName().substring(0,
+					zipFile.getName().toString().indexOf(".zip"))))
+			{
+				
+				if (reDirName(
 					targetPath,
 					zipFile.getName().substring(0,
 							zipFile.getName().toString().indexOf(".zip")),
-					"_bak") == true) {
-				// unzip the zipFile in the remote host
-				this.reauthInfo.execCommand(
-						"unzip -q " + targetPath + zipFile.getName(), result,
-						errorResult);
-				if (result.isEmpty() && errorResult.isEmpty()) {
-					System.out.println("Unzip successfully!");
-				} else {
+					"_bak") == false) 
+				{
 					throw new RemoteException(errorResult.toString());
 				}
-
-				if (deleteFile(targetPath, zipFile.getName()) == false) {
+			}
+			// unzip the zipFile in the remote host
+			this.reauthInfo.execCommand(
+						"unzip -q " + targetPath + zipFile.getName(), result,
+						errorResult);
+			System.out.println("unzip -q " + targetPath + zipFile.getName());
+			
+			if (result.isEmpty() && errorResult.isEmpty()) 
+			{
+					System.out.println("Unzip successfully!");
+					if (deleteFile(targetPath, zipFile.getName()) == false) {
 					throw new RemoteException("zipFile deleted failed.");
-				} else
+					} else
 					System.out.println("zipFile deleted successfully!");
 			} else
-				throw new RemoteException("Rename failed");
-		}
+				throw new RemoteException("unzip failed");
+			}
+		
 
 	}
 
@@ -216,7 +228,7 @@ public class RecController implements Controller {
 	public boolean scopy(File zipFile, String targetPath) throws IOException,
 			RemoteException {
 		String zipFileName = zipFile.toString();
-
+		targetPath=pathStrConvert(targetPath);
 		Connection conn = new Connection(this.reauthInfo.getHostname());
 		/* Now connect */
 		conn.connect();
@@ -359,4 +371,16 @@ public class RecController implements Controller {
 		} else
 			return false;
 	}
+	
+	public String pathStrConvert(String pathstr)
+	{
+		String pathstrend = pathstr;
+		if(pathstr.charAt(pathstr.length()-1) != '/')
+		{
+			pathstrend=pathstr+"/";
+		}
+		System.out.println(pathstrend);
+		return pathstrend;
+	}
 }
+

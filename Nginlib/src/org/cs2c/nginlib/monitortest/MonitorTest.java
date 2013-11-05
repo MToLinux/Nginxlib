@@ -29,6 +29,8 @@ public class MonitorTest {
 	String hostname = "127.0.0.1";
 	String username = "root";
 	String password = "qwer1234";
+	int port = 22;
+	String nginxpath = "/usr/local/nginx/";
 
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
@@ -41,12 +43,13 @@ public class MonitorTest {
 	@Before
 	public void setUp() throws Exception {
 		
-		hostname = "127.0.0.1";
+		hostname = "10.1.50.4";
 		username = "root";
-		password = "qwer1234";
+		password = "cs2csolutions";
+		port = 22;
+		nginxpath = "/usr/local/nginx/";
 		
-		monitor = new RecMonitor(hostname, username, password);
-		
+		monitor = new RecMonitor(hostname, username, password, port, nginxpath);
 	}
 
 	@After
@@ -221,14 +224,12 @@ public class MonitorTest {
 	@Test(timeout=10000)
 	public void testGetMiddlewareStatus() throws RemoteException {
 
-		monitor.getMiddlewareStatus();
-
 	}
 
 	@Test(timeout=10000)
 	public void testGetNginxStatus() throws RemoteException {
 		
-		NginxStatus ngstat = monitor.getNginxStatus(null, null, null, null);
+		NginxStatus ngstat = monitor.getNginxStatus(null, null, null);
 		
 		assertTrue(ngstat.getActiveConnections() >= 0);
 		assertTrue(ngstat.getServerAccepts() >= 0);

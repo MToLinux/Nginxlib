@@ -25,7 +25,7 @@ public abstract class MiddlewareFactory {
 	 * */
 	static public MiddlewareFactory getInstance(AuthInfo authInfo, String middlewareHome) throws RemoteException{
 		// TODO
-		RecMiddlewareFactory recmiddleware=new RecMiddlewareFactory(authInfo,middlewareHome);
+		RecMiddlewareFactory recmiddleware=new RecMiddlewareFactory(authInfo,pathStrConvert(middlewareHome));
 		return recmiddleware;
 	}
 	/**
@@ -44,6 +44,7 @@ public abstract class MiddlewareFactory {
 	//static public MiddlewareFactory install(AuthInfo authInfo, File gzFile, String targetPath, String s1,String s2) 
 	//		throws IOException, RemoteException{
 		// TODO
+		targetPath=pathStrConvert(targetPath);
 		//result:Used to store the result information of the command execution
 		ArrayList<String> result=new ArrayList<String>(0);	
 		//errorResult:Used to store the error information of the command execution
@@ -67,6 +68,7 @@ public abstract class MiddlewareFactory {
 			//if result is empty throw the RemoteException
 			if(!errorResult.isEmpty())
 			{
+				System.out.println("debug location 1");
 				throw new RemoteException(errorResult.toString());
 			}
 			
@@ -79,6 +81,7 @@ public abstract class MiddlewareFactory {
 				errorResult.clear();
 				
 				//get the compile option from the parameter modules
+				/** have no model
 				List<String> optionList=new ArrayList<String>(0) ;
 				for(int i=0;i<modules.size();i++)
 				{
@@ -87,7 +90,10 @@ public abstract class MiddlewareFactory {
 				//optionList.add("--with-"+s1.substring(4)+" --with-"+s2.substring(4));
 				
 				//configure the middleware src
+				
 				cmd="cd "+targetPath+gzFile.getName().substring(0,gzFile.getName().indexOf(".tar.gz"))+" && ./configure --prefix="+targetPath+" "+optionList.toString().substring(optionList.toString().indexOf('[')+1, optionList.toString().indexOf(']'));
+				*/
+				cmd="cd "+targetPath+gzFile.getName().substring(0,gzFile.getName().indexOf(".tar.gz"))+" && ./configure --prefix="+targetPath;
 				recAuthInfo.execCommand(cmd,result,errorResult);
 				//if having error throw the exception
 				if(result.toString().indexOf("configure: error:")==-1)
@@ -97,15 +103,31 @@ public abstract class MiddlewareFactory {
 					result.clear();
 					errorResult.clear();
 					recAuthInfo.execCommand(cmd,result,errorResult);
-					if(result.toString().indexOf("error")==-1)
+					
+					if(result.toString().indexOf("error:")==-1)
 					{
 						if(errorResult.isEmpty())
-							System.out.println("Nginx is installed successfully");
+							System.out.println("Nginx is installed successfully1");
 						else 
+						{
+							
 							throw new RemoteException(errorResult.toString());
+						}
 					}
 					else
-						throw new RemoteException(result.toString());
+					{
+						cmd="cd "+targetPath+"sbin && ls | grep nginx";
+						result.clear();
+						errorResult.clear();
+						recAuthInfo.execCommand(cmd,result,errorResult);
+						if(result.toString().isEmpty())
+							throw new RemoteException(result.toString());
+						else
+							System.out.println("Nginx is installed successfully2");
+						
+					}
+					
+					
 				}
 				else
 				{
@@ -146,5 +168,31 @@ public abstract class MiddlewareFactory {
 		// TODO
 		 RecAuthInfo recauthinfo=new RecAuthInfo();
 			return recauthinfo;
+	}
+	static public void main(String[] args){
+		AuthInfo authInfo=MiddlewareFactory.newAuthInfo();
+		authInfo.setHost("10.1.50.4");
+		authInfo.setUsername("git");
+		authInfo.setPassword("qwer1234");
+		try{
+			MiddlewareFactory middleware=MiddlewareFactory.getInstance(authInfo, "/usr/local/nginx/");
+			Monitor monitor=middleware.getMonitor();
+			CPUStatus cpu=monitor.getCPUStatus();
+			int num=cpu.getBlockingNum();
+			System.out.println(num);
+		}
+		catch(Exception e){
+			e.printStackTrace();
+		}
+	}
+	public static String pathStrConvert(String pathstr)
+	{
+		String pathstrend = pathstr;
+		if(pathstr.charAt(pathstr.length()-1) != '/')
+		{
+			pathstrend=pathstr+"/";
+		}
+		System.out.println(pathstrend);
+		return pathstrend;
 	}
 }
