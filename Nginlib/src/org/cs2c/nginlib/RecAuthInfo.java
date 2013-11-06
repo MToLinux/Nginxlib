@@ -94,27 +94,10 @@ public class RecAuthInfo implements AuthInfo {
 	 *        errorList the error information printed in the terminal after executing the "cmd" if there are.
 	 *         
 	 * */
-	public void execCommand(String cmd,ArrayList<String> list,ArrayList<String> errorList)
+	public void execCommand(Connection conn,String cmd,ArrayList<String> list,ArrayList<String> errorList)
 		{
 			
-			/* Create a connection instance */
-			Connection conn = new Connection(hostName);
-			/* Now connect */
-			try {
-				conn.connect();
-			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-			try	{
-				/* Authenticate.
-				 * If you get an IOException saying something like
-				 * "Authentication method password not supported by the server at this stage."
-				 * then please check the FAQ.
-				 */
-				boolean isAuthenticated = conn.authenticateWithPassword(userName, passWord);
-				if (isAuthenticated == false)
-				throw new IOException("Authentication failed.");
+			try{
 				/* Create a session */
 				Session sess = conn.openSession();		
 				sess.execCommand(cmd);
@@ -145,10 +128,7 @@ public class RecAuthInfo implements AuthInfo {
 				
 				/* Close this session */
 				sess.close();
-				
-				/* Close the connection */				
-				conn.close();
-			
+							
 				}catch (IOException e){
 					e.printStackTrace(System.err);
 					System.exit(2);

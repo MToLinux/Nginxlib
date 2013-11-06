@@ -7,6 +7,8 @@ import org.cs2c.nginlib.ctl.*;
 import org.cs2c.nginlib.monitor.*;
 import org.cs2c.nginlib.RecMiddlewareFactory;
 
+import com.trilead.ssh2.Connection;
+
 import java.util.*;
 import java.io.*;
 /**
@@ -22,8 +24,9 @@ public abstract class MiddlewareFactory {
 	 * @param authInfo Remote host access information
 	 * @return the instance binded with the specific remote middleware.
 	 * @throws RemoteException When authentication fails, network error or nginx does not exist.
+	 * @throws IOException 
 	 * */
-	static public MiddlewareFactory getInstance(AuthInfo authInfo, String middlewareHome) throws RemoteException{
+	static public MiddlewareFactory getInstance(AuthInfo authInfo, String middlewareHome) throws RemoteException, IOException{
 		// TODO
 		RecMiddlewareFactory recmiddleware=new RecMiddlewareFactory(authInfo,pathStrConvert(middlewareHome));
 		return recmiddleware;
@@ -50,18 +53,23 @@ public abstract class MiddlewareFactory {
 		//errorResult:Used to store the error information of the command execution
 		ArrayList<String> errorResult=new ArrayList<String>(0);
 		
+		
+		RecMiddlewareFactory recmiddleware=new RecMiddlewareFactory(authInfo,pathStrConvert(targetPath));
+
+		
 		/**Convert authInfo into RecAuthInfo forcefully,in order 
 		 * to call the function execCommand of RecAuthInfo
 		 */
 		RecAuthInfo recAuthInfo=(RecAuthInfo)authInfo;
 		
 		//Instantiate the RecController,and call scopy() to copy local file to the remote target path
-		RecController controller=new RecController(recAuthInfo,targetPath);
-		controller.scopy(gzFile, targetPath);
+		//RecController controller=new RecController(recAuthInfo,pathStrConvert(targetPath),recmiddleware.getConnection());
+		RecController controller=(RecController) recmiddleware.getController();
+		controller.scopy(recmiddleware.getConnection(),gzFile, targetPath);
 		
 		//uncompress the gzFile in the remote host
 		String cmd="cd "+targetPath+" && tar zxf "+gzFile.getName()+" && cd "+gzFile.getName().substring(0,gzFile.getName().indexOf(".tar.gz"))+"&& pwd";
-		recAuthInfo.execCommand(cmd,result,errorResult);
+		recAuthInfo.execCommand(recmiddleware.getConnection(),cmd,result,errorResult);
 		//the result is similar to "/usr/local/nginx/nginx-1.0.5"
 		if(result.isEmpty()) 
 		{
@@ -94,7 +102,7 @@ public abstract class MiddlewareFactory {
 				cmd="cd "+targetPath+gzFile.getName().substring(0,gzFile.getName().indexOf(".tar.gz"))+" && ./configure --prefix="+targetPath+" "+optionList.toString().substring(optionList.toString().indexOf('[')+1, optionList.toString().indexOf(']'));
 				*/
 				cmd="cd "+targetPath+gzFile.getName().substring(0,gzFile.getName().indexOf(".tar.gz"))+" && ./configure --prefix="+targetPath;
-				recAuthInfo.execCommand(cmd,result,errorResult);
+				recAuthInfo.execCommand(recmiddleware.getConnection(),cmd,result,errorResult);
 				//if having error throw the exception
 				if(result.toString().indexOf("configure: error:")==-1)
 				{
@@ -102,7 +110,7 @@ public abstract class MiddlewareFactory {
 					cmd="cd "+targetPath+gzFile.getName().substring(0,gzFile.getName().indexOf(".tar.gz"))+" && make && make install";
 					result.clear();
 					errorResult.clear();
-					recAuthInfo.execCommand(cmd,result,errorResult);
+					recAuthInfo.execCommand(recmiddleware.getConnection(),cmd,result,errorResult);
 					
 					if(result.toString().indexOf("error:")==-1)
 					{
@@ -119,7 +127,7 @@ public abstract class MiddlewareFactory {
 						cmd="cd "+targetPath+"sbin && ls | grep nginx";
 						result.clear();
 						errorResult.clear();
-						recAuthInfo.execCommand(cmd,result,errorResult);
+						recAuthInfo.execCommand(recmiddleware.getConnection(),cmd,result,errorResult);
 						if(result.toString().isEmpty())
 							throw new RemoteException(result.toString());
 						else
@@ -140,7 +148,7 @@ public abstract class MiddlewareFactory {
 			}
 		}
 		//After installing the middleware,return a instance
-		RecMiddlewareFactory recmiddleware=new RecMiddlewareFactory(authInfo,targetPath);
+		//RecMiddlewareFactory recmiddleware=new RecMiddlewareFactory(authInfo,targetPath);
 		return recmiddleware;
 		
 	}
@@ -159,6 +167,13 @@ public abstract class MiddlewareFactory {
 	 * @return The monitor interface of the middleware (Nginx).
 	 * */
 	abstract public Monitor getMonitor();
+	
+	/**
+	 * Get the connection interface in order to fetch the connection to the remote host.
+	 * @return The connection of the current middleware instance.
+	 * @throws IOException 
+	 * */
+	abstract public Connection getConnection() throws IOException;
 	/**
 	 * Create an instance of AuthInfo without any info.
 	 * Then you can set the instance info through AuthInfo interface.
