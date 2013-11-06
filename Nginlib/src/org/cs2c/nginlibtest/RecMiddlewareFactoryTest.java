@@ -50,8 +50,8 @@ public class RecMiddlewareFactoryTest extends TestCase {
 
 	@SuppressWarnings("deprecation")
 	@Test
-	public void testGetController() {
-		Controller rcontroller=new RecController(authInfo, "/usr/local/nginx");
+	public void testGetController() throws IOException {
+		Controller rcontroller=new RecController(authInfo, "/usr/local/nginx",instance.getConnection());
 		rcontroller=instance.getController();
 		Assert.assertNotNull(rcontroller);
 	}
@@ -74,7 +74,7 @@ public class RecMiddlewareFactoryTest extends TestCase {
 
 	
 	@Test
-	public void testGetInstance() throws RemoteException  {
+	public void testGetInstance() throws RemoteException, IOException  {
 		Assert.assertNotNull(instance.getInstance(authInfo, "/usr/local/nginx"));
 
 	}

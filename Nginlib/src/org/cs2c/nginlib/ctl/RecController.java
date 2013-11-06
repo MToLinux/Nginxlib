@@ -22,23 +22,25 @@ public class RecController implements Controller {
 	String midwarePath;
 	String serverName;
 	String confFile;
-	public static int flag=0;
+	Connection conncontroller;
 
 	/** Construct a RecController with specified properties */
-	public RecController(RecAuthInfo reauthInfo, String midwarePath) {
+	public RecController(RecAuthInfo reauthInfo, String midwarePath,Connection conn) {
 		this.reauthInfo = reauthInfo;
 		this.midwarePath = pathStrConvert(midwarePath);
 		this.confFile = "nginx.conf";
 		this.serverName = "nginx";
+		this.conncontroller=conn;
 	}
 	
 	/** Construct a RecController with specified properties */
 	public RecController(RecAuthInfo reauthInfo, String midwarePath,
-			String serverName, String confFile) {
+			String serverName, String confFile,Connection conn) {
 		this.reauthInfo = reauthInfo;
 		this.midwarePath = pathStrConvert(midwarePath);
 		this.confFile = confFile;
 		this.serverName = serverName;
+		this.conncontroller=conn;
 	}
 
 	@Override
@@ -69,7 +71,7 @@ public class RecController implements Controller {
 		//String cmd = midwarePath + "sbin/nginx -v " ;//+ " && cat " + midwarePath+ "logs/nginx.pid"
 				
 		System.out.println(cmd);
-		this.reauthInfo.execCommand(cmd, result, errorResult);
+		this.reauthInfo.execCommand(conncontroller,cmd, result, errorResult);
 		
 		if (result.isEmpty()) {
 			if (!errorResult.isEmpty())
@@ -103,7 +105,7 @@ public class RecController implements Controller {
 
 		// shut down the nginx
 		String cmd = midwarePath + "sbin/nginx -s quit";
-		this.reauthInfo.execCommand(cmd, result, errorResult);
+		this.reauthInfo.execCommand(conncontroller,cmd, result, errorResult);
 		if (isRunning() == false) {
 			System.out.println("The " + serverName
 					+ " is shut down successfully. ");
@@ -111,7 +113,7 @@ public class RecController implements Controller {
 			result.clear();
 			errorResult.clear();
 			// shut down the nginx forcefully
-			this.reauthInfo.execCommand("killall nginx", result, errorResult);
+			this.reauthInfo.execCommand(conncontroller,"killall nginx", result, errorResult);
 
 			if (isRunning() == false) {
 				System.out.println("The " + serverName
@@ -156,7 +158,7 @@ public class RecController implements Controller {
 			String cmd = midwarePath + "sbin/nginx -s reload";
 	
 			// reload the nginx
-			this.reauthInfo.execCommand(cmd, result, errorResult);
+			this.reauthInfo.execCommand(conncontroller,cmd, result, errorResult);
 			if (result.isEmpty()) {
 				if (!errorResult.isEmpty()) {
 					throw new RemoteException(errorResult.toString());
@@ -175,7 +177,7 @@ public class RecController implements Controller {
 		ArrayList<String> errorResult = new ArrayList<String>(0);
 
 		// copy the local file zipFile to targetPath of remote host
-		if (this.scopy(zipFile, targetPath) == true) {
+		if (this.scopy(conncontroller,zipFile, targetPath) == true) {
 			
 			System.out.println(targetPath+zipFile.getName().substring(0,
 					zipFile.getName().toString().indexOf(".zip")));
@@ -193,7 +195,7 @@ public class RecController implements Controller {
 				}
 			}
 			// unzip the zipFile in the remote host
-			this.reauthInfo.execCommand(
+			this.reauthInfo.execCommand(conncontroller,
 						"unzip -q " + targetPath + zipFile.getName(), result,
 						errorResult);
 			System.out.println("unzip -q " + targetPath + zipFile.getName());
@@ -225,23 +227,10 @@ public class RecController implements Controller {
 	 * @throws IOException
 	 *             When connect remote host by ssh2
 	 * */
-	public boolean scopy(File zipFile, String targetPath) throws IOException,
+	public boolean scopy(Connection conn,File zipFile, String targetPath) throws IOException,
 			RemoteException {
 		String zipFileName = zipFile.toString();
 		targetPath=pathStrConvert(targetPath);
-		Connection conn = new Connection(this.reauthInfo.getHostname());
-		/* Now connect */
-		conn.connect();
-
-		/*
-		 * Authenticate. If you get an IOException saying something like
-		 * "Authentication method password not supported by the server at this stage."
-		 * then please check the FAQ.
-		 */
-		boolean isAuthenticated = conn.authenticateWithPassword(
-				this.reauthInfo.getUsername(), this.reauthInfo.getPassword());
-		if (isAuthenticated == false)
-			throw new IOException("Authentication failed.");
 
 		SCPClient scpc = conn.createSCPClient();
 		scpc.put(zipFileName, targetPath);
@@ -261,7 +250,7 @@ public class RecController implements Controller {
 		ArrayList<String> result = new ArrayList<String>(0);
 		ArrayList<String> errorResult = new ArrayList<String>(0);
 
-		this.reauthInfo.execCommand("pgrep -u " + this.reauthInfo.getUsername()
+		this.reauthInfo.execCommand(conncontroller,"pgrep -u " + this.reauthInfo.getUsername()
 				+ " " + serverName, result, errorResult);
 		if (result.isEmpty())
 			return false;
@@ -288,7 +277,7 @@ public class RecController implements Controller {
 		String cmd = "cd " + targetPath + " && mv " + DirName + " " + DirName
 				+ subfix;
 		System.out.println(cmd);
-		this.reauthInfo.execCommand(cmd, result, errorResult);
+		this.reauthInfo.execCommand(conncontroller,cmd, result, errorResult);
 		System.out.println(cmd);
 		if (!errorResult.isEmpty()) {
 			return false;
@@ -311,7 +300,7 @@ public class RecController implements Controller {
 		// To determine whether the configuration file exists
 		String cmd = "ls " + targetPath + " | grep " + fileName;
 		System.out.println(cmd);
-		this.reauthInfo.execCommand(cmd, result, errorResult);
+		this.reauthInfo.execCommand(conncontroller,cmd, result, errorResult);
 		if (result.isEmpty())
 			return false;
 		else
@@ -329,7 +318,7 @@ public class RecController implements Controller {
 		String cmd = "cd " + targetPath + " && ls -l | grep ^d | grep "
 				+ DirName;
 		System.out.println(cmd);
-		this.reauthInfo.execCommand(cmd, result, errorResult);
+		this.reauthInfo.execCommand(conncontroller,cmd, result, errorResult);
 		System.out.println(result.toString());
 		System.out.println(errorResult.toString());
 		if ((!result.isEmpty()) && errorResult.isEmpty()) {
@@ -349,7 +338,7 @@ public class RecController implements Controller {
 		ArrayList<String> errorResult = new ArrayList<String>(0);
 		String cmd = "cd " + targetPath + " && rm -rf " + dirName;
 		System.out.println(cmd);
-		this.reauthInfo.execCommand(cmd, result, errorResult);
+		this.reauthInfo.execCommand(conncontroller,cmd, result, errorResult);
 		if (result.isEmpty() && errorResult.isEmpty())
 			return true;
 		else
@@ -364,7 +353,7 @@ public class RecController implements Controller {
 	public boolean deleteFile(String targetPath, String fileName) {
 		ArrayList<String> result = new ArrayList<String>(0);
 		ArrayList<String> errorResult = new ArrayList<String>(0);
-		this.reauthInfo.execCommand("cd " + targetPath + " && rm -f "
+		this.reauthInfo.execCommand(conncontroller,"cd " + targetPath + " && rm -f "
 				+ fileName, result, errorResult);
 		if (isExistedFile(targetPath, fileName) == false) {
 			return true;

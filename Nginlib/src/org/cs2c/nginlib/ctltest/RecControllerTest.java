@@ -22,8 +22,12 @@ public class RecControllerTest extends TestCase {
 		authInfo.setHost("10.1.50.4");
 		authInfo.setUsername("root");
 		authInfo.setPassword("cs2csolutions");
-			
-		testController=new org.cs2c.nginlib.ctl.RecController((RecAuthInfo)authInfo,"/usr/local/nginx/");
+		MiddlewareFactory instance= null;
+		
+		
+		instance = MiddlewareFactory.getInstance(authInfo, "/usr/local/nginx/");
+
+		testController=new org.cs2c.nginlib.ctl.RecController((RecAuthInfo)authInfo,"/usr/local/nginx/",instance.getConnection());
 
 	}
 	@Test
