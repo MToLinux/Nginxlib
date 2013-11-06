@@ -2,6 +2,7 @@ package org.cs2c.nginlib.monitortest;
 
 import static org.junit.Assert.*;
 
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -22,6 +23,8 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import com.trilead.ssh2.Connection;
+
 public class MonitorTest {
 	
 	private static Monitor monitor = null;
@@ -31,7 +34,35 @@ public class MonitorTest {
 	String password = "qwer1234";
 	int port = 22;
 	String nginxpath = "/usr/local/nginx/";
+	
+	Connection conn;
 
+	public void establishConnection() throws IOException
+	{
+		/* Create a connection instance */
+		conn = new Connection(hostname, port);
+		
+		/* Connect */
+		conn.connect();
+
+		/* Authenticate. */
+		boolean isAuthenticated = 
+		conn.authenticateWithPassword(username, password);
+		if (isAuthenticated == false)
+			throw new IOException("Authentication failed.");
+	}
+	
+	public MonitorTest() throws IOException 
+	{
+		hostname = "10.1.50.4";
+		username = "root";
+		password = "cs2csolutions";
+		port = 22;
+		nginxpath = "/usr/local/nginx/";
+		
+		establishConnection();
+	}
+	
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
 	}
@@ -49,7 +80,7 @@ public class MonitorTest {
 		port = 22;
 		nginxpath = "/usr/local/nginx/";
 		
-		monitor = new RecMonitor(hostname, username, password, port, nginxpath);
+		monitor = new RecMonitor(hostname, username, password, port, nginxpath, conn);
 	}
 
 	@After
