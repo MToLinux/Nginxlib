@@ -76,7 +76,7 @@ public abstract class MiddlewareFactory {
 			//if result is empty throw the RemoteException
 			if(!errorResult.isEmpty())
 			{
-				System.out.println("debug location 1");
+				//System.out.println("debug location 1");
 				throw new RemoteException(errorResult.toString());
 			}
 			
@@ -115,7 +115,9 @@ public abstract class MiddlewareFactory {
 					if(result.toString().indexOf("error:")==-1)
 					{
 						if(errorResult.isEmpty())
-							System.out.println("Nginx is installed successfully1");
+							{
+								//System.out.println("Nginx is installed successfully1");
+							}
 						else 
 						{
 							
@@ -131,11 +133,10 @@ public abstract class MiddlewareFactory {
 						if(result.toString().isEmpty())
 							throw new RemoteException(result.toString());
 						else
-							System.out.println("Nginx is installed successfully2");
-						
-					}
-					
-					
+						{
+							//System.out.println("Nginx is installed successfully2");
+						}
+						}
 				}
 				else
 				{
@@ -200,14 +201,15 @@ public abstract class MiddlewareFactory {
 			e.printStackTrace();
 		}
 	}
-	public static String pathStrConvert(String pathstr)
+	static String pathStrConvert(String pathstr)
 	{
 		String pathstrend = pathstr;
 		if(pathstr.charAt(pathstr.length()-1) != '/')
 		{
 			pathstrend=pathstr+"/";
 		}
-		System.out.println(pathstrend);
-		return pathstrend;
+		
+		return pathstrend;	 
 	}
+	
 }

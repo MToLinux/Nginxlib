@@ -11,50 +11,50 @@ import org.cs2c.nginlib.AuthInfo;
 import org.cs2c.nginlib.RemoteException;
 import org.cs2c.nginlib.RecAuthInfo;
 
-
-	/**
-	 * @author LiuQin The implement class of AuthInfo
-	 * @see AuthInfo
-	 */
+/**
+ * @author LiuQin The implement class of AuthInfo
+ * @see AuthInfo
+ */
 public class RecController implements Controller {
 
-	public RecAuthInfo reauthInfo;
-	String midwarePath;
-	String serverName;
-	String confFile;
-	Connection conncontroller;
+	RecAuthInfo reauthInfo = null;
+	String midwarePath = "";
+	String serverName = "";
+	String confFile = "";
+	Connection conncontroller = null;
 
 	/** Construct a RecController with specified properties */
-	public RecController(RecAuthInfo reauthInfo, String midwarePath,Connection conn) {
+	public RecController(RecAuthInfo reauthInfo, String midwarePath,
+			Connection conn) {
 		this.reauthInfo = reauthInfo;
 		this.midwarePath = pathStrConvert(midwarePath);
 		this.confFile = "nginx.conf";
 		this.serverName = "nginx";
-		this.conncontroller=conn;
+		this.conncontroller = conn;
 	}
-	
+
 	/** Construct a RecController with specified properties */
 	public RecController(RecAuthInfo reauthInfo, String midwarePath,
-			String serverName, String confFile,Connection conn) {
+			String serverName, String confFile, Connection conn) {
 		this.reauthInfo = reauthInfo;
 		this.midwarePath = pathStrConvert(midwarePath);
 		this.confFile = confFile;
 		this.serverName = serverName;
-		this.conncontroller=conn;
+		this.conncontroller = conn;
 	}
 
 	@Override
 	public void start() throws RemoteException {
 		// TODO Auto-generated method stub
 		// determine the configure file is existed or not
-		
+
 		if (isExistedFile(midwarePath + "conf", confFile) == false) {
-			
+
 			throw new RemoteException("There is no " + confFile);
 		}
 		// determine the server is running or not
 		if (isRunning() == true) {
-			
+
 			throw new RemoteException("The " + serverName
 					+ " is running already. ");
 		}
@@ -67,28 +67,25 @@ public class RecController implements Controller {
 
 		// start the nginx
 		String cmd = midwarePath + "sbin/nginx -c " + midwarePath
-				+ "conf/nginx.conf" ;//+ " && cat " + midwarePath+ "logs/nginx.pid"
-		//String cmd = midwarePath + "sbin/nginx -v " ;//+ " && cat " + midwarePath+ "logs/nginx.pid"
-				
-		System.out.println(cmd);
-		this.reauthInfo.execCommand(conncontroller,cmd, result, errorResult);
-		
+				+ "conf/nginx.conf";// + " && cat " + midwarePath+
+									// "logs/nginx.pid"
+		// String cmd = midwarePath + "sbin/nginx -v " ;//+ " && cat " +
+		// midwarePath+ "logs/nginx.pid"
+
+		// System.out.println(cmd);
+		this.reauthInfo.execCommand(conncontroller, cmd, result, errorResult);
+
 		if (result.isEmpty()) {
-			if (!errorResult.isEmpty())
-			{
-				
+			if (!errorResult.isEmpty()) {
+
 				throw new RemoteException(errorResult.toString());
+			} else {
+
+				// System.out.println("The Nginx start successfully");
 			}
-			else
-			{
-				
-				System.out.println("The Nginx start successfully");
-			}
-		} 
-		else
-		{
-			
-			System.out.println(result.toString());
+		} else {
+
+			// System.out.println(result.toString());
 		}
 	}
 
@@ -105,19 +102,20 @@ public class RecController implements Controller {
 
 		// shut down the nginx
 		String cmd = midwarePath + "sbin/nginx -s quit";
-		this.reauthInfo.execCommand(conncontroller,cmd, result, errorResult);
+		this.reauthInfo.execCommand(conncontroller, cmd, result, errorResult);
 		if (isRunning() == false) {
-			System.out.println("The " + serverName
-					+ " is shut down successfully. ");
+			// System.out.println("The " + serverName
+			// + " is shut down successfully. ");
 		} else {
 			result.clear();
 			errorResult.clear();
 			// shut down the nginx forcefully
-			this.reauthInfo.execCommand(conncontroller,"killall nginx", result, errorResult);
+			this.reauthInfo.execCommand(conncontroller, "killall nginx",
+					result, errorResult);
 
 			if (isRunning() == false) {
-				System.out.println("The " + serverName
-						+ " is shut down forcefully. ");
+				// System.out.println("The " + serverName
+				// + " is shut down forcefully. ");
 			} else {
 				throw new RemoteException(errorResult.toString());
 			}
@@ -130,9 +128,7 @@ public class RecController implements Controller {
 		// TODO Auto-generated method stub
 		if (isRunning() == false) {
 			start();
-		}
-		else
-		{
+		} else {
 			shutdown();
 			start();
 		}
@@ -149,21 +145,21 @@ public class RecController implements Controller {
 		// determine the server is running or not
 		if (isRunning() == false) {
 			start();
-		}
-		else
-		{
+		} else {
 
 			ArrayList<String> result = new ArrayList<String>(0);
 			ArrayList<String> errorResult = new ArrayList<String>(0);
 			String cmd = midwarePath + "sbin/nginx -s reload";
-	
+
 			// reload the nginx
-			this.reauthInfo.execCommand(conncontroller,cmd, result, errorResult);
+			this.reauthInfo.execCommand(conncontroller, cmd, result,
+					errorResult);
 			if (result.isEmpty()) {
 				if (!errorResult.isEmpty()) {
 					throw new RemoteException(errorResult.toString());
-				} else
-					System.out.println("Reload sucessfully.");
+				} else {
+					// System.out.println("Reload sucessfully.");
+				}
 			}
 		}
 	}
@@ -172,45 +168,43 @@ public class RecController implements Controller {
 	public void deploy(File zipFile, String targetPath) throws IOException,
 			RemoteException {
 		// TODO Auto-generated method stub
-		targetPath=pathStrConvert(targetPath);
+		targetPath = pathStrConvert(targetPath);
 		ArrayList<String> result = new ArrayList<String>(0);
 		ArrayList<String> errorResult = new ArrayList<String>(0);
 
 		// copy the local file zipFile to targetPath of remote host
-		if (this.scopy(conncontroller,zipFile, targetPath) == true) {
-			
-			System.out.println(targetPath+zipFile.getName().substring(0,
-					zipFile.getName().toString().indexOf(".zip")));
-			if(isExistedDirectory(targetPath,zipFile.getName().substring(0,
-					zipFile.getName().toString().indexOf(".zip"))))
-			{
-				
-				if (reDirName(
+		if (this.scopy(conncontroller, zipFile, targetPath) == true) {
+
+			// System.out.println(targetPath+zipFile.getName().substring(0,
+			// zipFile.getName().toString().indexOf(".zip")));
+			if (isExistedDirectory(
 					targetPath,
 					zipFile.getName().substring(0,
-							zipFile.getName().toString().indexOf(".zip")),
-					"_bak") == false) 
-				{
+							zipFile.getName().toString().indexOf(".zip")))) {
+
+				if (reDirName(
+						targetPath,
+						zipFile.getName().substring(0,
+								zipFile.getName().toString().indexOf(".zip")),
+						"_bak") == false) {
 					throw new RemoteException(errorResult.toString());
 				}
 			}
 			// unzip the zipFile in the remote host
-			this.reauthInfo.execCommand(conncontroller,
-						"unzip -q " + targetPath + zipFile.getName(), result,
-						errorResult);
-			System.out.println("unzip -q " + targetPath + zipFile.getName());
-			
-			if (result.isEmpty() && errorResult.isEmpty()) 
-			{
-					System.out.println("Unzip successfully!");
-					if (deleteFile(targetPath, zipFile.getName()) == false) {
+			this.reauthInfo.execCommand(conncontroller, "unzip -q "
+					+ targetPath + zipFile.getName(), result, errorResult);
+			// System.out.println("unzip -q " + targetPath + zipFile.getName());
+
+			if (result.isEmpty() && errorResult.isEmpty()) {
+				// System.out.println("Unzip successfully!");
+				if (deleteFile(targetPath, zipFile.getName()) == false) {
 					throw new RemoteException("zipFile deleted failed.");
-					} else
-					System.out.println("zipFile deleted successfully!");
+				} else {
+					// System.out.println("zipFile deleted successfully!");
+				}
 			} else
 				throw new RemoteException("unzip failed");
-			}
-		
+		}
 
 	}
 
@@ -227,10 +221,10 @@ public class RecController implements Controller {
 	 * @throws IOException
 	 *             When connect remote host by ssh2
 	 * */
-	public boolean scopy(Connection conn,File zipFile, String targetPath) throws IOException,
-			RemoteException {
+	public boolean scopy(Connection conn, File zipFile, String targetPath)
+			throws IOException, RemoteException {
 		String zipFileName = zipFile.toString();
-		targetPath=pathStrConvert(targetPath);
+		targetPath = pathStrConvert(targetPath);
 
 		SCPClient scpc = conn.createSCPClient();
 		scpc.put(zipFileName, targetPath);
@@ -245,13 +239,14 @@ public class RecController implements Controller {
 	 * 
 	 * @return The server is running return true;or else return false
 	 * */
-	
-	public boolean isRunning() {
+
+	boolean isRunning() {
 		ArrayList<String> result = new ArrayList<String>(0);
 		ArrayList<String> errorResult = new ArrayList<String>(0);
 
-		this.reauthInfo.execCommand(conncontroller,"pgrep -u " + this.reauthInfo.getUsername()
-				+ " " + serverName, result, errorResult);
+		this.reauthInfo.execCommand(conncontroller, "pgrep -u "
+				+ this.reauthInfo.getUsername() + " " + serverName, result,
+				errorResult);
 		if (result.isEmpty())
 			return false;
 		else
@@ -264,7 +259,7 @@ public class RecController implements Controller {
 	 * 
 	 * @return Rename successfully return true;or else return false
 	 * */
-	public boolean reDirName(String targetPath, String DirName, String subfix)
+	boolean reDirName(String targetPath, String DirName, String subfix)
 			throws RemoteException {
 
 		if (isExistedDirectory(targetPath, DirName + subfix) == true) {
@@ -276,9 +271,9 @@ public class RecController implements Controller {
 		ArrayList<String> errorResult = new ArrayList<String>(0);
 		String cmd = "cd " + targetPath + " && mv " + DirName + " " + DirName
 				+ subfix;
-		System.out.println(cmd);
-		this.reauthInfo.execCommand(conncontroller,cmd, result, errorResult);
-		System.out.println(cmd);
+		// System.out.println(cmd);
+		this.reauthInfo.execCommand(conncontroller, cmd, result, errorResult);
+		// System.out.println(cmd);
 		if (!errorResult.isEmpty()) {
 			return false;
 		}
@@ -290,7 +285,7 @@ public class RecController implements Controller {
 	 * 
 	 * @return The file exists return true;or else return false
 	 * */
-	public Boolean isExistedFile(String targetPath, String fileName) {
+	boolean isExistedFile(String targetPath, String fileName) {
 		// result:Used to store the result information of the command execution
 		ArrayList<String> result = new ArrayList<String>(0);
 		// errorResult:Used to store the error information of the command
@@ -299,8 +294,8 @@ public class RecController implements Controller {
 
 		// To determine whether the configuration file exists
 		String cmd = "ls " + targetPath + " | grep " + fileName;
-		System.out.println(cmd);
-		this.reauthInfo.execCommand(conncontroller,cmd, result, errorResult);
+		// System.out.println(cmd);
+		this.reauthInfo.execCommand(conncontroller, cmd, result, errorResult);
 		if (result.isEmpty())
 			return false;
 		else
@@ -312,17 +307,17 @@ public class RecController implements Controller {
 	 * 
 	 * @return The directory exists return true;or else return false
 	 * */
-	public boolean isExistedDirectory(String targetPath, String DirName) {
+	boolean isExistedDirectory(String targetPath, String DirName) {
 		ArrayList<String> result = new ArrayList<String>(0);
 		ArrayList<String> errorResult = new ArrayList<String>(0);
 		String cmd = "cd " + targetPath + " && ls -l | grep ^d | grep "
 				+ DirName;
-		System.out.println(cmd);
-		this.reauthInfo.execCommand(conncontroller,cmd, result, errorResult);
-		System.out.println(result.toString());
-		System.out.println(errorResult.toString());
+		// System.out.println(cmd);
+		this.reauthInfo.execCommand(conncontroller, cmd, result, errorResult);
+		// System.out.println(result.toString());
+		// System.out.println(errorResult.toString());
 		if ((!result.isEmpty()) && errorResult.isEmpty()) {
-			System.out.println(result.toString());
+			// System.out.println(result.toString());
 			return true;
 		} else
 			return false;
@@ -333,12 +328,12 @@ public class RecController implements Controller {
 	 * 
 	 * @return Delete successfully return true;or else return false
 	 * */
-	public boolean deleteDirectory(String targetPath, String dirName) {
+	boolean deleteDirectory(String targetPath, String dirName) {
 		ArrayList<String> result = new ArrayList<String>(0);
 		ArrayList<String> errorResult = new ArrayList<String>(0);
 		String cmd = "cd " + targetPath + " && rm -rf " + dirName;
-		System.out.println(cmd);
-		this.reauthInfo.execCommand(conncontroller,cmd, result, errorResult);
+		// System.out.println(cmd);
+		this.reauthInfo.execCommand(conncontroller, cmd, result, errorResult);
 		if (result.isEmpty() && errorResult.isEmpty())
 			return true;
 		else
@@ -350,26 +345,23 @@ public class RecController implements Controller {
 	 * 
 	 * @return Delete successfully return true;or else return false
 	 * */
-	public boolean deleteFile(String targetPath, String fileName) {
+	boolean deleteFile(String targetPath, String fileName) {
 		ArrayList<String> result = new ArrayList<String>(0);
 		ArrayList<String> errorResult = new ArrayList<String>(0);
-		this.reauthInfo.execCommand(conncontroller,"cd " + targetPath + " && rm -f "
-				+ fileName, result, errorResult);
+		this.reauthInfo.execCommand(conncontroller, "cd " + targetPath
+				+ " && rm -f " + fileName, result, errorResult);
 		if (isExistedFile(targetPath, fileName) == false) {
 			return true;
 		} else
 			return false;
 	}
-	
-	public String pathStrConvert(String pathstr)
-	{
+
+	String pathStrConvert(String pathstr) {
 		String pathstrend = pathstr;
-		if(pathstr.charAt(pathstr.length()-1) != '/')
-		{
-			pathstrend=pathstr+"/";
+		if (pathstr.charAt(pathstr.length() - 1) != '/') {
+			pathstrend = pathstr + "/";
 		}
-		System.out.println(pathstrend);
+		// System.out.println(pathstrend);
 		return pathstrend;
 	}
 }
-
