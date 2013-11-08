@@ -2,10 +2,13 @@ package org.cs2c.nginlib.monitortest;
 
 import static org.junit.Assert.*;
 
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+//import org.cs2c.nginlib.AuthInfo;
+import org.cs2c.nginlib.RecAuthInfo;
 import org.cs2c.nginlib.RemoteException;
 import org.cs2c.nginlib.monitor.CPUStatus;
 import org.cs2c.nginlib.monitor.Device;
@@ -22,26 +25,38 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import com.trilead.ssh2.Connection;
+
 public class MonitorTest {
 	
 	private static Monitor monitor = null;
+	private static Connection conn;
+	private static String hostname = "127.0.0.1";
+	private static String username = "root";
+	private static String password = "qwer1234";
+	private static RecAuthInfo auInfo = null;
+	private static int port = 22;
+	private static String nginxpath = "/usr/local/nginx/";
 	
-	String hostname = "127.0.0.1";
-	String username = "root";
-	String password = "qwer1234";
-	int port = 22;
-	String nginxpath = "/usr/local/nginx/";
+	public static void establishConnection() throws IOException {
+		/* Create a connection instance */
+		conn = new Connection(hostname, port);
+		
+		/* Connect */
+		conn.connect();
 
+		/* Authenticate. */
+		boolean isAuthenticated = 
+		conn.authenticateWithPassword(username, password);
+		if (isAuthenticated == false)
+			throw new IOException("Authentication failed.");
+	}
+	public static void CloseConnection() throws IOException {
+		conn.close();
+	}
+	
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
-	}
-
-	@AfterClass
-	public static void tearDownAfterClass() throws Exception {
-	}
-
-	@Before
-	public void setUp() throws Exception {
 		
 		hostname = "10.1.50.4";
 		username = "root";
@@ -49,7 +64,23 @@ public class MonitorTest {
 		port = 22;
 		nginxpath = "/usr/local/nginx/";
 		
-		monitor = new RecMonitor(hostname, username, password, port, nginxpath);
+		auInfo = new RecAuthInfo();
+		auInfo.setHost(hostname);
+		auInfo.setUsername(username);
+		auInfo.setPassword(password);
+		
+		establishConnection();
+		
+		monitor = new RecMonitor(auInfo, nginxpath, conn);
+	}
+
+	@AfterClass
+	public static void tearDownAfterClass() throws Exception {
+		CloseConnection();
+	}
+
+	@Before
+	public void setUp() throws Exception {
 	}
 
 	@After
@@ -219,11 +250,6 @@ public class MonitorTest {
 		System.out.println("Used:" + memstat.getUsed());
 		
 		System.out.println("");
-	}
-
-	@Test(timeout=10000)
-	public void testGetMiddlewareStatus() throws RemoteException {
-
 	}
 
 	@Test(timeout=10000)

@@ -20,67 +20,18 @@ public class RecMonitor implements Monitor {
 	private String hostname = "127.0.0.1";
 	private String username = "root";
 	private String password = "qwer1234";
-	private int port = 22;
 	private Connection conn = null;
 	private Session sess = null;
 	private String nginxpath = "/usr/local/nginx/";
 	
 	/* Constructor */
-	public RecMonitor()
-	{
-		this.hostname = "127.0.0.1";
-		this.username = "root";
-		this.password = "qwer1234";
-		this.port = 22;
-		this.nginxpath = "/usr/local/nginx/";
-	}
-	public RecMonitor(String hostname)
-	{
-		this.hostname = hostname;
-		this.username = "root";
-		this.password = "qwer1234";
-		this.port = 22;
-		this.nginxpath = "/usr/local/nginx/";
-	}
-	public RecMonitor(String hostname, String username, String password)
-	{
-		this.hostname = hostname;
-		this.username = username;
-		this.password = password;
-		this.port = 22;
-		this.nginxpath = "/usr/local/nginx/";
-	}
-	public RecMonitor(String hostname, String username, String password, int port)
-	{
-		this.hostname = hostname;
-		this.username = username;
-		this.password = password;
-		this.port = port;
-		this.nginxpath = "/usr/local/nginx/";
-	}
-	public RecMonitor(String hostname, String username, String password, String nginxpath)
-	{
-		this.hostname = hostname;
-		this.username = username;
-		this.password = password;
-		this.port = 22;
-		this.nginxpath = nginxpath;
-	}
-	public RecMonitor(String hostname, String username, String password, int port, String nginxpath)
-	{
-		this.hostname = hostname;
-		this.username = username;
-		this.password = password;
-		this.port = port;
-		this.nginxpath = nginxpath;
-	}
-	public RecMonitor(RecAuthInfo ainfo, String nginxpath)
+	public RecMonitor(RecAuthInfo ainfo, String nginxpath, Connection conn)
 	{
 		this.hostname = ainfo.getHostname();
 		this.username = ainfo.getUsername();
 		this.password = ainfo.getPassword();
-		this.port = 22;
 		this.nginxpath = nginxpath;
+		this.conn = conn;
 	}
 	
 	public String getHostname()
@@ -96,21 +47,6 @@ public class RecMonitor implements Monitor {
 		return password;
 	}
 	
-	public void establishConnection() throws IOException
-	{
-		/* Create a connection instance */
-		conn = new Connection(hostname, port);
-		
-		/* Connect */
-		conn.connect();
-
-		/* Authenticate. */
-		boolean isAuthenticated = 
-		conn.authenticateWithPassword(username, password);
-		if (isAuthenticated == false)
-			throw new IOException("Authentication failed.");
-	}
-	
 	public void establishSession() throws IOException
 	{
 		sess = conn.openSession();
@@ -119,11 +55,6 @@ public class RecMonitor implements Monitor {
 	public void closeSession()
 	{
 		sess.close();
-	}
-	
-	public void closeConnection()
-	{
-		conn.close();
 	}
 
 	public Connection getConnection()
@@ -184,8 +115,7 @@ public class RecMonitor implements Monitor {
 	public CPUStatus getCPUStatus() throws RemoteException {
 		try
 		{
-			/* Connect to the remote host and establish a Session */
-			establishConnection();
+			/* establish a Session */
 			establishSession();
 			
 			int RunningNum = 0;
@@ -253,9 +183,8 @@ public class RecMonitor implements Monitor {
 			cpusta.setSystemPercent(SystemPercent);
 			cpusta.setUserPercent(UserPercent);
 								
-			/* Close the session and disconnect to the remote host */
+			/* Close the session */
 			closeSession();
-			closeConnection();
 			
 			if(cmdflag == false)
 			{
@@ -274,8 +203,7 @@ public class RecMonitor implements Monitor {
 	public IOStatus getIOStatus() throws RemoteException {
 		try
 		{
-			/* Connect to the remote host and establish a Session */
-			establishConnection();
+			/* establish a Session */
 			establishSession();
 			
 			float BlockInPerSec = 0;
@@ -419,9 +347,8 @@ public class RecMonitor implements Monitor {
 			iosta.setBlockOutPerSec(BlockOutPerSec);
 			iosta.setDevices(Devices);
 								
-			/* Close the session and disconnect to the remote host */
+			/* Close the session */
 			closeSession();
-			closeConnection();
 			
 			if(cmdflag == false)
 			{
@@ -440,8 +367,7 @@ public class RecMonitor implements Monitor {
 	public NetworkStatus getNetworkStatus() throws RemoteException {
 		try
 		{
-			/* Connect to the remote host and establish a Session */
-			establishConnection();
+			/* establish a Session */
 			establishSession();
 			
 			float InputKbPerSec = 0;
@@ -509,9 +435,8 @@ public class RecMonitor implements Monitor {
 			nwsta.setInputKbPerSec(InputKbPerSec);
 			nwsta.setOutputPerSec(OutputPerSec);
 
-			/* Close the session and disconnect to the remote host */
+			/* Close the session */
 			closeSession();
-			closeConnection();
 			
 			if(cmdflag == false)
 			{
@@ -530,8 +455,7 @@ public class RecMonitor implements Monitor {
 	public MemoryStatus getMemoryStatus() throws RemoteException {
 		try
 		{
-			/* Connect to the remote host and establish a Session */
-			establishConnection();
+			/* establish a Session */
 			establishSession();
 			
 			int UsedSwap = 0;
@@ -586,7 +510,6 @@ public class RecMonitor implements Monitor {
 			
 			if(cmdflag == false)
 			{
-				closeConnection();
 				throw new IOException("Command vmstat Execution failed.");
 			}
 
@@ -655,9 +578,8 @@ public class RecMonitor implements Monitor {
 			memsta.setUsed(Used);
 			memsta.setUsedSwap(UsedSwap);
 								
-			/* Close the session and disconnect to the remote host */
+			/* Close the session */
 			closeSession();
-			closeConnection();
 			
 			if(cmdflag == false)
 			{
@@ -684,8 +606,7 @@ public class RecMonitor implements Monitor {
 				nginxStatusCommond += struserps;
 			}
 			
-			/* Connect to the remote host and establish a Session */
-			establishConnection();
+			/* establish a Session */
 			establishSession();
 			
 			int ActiveConnections = 0;
@@ -962,9 +883,8 @@ public class RecMonitor implements Monitor {
 			ngsta.setNginxPSList(listNginxPS);
 			ngsta.setNginxCAList(listNginxCA);
 			
-			/* Close the session and disconnect to the remote host */
+			/* Close the session */
 			closeSession();
-			closeConnection();
 			
 			if(false == nginxflag)
 			{

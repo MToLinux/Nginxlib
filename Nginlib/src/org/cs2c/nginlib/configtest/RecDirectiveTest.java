@@ -55,7 +55,7 @@ public class RecDirectiveTest {
 		RecRemoteOperator rro = new RecRemoteOperator();
 		List<Block> list= null;
 		String path = "D:\\eclipseWorkspace\\confpath\\nginx.conf";
-		rro.SetConfpathWithName(path);
+		rro.SetLocalConfpath(path);
 		list= rro.getBlocks("server", "");
 		
 		List<Directive> listd = new ArrayList<Directive>();
