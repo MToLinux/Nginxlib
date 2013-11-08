@@ -6,20 +6,23 @@ import org.cs2c.nginlib.RemoteException;
 import org.cs2c.nginlib.AuthInfo;
 import org.cs2c.nginlib.RecAuthInfo;
 
+import com.trilead.ssh2.Connection;
+
 public class RecConfigurator implements Configurator {
 
-	private RecAuthInfo creauthInfo;
-	private String remoteTargetDirectory;
-	private String confPathWithName = null;
+	private RecAuthInfo creauthInfo= null;
+	private String cmidwarePath= null;
+	private String confPath = null;
+	private Connection connConfigurator = null;
 	
-	public RecConfigurator()
-	{
-	}
+	RecRemoteOperator rro = null;
 	
-	public RecConfigurator(AuthInfo reauthInfo,String midwarePath)
+	public RecConfigurator(AuthInfo reauthInfo,String midwarePath,Connection conn)
 	{
 		this.creauthInfo=(RecAuthInfo) reauthInfo;
-		this.remoteTargetDirectory=midwarePath;
+		this.cmidwarePath=midwarePath;
+		this.connConfigurator=conn;
+		rro = new RecRemoteOperator(creauthInfo,cmidwarePath,connConfigurator);
 	}
 	
 	//set local Conf File With full Name.
@@ -27,47 +30,43 @@ public class RecConfigurator implements Configurator {
 	 * Set the name of the local Conf File.
 	 * @param PathWithName : Path With full nginx.conf Name.
 	 * */
-	public void SetConfpathWithName(String PathWithName){
-		confPathWithName = PathWithName;
+	public void SetLocalConfpath(String Path){
+		confPath = Path;
+		rro.SetLocalConfpath(confPath);
 	}
 	
 	@Override
 	public void append(Element element, String outerBlockNames)
 			throws RemoteException {
-		RecRemoteOperator rro = new RecRemoteOperator();
-		rro.SetConfpathWithName(confPathWithName);
 		rro.append(element, outerBlockNames);
 	}
 
 	@Override
 	public void delete(Element element, String outerBlockNames)
 			throws RemoteException {
-		RecRemoteOperator rro = new RecRemoteOperator();
-		rro.SetConfpathWithName(confPathWithName);
 		rro.delete(element, outerBlockNames);
 	}
 
 	@Override
 	public void insertAfter(Element element, Element after,
 			String outerBlockNames) throws RemoteException {
-		RecRemoteOperator rro = new RecRemoteOperator();
-		rro.SetConfpathWithName(confPathWithName);
+
 		rro.insertAfter(element, after, outerBlockNames);
 	}
 
 	@Override
 	public void replace(Element oldElement, Element newElement,
 			String outerBlockNames) throws RemoteException {
-		RecRemoteOperator rro = new RecRemoteOperator();
-		rro.SetConfpathWithName(confPathWithName);
+//		RecRemoteOperator rro = new RecRemoteOperator(creauthInfo,cmidwarePath,connConfigurator);
+
 		rro.replace(oldElement, newElement, outerBlockNames);
 	}
 
 	@Override
 	public List<Block> getBlocks(String blockName, String outerBlockNames)
 			throws RemoteException {
-		RecRemoteOperator rro = new RecRemoteOperator();
-		rro.SetConfpathWithName(confPathWithName);
+//		RecRemoteOperator rro = new RecRemoteOperator(creauthInfo,cmidwarePath,connConfigurator);
+
 		return rro.getBlocks(blockName, outerBlockNames);
 	}
 

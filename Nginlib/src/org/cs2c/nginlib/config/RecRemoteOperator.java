@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
@@ -16,31 +18,51 @@ import java.util.Set;
 import org.cs2c.nginlib.AuthInfo;
 import org.cs2c.nginlib.RecAuthInfo;
 import org.cs2c.nginlib.RemoteException;
+import org.cs2c.nginlib.monitor.MemoryStatus;
 
 import com.trilead.ssh2.Connection;
 import com.trilead.ssh2.SCPClient;
 import com.trilead.ssh2.Session;
+import com.trilead.ssh2.StreamGobbler;
 
 public class RecRemoteOperator implements RemoteOperator{
 	private String confText = null;
-	private String confPathWithName = null;
+	private String localConfPath = null;
+//	private String confPathWithName = null;
 	
-	private RecAuthInfo creauthInfo;
-	private String remoteTargetDirectory;
+	private RecAuthInfo creauthInfo = null;
+	private String remoteConf = null;
+	private Connection conn = null;
 	
-	public RecRemoteOperator()
-	{
+	public RecRemoteOperator(){
+		
 	}
 	
-	public RecRemoteOperator(AuthInfo reauthInfo,String midwarePath)
+	public RecRemoteOperator(AuthInfo reauthInfo,String midwarePath,Connection conn)
 	{
 		this.creauthInfo=(RecAuthInfo) reauthInfo;
-		this.remoteTargetDirectory=midwarePath;
+		this.remoteConf=ConvertfullPath(midwarePath);
+		this.conn=conn;
+		
+		this.localConfPath = System.getProperty("java.io.tmpdir");
+//		System.out.println(localConfPath);
+	}
+	
+	private String ConvertfullPath(String pathstr)
+	{
+		String pathstrend = pathstr;
+		if(!pathstr.substring(pathstr.length()-1).equals("/"))
+		{
+			pathstrend=pathstr + "/";
+		}
+
+		pathstrend += "conf/nginx.conf"; 
+		return pathstrend;
 	}
 	
 	//Set local Confpath With full Name
-	public void SetConfpathWithName(String PathWithName){
-		confPathWithName = PathWithName;
+	public void SetLocalConfpath(String loPath){
+		this.localConfPath = loPath;
 	}
 	
 	@Override
@@ -69,6 +91,7 @@ public class RecRemoteOperator implements RemoteOperator{
 
 		// write to local conf file
 		WriteConf(newConfText);
+		WriteRemoteConf();
 	}
 	
 	@Override
@@ -109,11 +132,12 @@ public class RecRemoteOperator implements RemoteOperator{
 	
 			// write to local conf file
 			WriteConf(newConfText);
+			WriteRemoteConf();
 	    }
 	}
 	
 	/**
-	 * 删除指定Block内的 Element元素。
+	 * delete the Block's Element
 	 * @return Block text which parameter element is deleted.
 	 * */
 	private String BlockDeleteElement(String BlockText,Element element){
@@ -175,6 +199,7 @@ public class RecRemoteOperator implements RemoteOperator{
 //		System.out.println(editBlockText);
 		// write to local conf file
 		WriteConf(newConfText);
+		WriteRemoteConf();
 	}
 	
 	// 把 after 放于BlockText的子元素element之后，
@@ -184,7 +209,7 @@ public class RecRemoteOperator implements RemoteOperator{
 		//找到第一个符合的element文本位置
 		int nelementLocation = BlockText.indexOf(element.toString());
 		if(-1 == nelementLocation){
-			// 无符合的位置（无子元素element时）。
+			// if no have element
 			return BlockText;
 		}
 		
@@ -270,6 +295,8 @@ public class RecRemoteOperator implements RemoteOperator{
 
 		// write to local conf file
 		WriteConf(newConfText);
+		
+		WriteRemoteConf();
 	}
 	private String BlockReplaceElement(String BlockText,Element oldElement,Element newElement){
 		
@@ -290,6 +317,8 @@ public class RecRemoteOperator implements RemoteOperator{
 	    if((null == blockName.toString()) || ("" == blockName.toString())){
 	    	return null;
 	    }
+	    
+	    GetRemoteConf(remoteConf);
 	    
 		if("".equals(outerBlockNames.trim())){
 			// when outerBlockNames is "" ,search all nginx.conf file.
@@ -398,57 +427,93 @@ public class RecRemoteOperator implements RemoteOperator{
 	 * Get the nginx.conf file which nginx.conf fullpath is parameter remoteFile.
 	 * @throws IOException 
 	 * */
-	public void GetRemoteConf(String remoteFile) throws RemoteException, IOException
+	private void GetRemoteConf(String remoteFile) throws RemoteException
 	{
-        if(null == confPathWithName || "" == confPathWithName){
-        	throw new RemoteException("local confPathWithName is not correct.please set SetConfpathWithName()");
+        if(null == localConfPath || "" == localConfPath){
+        	throw new RemoteException("local localConfPath is not correct.please set SetConfpathWithName()");
         }
-		String localTargetDirectory = confPathWithName.substring(0,
-				confPathWithName.lastIndexOf(File.separator));
 		
-		Connection conn = new Connection(this.creauthInfo.getHostname());
 		/* Now connect */
-		conn.connect();
-		boolean isAuthenticated = conn.authenticateWithPassword(
-				this.creauthInfo.getUsername(), this.creauthInfo.getPassword());
-		if (isAuthenticated == false)
-			throw new RemoteException("Authentication failed.");
-		
-		SCPClient scpc=conn.createSCPClient();
-		
-		scpc.get(remoteFile, localTargetDirectory);
-		/* Close the connection */
-		conn.close();
+		try {
+			SCPClient scpc=conn.createSCPClient();
+			scpc.get(remoteFile, localConfPath);
+			/*no Close the connection */
+
+		} catch (IOException e) {
+			throw new RemoteException(e.getMessage());
+		}
+	}
+	
+	private String GetlocalConfFullName(){
+		return localConfPath + "nginx.conf";
 	}
 	
 	/**
 	 * Write the Remote nginx.conf file which is select.
 	 * @throws RemoteException 
 	 * */
-	public void WriteRemoteConf() throws IOException, RemoteException{
-        if(null == confPathWithName || "" == confPathWithName){
-        	throw new RemoteException("local confPathWithName is not correct.please set SetConfpathWithName()");
+	private void WriteRemoteConf() throws RemoteException{
+        if(null == localConfPath || "" == localConfPath){
+        	throw new RemoteException("local localConfPath is not correct.please set SetConfpathWithName()");
         }
         
-		Connection conn = new Connection(this.creauthInfo.getHostname());
-		/* Now connect */
-		conn.connect();
-		boolean isAuthenticated = conn.authenticateWithPassword(
-				this.creauthInfo.getUsername(), this.creauthInfo.getPassword());
-		if (isAuthenticated == false)
-			throw new IOException("Authentication failed.");
-		
-		SCPClient scpc=conn.createSCPClient();
-//		Session sess = conn.openSession();		
-		
-		String localFile = confPathWithName;
-		scpc.put(localFile, remoteTargetDirectory);
-		
-		/* Close this session */
-//		sess.close();
-		/* Close the connection */
-		conn.close();
+		try {
+			getFileModifyTime();
+			SCPClient scpc=conn.createSCPClient();	
+			
+			String localFile = GetlocalConfFullName();
+			String remoteConfDirectory = remoteConf.substring(0,
+					remoteConf.lastIndexOf(File.separator));
+			scpc.put(localFile, remoteConfDirectory);
+
+		} catch (IOException e) {
+			throw new RemoteException(e.getMessage());
 		}
+	}
+	
+	private String getFileModifyTime() throws RemoteException {
+		Session sess = null;
+		try {
+			/* Connect to the remote host and establish a Session */
+			sess = conn.openSession();
+			
+			InputStream stdout = null;
+			BufferedReader br = null;
+
+			boolean cmdflag = true;
+			
+			/* Execute a command */
+			String cmd = "stat awk.txt | grep -i Modify | awk -F. '{print $1}' | awk '{print $2$3}'| awk -F- '{print $1$2$3}' | awk -F: '{print $1$2$3}'";
+			sess.execCommand(cmd);
+
+			stdout = new StreamGobbler(sess.getStdout());
+			br = new BufferedReader(new InputStreamReader(stdout));
+			
+		    StringBuilder sb = new StringBuilder();
+		    String s ="";
+		    
+			while( (s = br.readLine()) != null) {
+				sb.append(s);
+				cmdflag = false;
+			}
+			
+			stdout.close();
+			br.close();
+			
+			if(cmdflag)
+			{
+				throw new RemoteException("Command stat Execution failed.");
+			}
+			
+			System.out.println(sb.toString());	// TODO
+			
+			return sb.toString();
+		} catch (IOException e) {
+			throw new RemoteException(e.getMessage());
+		}finally{
+			sess.close();
+		}
+	}
 
 	/**
 	 * Get the conf text which conf path is confPathWithName.
@@ -459,7 +524,7 @@ public class RecRemoteOperator implements RemoteOperator{
 	public String ReadConf() throws RemoteException{
 	    try {
 		    // read conf
-		    File file = new File(confPathWithName);
+		    File file = new File(GetlocalConfFullName());
 		    StringBuilder sb = new StringBuilder();
 		    String s ="";
 
@@ -481,7 +546,7 @@ public class RecRemoteOperator implements RemoteOperator{
 	private void WriteConf(String wcConftext) throws RemoteException{
 		try {
 	    	FileWriter fw = null;
-	    	fw = new FileWriter(confPathWithName);
+	    	fw = new FileWriter(GetlocalConfFullName());
 
 		    fw.write(wcConftext);
 			fw.close();
