@@ -8,6 +8,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringReader;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Iterator;
@@ -29,7 +32,7 @@ public class RecRemoteOperator implements RemoteOperator{
 	private String confText = null;
 	private String localConfPath = null;
 //	private String confPathWithName = null;
-	
+	private String oldConfDatestamp = null;
 	private RecAuthInfo creauthInfo = null;
 	private String remoteConf = null;
 	private Connection conn = null;
@@ -132,8 +135,9 @@ public class RecRemoteOperator implements RemoteOperator{
 	
 			// write to local conf file
 			WriteConf(newConfText);
-			WriteRemoteConf();
 	    }
+	    
+		WriteRemoteConf();
 	}
 	
 	/**
@@ -435,6 +439,8 @@ public class RecRemoteOperator implements RemoteOperator{
 		
 		/* Now connect */
 		try {
+			oldConfDatestamp = getFileModifyTime();
+			
 			SCPClient scpc=conn.createSCPClient();
 			scpc.get(remoteFile, localConfPath);
 			/*no Close the connection */
@@ -458,17 +464,42 @@ public class RecRemoteOperator implements RemoteOperator{
         }
         
 		try {
-			getFileModifyTime();
-			SCPClient scpc=conn.createSCPClient();	
+			if(!CanCommitFile()){
+	        	throw new RemoteException("the remote Nginx.conf has modified before.Please check remote Nginx.conf timestamp");
+			}
+			SCPClient scpc=conn.createSCPClient();
 			
 			String localFile = GetlocalConfFullName();
 			String remoteConfDirectory = remoteConf.substring(0,
-					remoteConf.lastIndexOf(File.separator));
+					remoteConf.lastIndexOf("/"));
 			scpc.put(localFile, remoteConfDirectory);
 
 		} catch (IOException e) {
 			throw new RemoteException(e.getMessage());
 		}
+	}
+
+	private boolean CanCommitFile() throws RemoteException{
+		String nowConfDatestamp = getFileModifyTime();
+		
+		if(StringToDate(oldConfDatestamp).compareTo(StringToDate(nowConfDatestamp)) < 0){
+//			System.out.println("<");
+			return false;
+		}else{
+			return true;
+		}
+	}
+	
+	private Date StringToDate(String s) throws RemoteException{
+		Date time=new Date();
+		SimpleDateFormat sd=new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+		try{
+			 time=sd.parse(s);
+		}
+		catch (ParseException e) {
+			throw new RemoteException(e.getMessage());
+		}
+		return time;
 	}
 	
 	private String getFileModifyTime() throws RemoteException {
@@ -483,7 +514,8 @@ public class RecRemoteOperator implements RemoteOperator{
 			boolean cmdflag = true;
 			
 			/* Execute a command */
-			String cmd = "stat awk.txt | grep -i Modify | awk -F. '{print $1}' | awk '{print $2$3}'| awk -F- '{print $1$2$3}' | awk -F: '{print $1$2$3}'";
+			String cmd = "stat "+remoteConf+" | grep -i Modify | awk -F. '{print $1}'";
+//			System.out.println(cmd);
 			sess.execCommand(cmd);
 
 			stdout = new StreamGobbler(sess.getStdout());
@@ -502,12 +534,12 @@ public class RecRemoteOperator implements RemoteOperator{
 			
 			if(cmdflag)
 			{
-				throw new RemoteException("Command stat Execution failed.");
+				throw new RemoteException("Command stat "+remoteConf+" Execution failed.");
 			}
 			
-			System.out.println(sb.toString());	// TODO
-			
-			return sb.toString();
+			String af = sb.toString().substring(8).replace('-', '/');
+//			System.out.println(af);
+			return af;
 		} catch (IOException e) {
 			throw new RemoteException(e.getMessage());
 		}finally{
