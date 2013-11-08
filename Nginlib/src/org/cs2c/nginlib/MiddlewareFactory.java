@@ -24,9 +24,8 @@ public abstract class MiddlewareFactory {
 	 * @param authInfo Remote host access information
 	 * @return the instance binded with the specific remote middleware.
 	 * @throws RemoteException When authentication fails, network error or nginx does not exist.
-	 * @throws IOException 
 	 * */
-	static public MiddlewareFactory getInstance(AuthInfo authInfo, String middlewareHome) throws RemoteException, IOException{
+	static public MiddlewareFactory getInstance(AuthInfo authInfo, String middlewareHome) throws RemoteException{
 		// TODO
 		RecMiddlewareFactory recmiddleware=new RecMiddlewareFactory(authInfo,pathStrConvert(middlewareHome));
 		return recmiddleware;

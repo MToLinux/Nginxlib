@@ -23,14 +23,15 @@ public class RecMiddlewareFactory extends MiddlewareFactory {
 	RecConfigurator configurator = null;
 	Connection conn = null;
 	String midwarePath = "";
+	
 
 	/**
 	 * Construct a RecMiddlewareFactory with specified properties
 	 * 
-	 * @throws IOException
+	 * @throws RemoteException 
 	 */
 	public RecMiddlewareFactory(AuthInfo authInfo, String middlewareHome)
-			throws IOException {
+			throws  RemoteException {
 		this.authInfo = (RecAuthInfo) authInfo;
 		this.midwarePath = pathStrConvert(middlewareHome);
 		this.creatConnection();
@@ -47,7 +48,7 @@ public class RecMiddlewareFactory extends MiddlewareFactory {
 		return conn;
 	}
 
-	public void creatConnection() throws IOException {
+	public void creatConnection() throws RemoteException {
 		/* Create a connection instance */
 		conn = new Connection(authInfo.getHostname());
 		/* Now connect */
@@ -55,19 +56,16 @@ public class RecMiddlewareFactory extends MiddlewareFactory {
 			conn.connect();
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block
-			throw e1;
+			throw new RemoteException(e1);
+
 		}
-
-		/*
-		 * Authenticate. If you get an IOException saying something like
-		 * "Authentication method password not supported by the server at this stage."
-		 * then please check the FAQ.
-		 */
-		boolean isAuthenticated = conn.authenticateWithPassword(
-				authInfo.getUsername(), authInfo.getPassword());
-		if (isAuthenticated == false)
-			throw new IOException("Authentication failed.");
-
+		try {
+			conn.authenticateWithPassword(
+					authInfo.getUsername(), authInfo.getPassword());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			throw new RemoteException(e);
+		}
 	}
 
 	@Override
