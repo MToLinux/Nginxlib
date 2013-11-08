@@ -3,6 +3,7 @@ package org.cs2c.nginlib.configtest;
 import static org.junit.Assert.*;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 import org.cs2c.nginlib.AuthInfo;
@@ -16,6 +17,8 @@ import org.cs2c.nginlib.config.RecRemoteOperator;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.trilead.ssh2.Connection;
+
 public class RecRemoteOperatorTest {
 	RecRemoteOperator rro = new RecRemoteOperator();
 	String path = "D:\\eclipseWorkspace\\confpath\\nginx.conf";
@@ -24,7 +27,7 @@ public class RecRemoteOperatorTest {
 	public void setUp() throws Exception {
 		//ReadConf ok
 
-		rro.SetConfpathWithName(path);
+		rro.SetLocalConfpath(path);
 	}
 
 	@Test
@@ -34,13 +37,23 @@ public class RecRemoteOperatorTest {
 	}
 
 	@Test
-	public final void testRecRemoteOperatorAuthInfoString() {
-		String midwarePath = "/root/nginx/conf/";
+	public final void testRecRemoteOperatorAuthInfoString() throws IOException, RemoteException {
+		String midwarePath = "/root/nginx/";
 		AuthInfo authInfo= new RecAuthInfo();
 		authInfo.setHost("10.1.50.4");
 		authInfo.setUsername("root");
 		authInfo.setPassword("cs2csolutions");
-		RecRemoteOperator rro1 = new RecRemoteOperator(authInfo,midwarePath);
+
+
+		Connection conn = new Connection("10.1.50.4");
+		/* Now connect */
+		conn.connect();
+		boolean isAuthenticated = conn.authenticateWithPassword(
+				"root", "cs2csolutions");
+		if (isAuthenticated == false)
+			throw new RemoteException("Authentication failed.");
+		
+		RecRemoteOperator rro1 = new RecRemoteOperator(authInfo,midwarePath,conn);
 
 		assertTrue(null != rro1);
 	}
@@ -57,9 +70,6 @@ public class RecRemoteOperatorTest {
 		String outerBlockNames = "";
 		List<Block> list= null;
 		
-		String path = "D:\\eclipseWorkspace\\confpath\\nginx.conf";
-
-		rro.SetConfpathWithName(path);
 		
 		try {
 			// case 1:
@@ -84,9 +94,9 @@ public class RecRemoteOperatorTest {
 //		outerBlockNames can be "http:0|server:0"
 		String outerBlockNames = "";
 		
-		String path = "D:\\eclipseWorkspace\\confpath\\nginx.conf";
-
-		rro.SetConfpathWithName(path);
+//		String path = "D:\\eclipseWorkspace\\confpath\\nginx.conf";
+//
+//		rro.SetConfpathWithName(path);
 		
 		try {
 			// case 2:
@@ -112,9 +122,9 @@ public class RecRemoteOperatorTest {
 		String outerBlockNames = "";
 		List<Block> list= null;
 		
-		String path = "D:\\eclipseWorkspace\\confpath\\nginx.conf";
-
-		rro.SetConfpathWithName(path);
+//		String path = "D:\\eclipseWorkspace\\confpath\\nginx.conf";
+//
+//		rro.SetConfpathWithName(path);
 		
 		try {
 			// case 1:
@@ -140,9 +150,9 @@ public class RecRemoteOperatorTest {
 		String outerBlockNames = "";
 		List<Block> list= null;
 		
-		String path = "D:\\eclipseWorkspace\\confpath\\nginx.conf";
-
-		rro.SetConfpathWithName(path);
+//		String path = "D:\\eclipseWorkspace\\confpath\\nginx.conf";
+//
+//		rro.SetConfpathWithName(path);
 		
 		try {
 			// case 1:
@@ -169,9 +179,9 @@ public class RecRemoteOperatorTest {
 		String outerBlockNames = "";
 		List<Block> list= null;
 		
-		String path = "D:\\eclipseWorkspace\\confpath\\nginx.conf";
-
-		rro.SetConfpathWithName(path);
+//		String path = "D:\\eclipseWorkspace\\confpath\\nginx.conf";
+//
+//		rro.SetConfpathWithName(path);
 		
 		try {
 			// case 1:
@@ -195,9 +205,9 @@ public class RecRemoteOperatorTest {
 		String outerBlockNames = "";
 		List<Block> list= null;
 		
-		String path = "D:\\eclipseWorkspace\\confpath\\nginx.conf";
-
-		rro.SetConfpathWithName(path);
+//		String path = "D:\\eclipseWorkspace\\confpath\\nginx.conf";
+//
+//		rro.SetConfpathWithName(path);
 		
 		try {
 			// case 1:
@@ -221,9 +231,9 @@ public class RecRemoteOperatorTest {
 		String outerBlockNames = "http:0|server:0|location /:0";
 		List<Block> list= null;
 		
-		String path = "D:\\eclipseWorkspace\\confpath\\nginx.conf";
-
-		rro.SetConfpathWithName(path);
+//		String path = "D:\\eclipseWorkspace\\confpath\\nginx.conf";
+//
+//		rro.SetConfpathWithName(path);
 		
 		try {
 			// case 1:
@@ -355,6 +365,7 @@ public class RecRemoteOperatorTest {
 		}
 	}
 	
+	/*
 	@Test
 	public final void testGetRemoteConf() {
 		AuthInfo authInfo= new RecAuthInfo();
@@ -400,7 +411,7 @@ public class RecRemoteOperatorTest {
 			fail(e.getMessage());
 		}
 	}
-
+*/
 	@Test
 	public final void testReadConf() {
 		String conftext = null;

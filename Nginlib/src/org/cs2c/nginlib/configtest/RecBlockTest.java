@@ -19,10 +19,10 @@ public class RecBlockTest {
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
 
-		String path = "D:\\eclipseWorkspace\\confpath\\nginx.conf";
+		String path = "D:\\eclipseWorkspace\\confpath\\";
 		//ReadConf ok
 		RecRemoteOperator rro = new RecRemoteOperator();
-		rro.SetConfpathWithName(path);
+		rro.SetLocalConfpath(path);
 		ConfText = rro.ReadConf();
 
 	}
@@ -47,10 +47,10 @@ public class RecBlockTest {
 
 	@Test
 	public final void testSetBlockText() {
-		String path = "D:\\eclipseWorkspace\\confpath\\nginx.conf";
+		String path = "D:\\eclipseWorkspace\\confpath\\";
 		//ReadConf ok
 		RecRemoteOperator rro = new RecRemoteOperator();
-		rro.SetConfpathWithName(path);
+		rro.SetLocalConfpath(path);
 		String ConfText;
 		try {
 			ConfText = rro.ReadConf();
@@ -66,10 +66,10 @@ public class RecBlockTest {
 	}
 
 	private void IntegrationTestInClass(){
-		String path = "D:\\eclipseWorkspace\\confpath\\nginx.conf";
+		String path = "D:\\eclipseWorkspace\\confpath\\";
 		//ReadConf ok
 		RecRemoteOperator rro = new RecRemoteOperator();
-		rro.SetConfpathWithName(path);
+		rro.SetLocalConfpath(path);
 		String ConfText;
 		try {
 			ConfText = rro.ReadConf();
@@ -178,8 +178,8 @@ public class RecBlockTest {
 		// get list.get(1) block
 		RecRemoteOperator rro = new RecRemoteOperator();
 		List<Block> list= null;
-		String path = "D:\\eclipseWorkspace\\confpath\\nginx.conf";
-		rro.SetConfpathWithName(path);
+		String path = "D:\\eclipseWorkspace\\confpath\\";
+		rro.SetLocalConfpath(path);
 		list= rro.getBlocks("events", "");
 //		System.out.println(list.get(1));
 		
@@ -199,8 +199,8 @@ public class RecBlockTest {
 		// get list.get(1) block
 		RecRemoteOperator rro = new RecRemoteOperator();
 		List<Block> list= null;
-		String path = "D:\\eclipseWorkspace\\confpath\\nginx.conf";
-		rro.SetConfpathWithName(path);
+		String path = "D:\\eclipseWorkspace\\confpath\\";
+		rro.SetLocalConfpath(path);
 		list= rro.getBlocks("events", "");
 		
 		List<Directive> listd = new ArrayList<Directive>();
