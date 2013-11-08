@@ -20,72 +20,16 @@ public class RecMonitor implements Monitor {
 	private String hostname = "127.0.0.1";
 	private String username = "root";
 	private String password = "qwer1234";
-	private int port = 22;
 	private Connection conn = null;
 	private Session sess = null;
 	private String nginxpath = "/usr/local/nginx/";
 	
 	/* Constructor */
-	public RecMonitor(Connection conn)
-	{
-		this.hostname = "127.0.0.1";
-		this.username = "root";
-		this.password = "qwer1234";
-		this.port = 22;
-		this.nginxpath = "/usr/local/nginx/";
-		this.conn = conn;
-	}
-	public RecMonitor(String hostname, Connection conn)
-	{
-		this.hostname = hostname;
-		this.username = "root";
-		this.password = "qwer1234";
-		this.port = 22;
-		this.nginxpath = "/usr/local/nginx/";
-		this.conn = conn;
-	}
-	public RecMonitor(String hostname, String username, String password, Connection conn)
-	{
-		this.hostname = hostname;
-		this.username = username;
-		this.password = password;
-		this.port = 22;
-		this.nginxpath = "/usr/local/nginx/";
-		this.conn = conn;
-	}
-	public RecMonitor(String hostname, String username, String password, int port, Connection conn)
-	{
-		this.hostname = hostname;
-		this.username = username;
-		this.password = password;
-		this.port = port;
-		this.nginxpath = "/usr/local/nginx/";
-		this.conn = conn;
-	}
-	public RecMonitor(String hostname, String username, String password, String nginxpath, Connection conn)
-	{
-		this.hostname = hostname;
-		this.username = username;
-		this.password = password;
-		this.port = 22;
-		this.nginxpath = nginxpath;
-		this.conn = conn;
-	}
-	public RecMonitor(String hostname, String username, String password, int port, String nginxpath, Connection conn)
-	{
-		this.hostname = hostname;
-		this.username = username;
-		this.password = password;
-		this.port = port;
-		this.nginxpath = nginxpath;
-		this.conn = conn;
-	}
 	public RecMonitor(RecAuthInfo ainfo, String nginxpath, Connection conn)
 	{
 		this.hostname = ainfo.getHostname();
 		this.username = ainfo.getUsername();
 		this.password = ainfo.getPassword();
-		this.port = 22;
 		this.nginxpath = nginxpath;
 		this.conn = conn;
 	}
