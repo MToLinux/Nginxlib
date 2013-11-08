@@ -34,7 +34,9 @@ public class RecControllerTest extends TestCase {
 	}
 	@Test
 	public void testStart() throws RemoteException {
+
 		testController.start();
+	
 	}
 
 	@Test

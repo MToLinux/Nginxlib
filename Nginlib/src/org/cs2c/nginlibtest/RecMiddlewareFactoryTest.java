@@ -51,21 +51,21 @@ public class RecMiddlewareFactoryTest extends TestCase {
 	@SuppressWarnings("deprecation")
 	@Test
 	public void testGetController() throws IOException {
-		Controller rcontroller=new RecController(authInfo, "/usr/local/nginx",instance.getConnection());
+		Controller rcontroller=null;
 		rcontroller=instance.getController();
 		Assert.assertNotNull(rcontroller);
 	}
 
 	@Test
 	public void testGetConfigurator() {
-		Configurator rconfigurator=new RecConfigurator(authInfo,"/usr/local/nginx");
+		Configurator rconfigurator=null;
 		rconfigurator=instance.getConfigurator();
 		Assert.assertNotNull(rconfigurator);
 	}
 
 	@Test
 	public void testGetMonitor() {
-		RecMonitor rmonitor=new RecMonitor(authInfo,"/usr/local/nginx");
+		RecMonitor rmonitor=null;
 		rmonitor=(RecMonitor)instance.getMonitor();
 		Assert.assertNotNull(rmonitor);
 	}
