@@ -25,7 +25,8 @@ public class RecDirective implements Directive,Element{
 	@Override
 	public List<Parameter> getParameters() {
 		// Directive_name Option=9 StringParameter $Variable
-		String[] lineArray=directiveValue.split(" ");
+		String divalue = directiveValue.substring(0, directiveValue.length()-1);
+		String[] lineArray=divalue.split(" ");
 		List<Parameter> listParam = new  ArrayList<Parameter>();
 		
 		for(int i=1;i<lineArray.length;i++){
