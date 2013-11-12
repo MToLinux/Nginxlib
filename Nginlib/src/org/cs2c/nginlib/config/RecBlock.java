@@ -201,6 +201,7 @@ public class RecBlock implements Block,Element {
 	    String linetxt =null;
 	    int nblockstart = 0;
 	    int nblockEnd = 0;
+	    int nlinecount = 0;	//TODO
 	    boolean bBlock = false;
 		
 		try {
@@ -223,9 +224,13 @@ public class RecBlock implements Block,Element {
 					if(IsNotComment(linetxt) && linetxt.contains("}")){
 						nblockEnd++;
 					}
-				    sb.append(linetxt + "\n");
-				
+					if((nlinecount==0)||((null != blname) && (nblockstart!=0) && (nblockstart == nblockEnd))){
+					}else{
+					    sb.append(linetxt + "\n");
+					}
+					nlinecount++;
 					if((null != blname) && (nblockstart!=0) && (nblockstart == nblockEnd)){
+
 						blText = sb.toString();
 			            RecBlock objblock = new RecBlock();
 			    		// get name
@@ -237,12 +242,13 @@ public class RecBlock implements Block,Element {
 						// close one block text,loop next.
 						bBlock = false;
 						blname = null;
+						nlinecount = 0;
 						sb.delete(0, sb.length());
 						
-						//递归SubBlock
+						//get SubBlock and do recursion
 						String blockcontent = GetBlockContent(blText);
 			    		if(hasSubBlock(blockcontent)){
-			    			GetSubBlocks(blockcontent);//递归
+			    			GetSubBlocks(blockcontent);//recursion
 			    		}
 					}
 				}
