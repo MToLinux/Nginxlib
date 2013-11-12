@@ -201,7 +201,7 @@ public class RecBlock implements Block,Element {
 	    String linetxt =null;
 	    int nblockstart = 0;
 	    int nblockEnd = 0;
-	    int nlinecount = 0;	//TODO
+	    int nlinecount = 0;
 	    boolean bBlock = false;
 		
 		try {
@@ -213,7 +213,7 @@ public class RecBlock implements Block,Element {
 				if((null != tempblname)&&(null == blname)){
 					blname = tempblname;
 					bBlock = true;
-					//System.out.println("blname:" + blname);
+//					System.out.println("blname:" + blname);
 				}
 				
 				// make sure text start from the block name
@@ -325,7 +325,7 @@ public class RecBlock implements Block,Element {
 		}
 		
 		if(linetxt.contains("{")){
-			int endIndex=linetxt.trim().lastIndexOf(" ");
+			int endIndex=linetxt.trim().lastIndexOf("{");
 			bname = linetxt.trim().substring(0, endIndex);
 		}
 		return bname;
