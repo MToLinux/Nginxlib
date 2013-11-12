@@ -326,7 +326,7 @@ public class RecBlock implements Block,Element {
 		
 		if(linetxt.contains("{")){
 			int endIndex=linetxt.trim().lastIndexOf("{");
-			bname = linetxt.trim().substring(0, endIndex);
+			bname = linetxt.trim().substring(0, endIndex-1);
 		}
 		return bname;
 	}
