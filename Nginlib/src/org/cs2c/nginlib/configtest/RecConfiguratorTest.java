@@ -242,7 +242,24 @@ public class RecConfiguratorTest {
 			e.printStackTrace();
 		}
 	}
+	@Test
+	public final void testGetBlocks1() {
+		String blockName = null;
+		String outerBlockNames = "http:0";
+		List<Block> list= null;
+		try {
+			testSetConfpathWithName();
+			
+			// case 2
+			blockName = "server";
+			list= orc.getBlocks(blockName, outerBlockNames);
+			assertEquals(1, list.size());
+			assertEquals(blockName, list.get(0).getName());
 
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
+	}
 	@Test
 	public final void testNewBlock() {
 		Block op = orc.newBlock();

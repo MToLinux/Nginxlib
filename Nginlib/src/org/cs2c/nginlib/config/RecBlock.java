@@ -201,6 +201,7 @@ public class RecBlock implements Block,Element {
 	    String linetxt =null;
 	    int nblockstart = 0;
 	    int nblockEnd = 0;
+	    int nlinecount = 0;
 	    boolean bBlock = false;
 		
 		try {
@@ -212,7 +213,7 @@ public class RecBlock implements Block,Element {
 				if((null != tempblname)&&(null == blname)){
 					blname = tempblname;
 					bBlock = true;
-					//System.out.println("blname:" + blname);
+//					System.out.println("blname:" + blname);
 				}
 				
 				// make sure text start from the block name
@@ -223,9 +224,13 @@ public class RecBlock implements Block,Element {
 					if(IsNotComment(linetxt) && linetxt.contains("}")){
 						nblockEnd++;
 					}
-				    sb.append(linetxt + "\n");
-				
+					if((nlinecount==0)||((null != blname) && (nblockstart!=0) && (nblockstart == nblockEnd))){
+					}else{
+					    sb.append(linetxt + "\n");
+					}
+					nlinecount++;
 					if((null != blname) && (nblockstart!=0) && (nblockstart == nblockEnd)){
+
 						blText = sb.toString();
 			            RecBlock objblock = new RecBlock();
 			    		// get name
@@ -237,12 +242,13 @@ public class RecBlock implements Block,Element {
 						// close one block text,loop next.
 						bBlock = false;
 						blname = null;
+						nlinecount = 0;
 						sb.delete(0, sb.length());
 						
-						//递归SubBlock
+						//get SubBlock and do recursion
 						String blockcontent = GetBlockContent(blText);
 			    		if(hasSubBlock(blockcontent)){
-			    			GetSubBlocks(blockcontent);//递归
+			    			GetSubBlocks(blockcontent);//recursion
 			    		}
 					}
 				}
@@ -319,8 +325,8 @@ public class RecBlock implements Block,Element {
 		}
 		
 		if(linetxt.contains("{")){
-			int endIndex=linetxt.trim().lastIndexOf(" ");
-			bname = linetxt.trim().substring(0, endIndex);
+			int endIndex=linetxt.trim().lastIndexOf("{");
+			bname = linetxt.trim().substring(0, endIndex).trim();
 		}
 		return bname;
 	}

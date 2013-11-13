@@ -641,12 +641,14 @@ public class RecRemoteOperator implements RemoteOperator{
 		return SufBlockText;
 	}
 	
+	//return BlockText with start"{",and end "{"
 	private String GetBlockTextWithIndex(String blname,int Index){
 		
 		RecBlock rb = new RecBlock();
 		rb.SetConfText(confText);
 		
 		String BlockText = rb.GetBlockText(blname,Index);
+//		System.out.println("BlockText:"+BlockText);
 		return BlockText;
 	}
 	
