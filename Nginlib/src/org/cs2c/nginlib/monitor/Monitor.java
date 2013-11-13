@@ -54,5 +54,5 @@ public interface Monitor {
 	 * @return A MiddlewareStatus(NginxStatus) handler by which to get the info already fetched.
 	 * @throws RemoteException When this remote operation fails for any non-local reason.
 	 * */
-	NginxStatus getNginxStatus(String nginx_statuspath, String nginx_username, String nginx_password) throws RemoteException;
+	NginxStatus getNginxStatus(boolean nginx_statusflag, String nginx_statuspath, String nginx_username, String nginx_password) throws RemoteException;
 }

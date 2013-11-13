@@ -38,6 +38,8 @@ public class MonitorTest {
 	private static int port = 22;
 	private static String nginxpath = "/usr/local/nginx/";
 	
+	private static boolean StatusModuleFlag = false;
+	
 	public static void establishConnection() throws IOException {
 		/* Create a connection instance */
 		conn = new Connection(hostname, port);
@@ -63,6 +65,8 @@ public class MonitorTest {
 		password = "cs2csolutions";
 		port = 22;
 		nginxpath = "/usr/local/nginx/";
+		
+		StatusModuleFlag = true;
 		
 		auInfo = new RecAuthInfo();
 		auInfo.setHost(hostname);
@@ -229,6 +233,7 @@ public class MonitorTest {
 
 		MemoryStatus memstat = monitor.getMemoryStatus();
 		
+		assertTrue(memstat.getTotalSwap() >= 0);
 		assertTrue(memstat.getUsedSwap() >= 0);
 		assertTrue(memstat.getSwapIn() >= 0);
 		assertTrue(memstat.getSwapOut() >= 0);
@@ -240,6 +245,7 @@ public class MonitorTest {
 		
 		//print
 		System.out.println("Memory Status:");
+		System.out.println("TotalSwap:" + memstat.getTotalSwap());
 		System.out.println("UsedSwap:" + memstat.getUsedSwap());
 		System.out.println("SwapIn:" + memstat.getSwapIn());
 		System.out.println("SwapOut:" + memstat.getSwapOut());
@@ -255,15 +261,17 @@ public class MonitorTest {
 	@Test(timeout=10000)
 	public void testGetNginxStatus() throws RemoteException {
 		
-		NginxStatus ngstat = monitor.getNginxStatus(null, null, null);
-		
-		assertTrue(ngstat.getActiveConnections() >= 0);
-		assertTrue(ngstat.getServerAccepts() >= 0);
-		assertTrue(ngstat.getServerHandled() >= 0);
-		assertTrue(ngstat.getServerRequests() >= 0);
-		assertTrue(ngstat.getNginxReading() >= 0);
-		assertTrue(ngstat.getNginxWriting() >= 0);
-		assertTrue(ngstat.getKeepAliveConnections() >= 0);
+		NginxStatus ngstat = monitor.getNginxStatus(StatusModuleFlag, null, null, null);
+		if(StatusModuleFlag)
+		{
+			assertTrue(ngstat.getActiveConnections() >= 0);
+			assertTrue(ngstat.getServerAccepts() >= 0);
+			assertTrue(ngstat.getServerHandled() >= 0);
+			assertTrue(ngstat.getServerRequests() >= 0);
+			assertTrue(ngstat.getNginxReading() >= 0);
+			assertTrue(ngstat.getNginxWriting() >= 0);
+			assertTrue(ngstat.getKeepAliveConnections() >= 0);
+		}
 
 
 		//Nginx Process
@@ -316,13 +324,20 @@ public class MonitorTest {
 
 		//print
 		System.out.println("Nginx Status:");
-		System.out.println("ActiveConnections:" + ngstat.getActiveConnections());
-		System.out.println("ServerAccepts:" + ngstat.getServerAccepts());
-		System.out.println("ServerHandled:" + ngstat.getServerHandled());
-		System.out.println("ServerRequests:" + ngstat.getServerRequests());
-		System.out.println("NginxReading:" + ngstat.getNginxReading());
-		System.out.println("NginxWriting:" + ngstat.getNginxWriting());
-		System.out.println("KeepAliveConnections:" + ngstat.getKeepAliveConnections());
+		if(StatusModuleFlag)
+		{
+			System.out.println("ActiveConnections:" + ngstat.getActiveConnections());
+			System.out.println("ServerAccepts:" + ngstat.getServerAccepts());
+			System.out.println("ServerHandled:" + ngstat.getServerHandled());
+			System.out.println("ServerRequests:" + ngstat.getServerRequests());
+			System.out.println("NginxReading:" + ngstat.getNginxReading());
+			System.out.println("NginxWriting:" + ngstat.getNginxWriting());
+			System.out.println("KeepAliveConnections:" + ngstat.getKeepAliveConnections());
+		}
+		else
+		{
+			System.out.println("Nginx status module is not installed!");
+		}
 
 		it = ngpslist.iterator();
 		System.out.println("NginxProcessListSize:" + ngpslist.size());

@@ -13,6 +13,7 @@ import org.junit.Test;
 public class MemoryStatusTest {
 	
 	private static MemoryStatus mmstat = new RecMemoryStatus();
+	private int TotalSwap = 1;
 	private int UsedSwap = 1;
 	private int SwapIn = 1;
 	private int SwapOut = 1;
@@ -33,6 +34,7 @@ public class MemoryStatusTest {
 	@Before
 	public void setUp() throws Exception {
 		
+		((RecMemoryStatus)mmstat).setTotalSwap(TotalSwap);
 		((RecMemoryStatus)mmstat).setUsedSwap(UsedSwap);
 		((RecMemoryStatus)mmstat).setSwapIn(SwapIn);
 		((RecMemoryStatus)mmstat).setSwapOut(SwapOut);
@@ -48,6 +50,11 @@ public class MemoryStatusTest {
 	public void tearDown() throws Exception {
 	}
 
+	@Test
+	public void testGetTotalSwap() {
+		assertEquals(TotalSwap, mmstat.getTotalSwap());
+	}
+	
 	@Test
 	public void testGetUsedSwap() {
 		assertEquals(UsedSwap, mmstat.getUsedSwap());

@@ -11,6 +11,11 @@ package org.cs2c.nginlib.monitor;
  */
 public interface MemoryStatus {
 	/**
+	 * Get current total swap (Kb) which has already fetched from remote host.
+	 * @return The current total swap (Kb).
+	 * */
+	int getTotalSwap();
+	/**
 	 * Get current used swap (Kb) which has already fetched from remote host.
 	 * @return The current used swap (Kb).
 	 * */

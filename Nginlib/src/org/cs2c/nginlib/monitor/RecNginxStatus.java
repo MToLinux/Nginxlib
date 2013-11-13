@@ -77,6 +77,7 @@ public class RecNginxStatus implements NginxStatus{
 
 	
 	/* Status Information */
+	private boolean StatusModuleFlag = false;
 	private int ActiveConnections = 0;
 	private int ServerAccepts = 0;
 	private int ServerHandled = 0;
@@ -85,7 +86,14 @@ public class RecNginxStatus implements NginxStatus{
 	private int NginxWriting = 0;
 	private int KeepAliveConnections = 0;
 	private List<RecProcessStatus> listNginxProcessStatus = null;
-		
+	
+	public void setStatusModuleFlag(boolean StatusModuleFlag) {
+		this.StatusModuleFlag = StatusModuleFlag;
+	}
+	public boolean getStatusModuleFlag() {
+		return StatusModuleFlag;
+	}
+	
 	public void setActiveConnections(int ActiveConnections) {
 		this.ActiveConnections = ActiveConnections;
 	}

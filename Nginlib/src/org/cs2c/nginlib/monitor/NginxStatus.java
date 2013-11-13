@@ -40,6 +40,12 @@ public interface NginxStatus {
 	
 	/* Status Informations */
 	/**
+	 * Get current nginx status module flag which indicates that the status module has been installed.
+	 * @return The current nginx status module flag. 
+	 * */
+	public boolean getStatusModuleFlag();
+	
+	/**
 	 * Get current number of all open connections which has already fetched from remote host.
 	 * @return The current number of all open connections.
 	 * */

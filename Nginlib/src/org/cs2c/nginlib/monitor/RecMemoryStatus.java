@@ -2,6 +2,7 @@ package org.cs2c.nginlib.monitor;
 
 public class RecMemoryStatus implements MemoryStatus {
 
+	private int TotalSwap = 0;
 	private int UsedSwap = 0;
 	private int SwapIn = 0;
 	private int SwapOut = 0;
@@ -10,6 +11,15 @@ public class RecMemoryStatus implements MemoryStatus {
 	private int Shared = 0;
 	private int Cached = 0;
 	private int Used = 0;
+	
+	public void setTotalSwap(int TotalSwap)
+	{
+		this.TotalSwap = TotalSwap;
+	}
+	@Override
+	public int getTotalSwap() {
+		return TotalSwap;
+	}
 	
 	public void setUsedSwap(int UsedSwap)
 	{

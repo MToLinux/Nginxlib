@@ -458,6 +458,7 @@ public class RecMonitor implements Monitor {
 			/* establish a Session */
 			establishSession();
 			
+			int TotalSwap = 0;
 			int UsedSwap = 0;
 			int SwapIn = 0;
 			int SwapOut = 0;
@@ -557,6 +558,7 @@ public class RecMonitor implements Monitor {
 				}
 				else if(linesplit[0].equals("Swap:"))
 				{
+					TotalSwap = Integer.parseInt(linesplit[1]);
 					UsedSwap = Integer.parseInt(linesplit[2]);
 				}
 				else
@@ -577,6 +579,8 @@ public class RecMonitor implements Monitor {
 			memsta.setSwapOut(SwapOut);
 			memsta.setUsed(Used);
 			memsta.setUsedSwap(UsedSwap);
+			memsta.setTotalSwap(TotalSwap);
+			
 								
 			/* Close the session */
 			closeSession();
@@ -595,7 +599,7 @@ public class RecMonitor implements Monitor {
 	}
 	
 	@Override
-	public NginxStatus getNginxStatus(/*String nginx_path, */String nginx_statuspath, String nginx_username, String nginx_password) throws RemoteException {
+	public NginxStatus getNginxStatus(boolean nginx_statusflag, String nginx_statuspath, String nginx_username, String nginx_password) throws RemoteException {
 		RecNginxStatus ngsta = new RecNginxStatus(this.nginxpath, nginx_statuspath, nginx_username, nginx_password);
 		try
 		{
@@ -638,86 +642,90 @@ public class RecMonitor implements Monitor {
 			boolean cmdflag = true;
 			boolean pscmdflag = true;
 			
-			/* Execute a command */
-			sess.execCommand(nginxStatusCommond);
-			
-			stdout = new StreamGobbler(sess.getStdout());
-			br = new BufferedReader(new InputStreamReader(stdout));
-			linenum = 0;
-			while (true)
+			if(nginx_statusflag)
 			{
-				String linein = br.readLine();
-				String line = null;
-				if (linein == null)
+				/* Execute a command */
+				sess.execCommand(nginxStatusCommond);
+				
+				stdout = new StreamGobbler(sess.getStdout());
+				br = new BufferedReader(new InputStreamReader(stdout));
+				linenum = 0;
+				while (true)
 				{
-					if(linenum == 0)
+					String linein = br.readLine();
+					String line = null;
+					if (linein == null)
 					{
-						cmdflag = false;
-					}
-					break;
-				}
-				linenum++;
-				if(linenum == 1)
-				{
-					if(linein.length()>=1)
-					{
-						line = deleteExtraSpace(linein);
-					}
-					if(line == null || line.length()<3)
-					{
-						linenum--;
-						continue;
-					}
-					String linesplit[] = line.split(":");
-					String actconn = deleteExtraSpace(linesplit[0]);
-					if(!actconn.equals("Active connections"))
-					{
-						nginxflag = false;
+						if(linenum == 0)
+						{
+							cmdflag = false;
+						}
 						break;
 					}
-					ActiveConnections = Integer.parseInt(deleteExtraSpace(linesplit[linesplit.length-1]));
+					linenum++;
+					if(linenum == 1)
+					{
+						if(linein.length()>=1)
+						{
+							line = deleteExtraSpace(linein);
+						}
+						if(line == null || line.length()<3)
+						{
+							linenum--;
+							continue;
+						}
+						String linesplit[] = line.split(":");
+						String actconn = deleteExtraSpace(linesplit[0]);
+						if(!actconn.equals("Active connections"))
+						{
+							nginxflag = false;
+							break;
+						}
+						ActiveConnections = Integer.parseInt(deleteExtraSpace(linesplit[linesplit.length-1]));
+					}
+					else if(linenum==3)
+					{
+						if(linein.length()>=1)
+						{
+							line = deleteExtraSpace(linein);
+						}
+						if(line == null || line.length()<3)
+						{
+							linenum--;
+							continue;
+						}
+						String linesplit[] = line.split(" ");
+	
+						ServerAccepts = Integer.parseInt(linesplit[0]);
+						ServerHandled = Integer.parseInt(linesplit[1]);
+						ServerRequests = Integer.parseInt(linesplit[2]);
+					}
+					else if(linenum==4)
+					{
+						if(linein.length()>=1)
+						{
+							linein = linein.replace(":", " ");
+							line = deleteExtraSpace(linein);
+						}
+						if(line == null || line.length()<3)
+						{
+							linenum--;
+							continue;
+						}
+						String linesplit[] = line.split(" ");
+						NginxReading = Integer.parseInt(deleteExtraSpace(linesplit[1]));
+						NginxWriting = Integer.parseInt(deleteExtraSpace(linesplit[3]));
+						KeepAliveConnections = Integer.parseInt(deleteExtraSpace(linesplit[5]));
+					}
 				}
-				else if(linenum==3)
-				{
-					if(linein.length()>=1)
-					{
-						line = deleteExtraSpace(linein);
-					}
-					if(line == null || line.length()<3)
-					{
-						linenum--;
-						continue;
-					}
-					String linesplit[] = line.split(" ");
-
-					ServerAccepts = Integer.parseInt(linesplit[0]);
-					ServerHandled = Integer.parseInt(linesplit[1]);
-					ServerRequests = Integer.parseInt(linesplit[2]);
-				}
-				else if(linenum==4)
-				{
-					if(linein.length()>=1)
-					{
-						linein = linein.replace(":", " ");
-						line = deleteExtraSpace(linein);
-					}
-					if(line == null || line.length()<3)
-					{
-						linenum--;
-						continue;
-					}
-					String linesplit[] = line.split(" ");
-					NginxReading = Integer.parseInt(deleteExtraSpace(linesplit[1]));
-					NginxWriting = Integer.parseInt(deleteExtraSpace(linesplit[3]));
-					KeepAliveConnections = Integer.parseInt(deleteExtraSpace(linesplit[5]));
-				}
+				stdout.close();
+				br.close();
+				
+				closeSession();
+				establishSession();
 			}
-			stdout.close();
-			br.close();
 			
 			/* Execute a command: nginx ps cmd */
-			closeSession();
-			establishSession();
 			sess.execCommand("ps -aux|grep nginx");
 			
 			stdout = new StreamGobbler(sess.getStdout());

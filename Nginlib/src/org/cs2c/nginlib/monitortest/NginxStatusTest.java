@@ -17,6 +17,7 @@ import org.junit.Test;
 public class NginxStatusTest {
 	
 	private static NginxStatus ngstat = new RecNginxStatus(null, null, null, null);
+	private boolean StatusModuleFlag = false;
 	private int ActiveConnections = 1;
 	private int ServerAccepts = 1;
 	private int ServerHandled = 1;
@@ -51,6 +52,7 @@ public class NginxStatusTest {
 
 	@Before
 	public void setUp() throws Exception {
+		((RecNginxStatus)ngstat).setStatusModuleFlag(StatusModuleFlag);
 		((RecNginxStatus)ngstat).setActiveConnections(ActiveConnections);
 		((RecNginxStatus)ngstat).setServerAccepts(ServerAccepts);
 		((RecNginxStatus)ngstat).setServerHandled(ServerHandled);
@@ -83,7 +85,11 @@ public class NginxStatusTest {
 	public void tearDown() throws Exception {
 	}
 
-
+	@Test
+	public void testGetStatusModuleFlag() {
+		assertFalse(ngstat.getStatusModuleFlag());
+	}
+	
 	@Test
 	public void testGetActiveConnections() {
 		assertEquals(ActiveConnections, ngstat.getActiveConnections());
