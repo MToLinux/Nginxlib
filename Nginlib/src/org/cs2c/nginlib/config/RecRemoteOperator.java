@@ -71,7 +71,7 @@ public class RecRemoteOperator implements RemoteOperator{
 	@Override
 	public void append(Element element, String outerBlockNames)
 			throws RemoteException {
-		
+		String editBlString = null;
 	    if(CheckOuterBlockNames(outerBlockNames)){
 	    	throw new RemoteException("outerBlockNames is not correct,outerBlockNames ="+outerBlockNames);
 	    }
@@ -88,8 +88,22 @@ public class RecRemoteOperator implements RemoteOperator{
 	    String BlockText = objHashMap.get("blocktext");
 	    int BlockLength = Integer.parseInt(objHashMap.get("blocklength"));
 	    int nblockNameNum = Integer.parseInt(objHashMap.get("nblocknamenum"));
+//		System.out.println("BlockLength:"+BlockLength);
+//		System.out.println("nblockNameNum"+nblockNameNum);
 
-		String newConfText = GetPreBlockText(confText,nblockNameNum)+BlockText+element.toString()
+		RecBlock objRecBlock = new RecBlock();
+		objRecBlock.setName(objHashMap.get("lastblockname"));
+		objRecBlock.SetBlockText(BlockText);
+		if(element.toString().contains("{")){
+			//check element is directive or block type
+			objRecBlock.addBlock((Block)element);
+		}else{
+			objRecBlock.addDirective((Directive)element);
+		}
+		editBlString = objRecBlock.toString();
+//		System.out.println("GetSufBlockText:"+GetSufBlockText(confText,nblockNameNum+BlockLength));
+		
+		String newConfText = GetPreBlockText(confText,nblockNameNum)+editBlString
 				+GetSufBlockText(confText,nblockNameNum+BlockLength);
 
 		// write to local conf file
@@ -176,6 +190,15 @@ public class RecRemoteOperator implements RemoteOperator{
 	@Override
 	public void insertAfter(Element element, Element after,
 			String outerBlockNames) throws RemoteException {
+	    if("".equals(outerBlockNames.trim())){
+	    	confText = ReadConf();
+	    	//confText not contains element, return @
+			String editconfText = BlockInsertAfter(confText,element,after);
+			// write to local conf file
+			WriteConf(editconfText);
+			WriteRemoteConf();
+			return;
+	    }
 	    
 	    if(CheckOuterBlockNames(outerBlockNames)){
 	    	throw new RemoteException("outerBlockNames is not correct,outerBlockNames ="+outerBlockNames);
@@ -195,7 +218,7 @@ public class RecRemoteOperator implements RemoteOperator{
 	    int BlockLength = Integer.parseInt(objHashMap.get("blocklength"));
 	    int nblockNameNum = Integer.parseInt(objHashMap.get("nblocknamenum"));
 	    
-		String editBlockText = BlockInsertAfter(BlockText,BlockLength,element,after);
+		String editBlockText = BlockInsertAfter(BlockText,element,after);
 		
 		String newConfText = GetPreBlockText(confText,nblockNameNum)+editBlockText
 				+GetSufBlockText(confText,nblockNameNum+BlockLength);
@@ -207,7 +230,7 @@ public class RecRemoteOperator implements RemoteOperator{
 	}
 	
 	// 把 after 放于BlockText的子元素element之后，
-	private String BlockInsertAfter(String BlockText,int BlockLength,Element element, Element after) throws RemoteException {
+	private String BlockInsertAfter(String BlockText,Element element, Element after) throws RemoteException {
 	    StringBuilder sbtext = new StringBuilder();
 	    
 		//找到第一个符合的element文本位置
@@ -265,8 +288,7 @@ public class RecRemoteOperator implements RemoteOperator{
 			BlockLength = GetBlockLenth(BlockText);
 		}
 		
-
-		
+		InfoHashMap.put("lastblockname", blname);
 		InfoHashMap.put("blocktext", BlockText);
 		InfoHashMap.put("blocklength",Integer.toString(BlockLength));
 		InfoHashMap.put("nblocknamenum", Integer.toString(nblockNameNum));
@@ -343,7 +365,6 @@ public class RecRemoteOperator implements RemoteOperator{
 		RecBlock objRecBlock = new RecBlock();
 		objRecBlock.SetBlockText(BlockText);
 		return objRecBlock.getBlocks(blockName);
-		
 	}
 
 	private boolean CheckOuterBlockNames(String outerBlockNames) {
@@ -481,9 +502,8 @@ public class RecRemoteOperator implements RemoteOperator{
 
 	private boolean CanCommitFile() throws RemoteException{
 		String nowConfDatestamp = getFileModifyTime();
-		
-		if(StringToDate(oldConfDatestamp).compareTo(StringToDate(nowConfDatestamp)) < 0){
-//			System.out.println("<");
+		if(StringToDate(oldConfDatestamp).compareTo(StringToDate(nowConfDatestamp)) != 0){
+//			System.out.println("!=");
 			return false;
 		}else{
 			return true;
@@ -491,6 +511,10 @@ public class RecRemoteOperator implements RemoteOperator{
 	}
 	
 	private Date StringToDate(String s) throws RemoteException{
+		if((null == s) || ("" == s)){
+			throw new RemoteException("Datestamp error,Please check Configurator.getBlocks and get date.");
+		}
+
 		Date time=new Date();
 		SimpleDateFormat sd=new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 		try{
@@ -641,7 +665,7 @@ public class RecRemoteOperator implements RemoteOperator{
 		return SufBlockText;
 	}
 	
-	//return BlockText with start"{",and end "{"
+	//return BlockText with start"{",and end with "}"
 	private String GetBlockTextWithIndex(String blname,int Index){
 		
 		RecBlock rb = new RecBlock();

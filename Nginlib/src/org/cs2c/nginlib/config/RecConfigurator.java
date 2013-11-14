@@ -57,8 +57,6 @@ public class RecConfigurator implements Configurator {
 	@Override
 	public void replace(Element oldElement, Element newElement,
 			String outerBlockNames) throws RemoteException {
-//		RecRemoteOperator rro = new RecRemoteOperator(creauthInfo,cmidwarePath,connConfigurator);
-
 		rro.replace(oldElement, newElement, outerBlockNames);
 	}
 
@@ -66,7 +64,6 @@ public class RecConfigurator implements Configurator {
 	public List<Block> getBlocks(String blockName, String outerBlockNames)
 			throws RemoteException {
 //		RecRemoteOperator rro = new RecRemoteOperator(creauthInfo,cmidwarePath,connConfigurator);
-
 		return rro.getBlocks(blockName, outerBlockNames);
 	}
 

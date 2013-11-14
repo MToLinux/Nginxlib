@@ -82,11 +82,24 @@ public class RecBlock implements Block,Element {
 	@Override
 	public void addBlock(Block block) {
 		StringBuilder sb = new StringBuilder();
-		String bltext = blockValue.substring(0, blockValue.length()-2);
-		String blEndtext = blockValue.substring(blockValue.length()-2, blockValue.length()-1);
-		sb.append(bltext + "\n");
-		sb.append(block.toString());
-		sb.append(blEndtext);
+		String blalltext = null;
+		if((null == blockValue) || ("" == blockValue)){
+			sb.append(blockName+" ");
+			sb.append("{"+ "\n");
+			sb.append(block.toString());
+			sb.append("}"+ "\n");
+		}else{
+			blalltext = this.toString();
+			String bltext = blalltext.substring(0, blalltext.length()-2);
+			String blEndtext = blalltext.substring(blalltext.length()-2, blalltext.length()-1);
+//			System.out.println("bltext :"+bltext);
+			sb.append(bltext);
+			sb.append(block.toString());
+			sb.append("\n");
+//			System.out.println("blEndtext :"+blEndtext);
+			sb.append(blEndtext);
+		}
+
 		// set blockValue
 		SetBlockText(sb.toString());
 	}
@@ -94,11 +107,20 @@ public class RecBlock implements Block,Element {
 	@Override
 	public void addDirective(Directive directive) {
 		StringBuilder sb = new StringBuilder();
-		String bltext = blockValue.substring(0, blockValue.length()-2);
-		String blEndtext = blockValue.substring(blockValue.length()-2, blockValue.length()-1);
-		sb.append(bltext + "\n");
-		sb.append(directive.toString()+ "\n");
-		sb.append(blEndtext);
+		if((null == blockValue) || ("" == blockValue)){
+			sb.append(blockName+" ");
+			sb.append("{"+ "\n");
+			sb.append("    " + directive.toString()+ "\n");
+			sb.append("    " + "}"+ "\n");
+		}else{
+			String bltext = blockValue.substring(0, blockValue.length()-2);
+			String blEndtext = blockValue.substring(blockValue.length()-2, blockValue.length()-1);
+			sb.append(bltext);
+//			sb.append("    ");
+			sb.append(directive.toString()+ "\n");
+			sb.append(blEndtext);
+		}
+
 		// set blockValue
 		SetBlockText(sb.toString());
 	}
@@ -113,7 +135,7 @@ public class RecBlock implements Block,Element {
 	@Override
 	public String toString(){
 		String blocktext=null;
-		if((null != blockName) && (null != blockValue)){
+		if((null != blockName) && ("" != blockValue)){
 			return blockValue;
 		}else if((null != blockName) && (null == blockValue)){
 			blocktext = GetBlockText(blockName);
@@ -201,7 +223,6 @@ public class RecBlock implements Block,Element {
 	    String linetxt =null;
 	    int nblockstart = 0;
 	    int nblockEnd = 0;
-	    int nlinecount = 0;
 	    boolean bBlock = false;
 		
 		try {
@@ -224,11 +245,9 @@ public class RecBlock implements Block,Element {
 					if(IsNotComment(linetxt) && linetxt.contains("}")){
 						nblockEnd++;
 					}
-					if((nlinecount==0)||((null != blname) && (nblockstart!=0) && (nblockstart == nblockEnd))){
-					}else{
-					    sb.append(linetxt + "\n");
-					}
-					nlinecount++;
+
+					sb.append(linetxt + "\n");
+
 					if((null != blname) && (nblockstart!=0) && (nblockstart == nblockEnd)){
 
 						blText = sb.toString();
@@ -242,7 +261,6 @@ public class RecBlock implements Block,Element {
 						// close one block text,loop next.
 						bBlock = false;
 						blname = null;
-						nlinecount = 0;
 						sb.delete(0, sb.length());
 						
 						//get SubBlock and do recursion
