@@ -13,7 +13,8 @@ doc: javadoc api and user manul pdf
 
 lib: libraries that the nginxlib used (Orion-SSH 2)
 
-nginxlib.jar: the final jar file compiled by sources
+nginxlib.jar: the final jar file compiled by sources. You could make src and doc into a jar file named nginxlib.jar. And then,
+ you could use it with orion-ssh in your application.
 
 If you want contribute to this project, we recommand to use eclipse ide.
 
