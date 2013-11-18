@@ -97,7 +97,7 @@ public class RecConfigurator implements Configurator {
 	}
 
 	@Override
-	public List<Block> getRootBlock() throws RemoteException {
+	public Block getRootBlock() throws RemoteException {
 		return rro.getRootBlock();
 	}
 }

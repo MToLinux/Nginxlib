@@ -228,16 +228,11 @@ public class RecConfiguratorTest {
 	}
 	@Test
 	public final void testgetRootBlock() {
-
-		List<Block> list= null;
 		
 		try {
-			list= orc.getRootBlock();
-			for(int i = 0;i< list.size();i++){
+			Block bl= orc.getRootBlock();
 //				System.out.println(list.get(i).getName());
-				
-				System.out.println(list.get(i).getName()+" :"+list.get(i).toString());
-			}
+			System.out.println(bl.toString());
 		} catch (RemoteException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

@@ -368,12 +368,13 @@ public class RecRemoteOperator implements RemoteOperator{
 	}
 	
 	@Override
-	public List<Block> getRootBlock() throws RemoteException {
+	public Block getRootBlock() throws RemoteException {
 	    GetRemoteConf(remoteConf);
 	    confText = ReadConf();
 		RecBlock objRecBlock = new RecBlock();
+		objRecBlock.setName("");
 		objRecBlock.SetBlockText(confText);
-		return objRecBlock.getBlocks();
+		return objRecBlock;
 	}
 	
 	private boolean CheckOuterBlockNames(String outerBlockNames) {
@@ -598,7 +599,7 @@ public class RecRemoteOperator implements RemoteOperator{
 			while( (s = br.readLine()) != null) {
 				sb.append(s + "\n");
 			}
-			
+			sb.deleteCharAt(sb.lastIndexOf("\n"));
 		    br.close();
 		    String str = sb.toString();
 		    return str;

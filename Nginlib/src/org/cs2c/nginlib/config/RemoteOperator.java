@@ -72,5 +72,5 @@ public interface RemoteOperator {
 	 * @return All blocks in a list.
 	 * @throws RemoteException When this remote operation fails for any non-local reason.
 	 * */
-	public List<Block> getRootBlock() throws RemoteException;
+	public Block getRootBlock() throws RemoteException;
 }
