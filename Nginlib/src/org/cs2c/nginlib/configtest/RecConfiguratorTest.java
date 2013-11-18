@@ -244,6 +244,11 @@ public class RecConfiguratorTest {
 //			// case 2
 			blockName = "server";
 			list= orc.getBlocks(blockName, "http");
+			System.out.println(list.get(0).toString());
+			
+//			for(int i = 0;i< list.get(0).getDirectives().size();i++){
+//				System.out.println(list.get(0).getDirectives().get(i).toString());
+//			}
 //			System.out.println("list.size() :"+list.size());
 //			assertEquals(2, list.size());
 //			assertEquals(blockName, list.get(0).getName());

@@ -235,7 +235,7 @@ public class RecBlockTest {
 	}
 
 	@Test
-	public final void testGetBlockText() {
+	public final void testGetBlockText() throws RemoteException {
 		orb.SetConfText(ConfText);
 		
 		String bltxt = orb.GetBlockText("http",1);
@@ -248,7 +248,7 @@ public class RecBlockTest {
 	}
 	
 	@Test
-	public final void testGetBlockText1() {
+	public final void testGetBlockText1() throws RemoteException {
 		orb.SetConfText(ConfText);
 		
 		String bltxt = orb.GetBlockText("server",1);
@@ -260,7 +260,7 @@ public class RecBlockTest {
 
 	}
 	@Test
-	public final void testGetBlockText2() {
+	public final void testGetBlockText2() throws RemoteException {
 		orb.SetConfText(ConfText);
 		
 		String bltxt = orb.GetBlockText("events",40);

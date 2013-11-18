@@ -666,7 +666,7 @@ public class RecRemoteOperator implements RemoteOperator{
 	}
 	
 	//return BlockText with start"{",and end with "}"
-	private String GetBlockTextWithIndex(String blname,int Index){
+	private String GetBlockTextWithIndex(String blname,int Index) throws RemoteException{
 		
 		RecBlock rb = new RecBlock();
 		rb.SetConfText(confText);
