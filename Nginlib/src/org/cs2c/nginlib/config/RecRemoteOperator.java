@@ -366,7 +366,16 @@ public class RecRemoteOperator implements RemoteOperator{
 		objRecBlock.SetBlockText(BlockText);
 		return objRecBlock.getBlocks(blockName);
 	}
-
+	
+	@Override
+	public List<Block> getRootBlock() throws RemoteException {
+	    GetRemoteConf(remoteConf);
+	    confText = ReadConf();
+		RecBlock objRecBlock = new RecBlock();
+		objRecBlock.SetBlockText(confText);
+		return objRecBlock.getBlocks();
+	}
+	
 	private boolean CheckOuterBlockNames(String outerBlockNames) {
 		if( outerBlockNames == null || "".equals(outerBlockNames.trim())){
 			return true;
@@ -577,7 +586,7 @@ public class RecRemoteOperator implements RemoteOperator{
 	 * @return config text.
 	 * @throws RemoteException 
 	 * */
-	public String ReadConf() throws RemoteException{
+	private String ReadConf() throws RemoteException{
 	    try {
 		    // read conf
 		    File file = new File(GetlocalConfFullName());

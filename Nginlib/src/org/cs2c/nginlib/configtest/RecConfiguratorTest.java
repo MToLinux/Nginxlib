@@ -226,6 +226,24 @@ public class RecConfiguratorTest {
 		list= orc.getBlocks("InsertAfter", outerBlockNames);
 		assertEquals(1, list.size());
 	}
+	@Test
+	public final void testgetRootBlock() {
+
+		List<Block> list= null;
+		
+		try {
+			list= orc.getRootBlock();
+			for(int i = 0;i< list.size();i++){
+//				System.out.println(list.get(i).getName());
+				
+				System.out.println(list.get(i).getName()+" :"+list.get(i).toString());
+			}
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
 
 	@Test
 	public final void testGetBlocks() {

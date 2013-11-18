@@ -25,10 +25,9 @@ public class RecConfigurator implements Configurator {
 		rro = new RecRemoteOperator(creauthInfo,cmidwarePath,connConfigurator);
 	}
 	
-	//set local Conf File With full Name.
 	/**
-	 * Set the name of the local Conf File.
-	 * @param PathWithName : Path With full nginx.conf Name.
+	 * Set the Path of the local Conf File.
+	 * @param Path : local nginx.conf Path.
 	 * */
 	public void SetLocalConfpath(String Path){
 		confPath = Path;
@@ -63,7 +62,6 @@ public class RecConfigurator implements Configurator {
 	@Override
 	public List<Block> getBlocks(String blockName, String outerBlockNames)
 			throws RemoteException {
-//		RecRemoteOperator rro = new RecRemoteOperator(creauthInfo,cmidwarePath,connConfigurator);
 		return rro.getBlocks(blockName, outerBlockNames);
 	}
 
@@ -96,5 +94,10 @@ public class RecConfigurator implements Configurator {
 	public Option newOption() {
 		Option opOption = new RecOption();
 		return opOption;
+	}
+
+	@Override
+	public List<Block> getRootBlock() throws RemoteException {
+		return rro.getRootBlock();
 	}
 }

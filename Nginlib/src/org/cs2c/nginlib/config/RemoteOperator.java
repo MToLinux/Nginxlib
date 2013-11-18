@@ -3,6 +3,7 @@
  */
 package org.cs2c.nginlib.config;
 import java.util.*;
+
 import org.cs2c.nginlib.*;
 /**
  * @author Mikes
@@ -66,4 +67,10 @@ public interface RemoteOperator {
 	 * @throws RemoteException When this remote operation fails for any non-local reason.
 	 * */
 	List<Block> getBlocks(String blockName, String outerBlockNames) throws RemoteException;
+	/**
+	 * Query all blocks in nginx.conf.
+	 * @return All blocks in a list.
+	 * @throws RemoteException When this remote operation fails for any non-local reason.
+	 * */
+	public List<Block> getRootBlock() throws RemoteException;
 }
