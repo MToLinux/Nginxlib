@@ -38,8 +38,9 @@ public interface Block extends Element{
 	/**
 	 * Add a block in the block end.
 	 * @param block block to be added.
+	 * @throws RemoteException 
 	 * */
-	void addBlock(Block block);
+	void addBlock(Block block) throws RemoteException;
 	/**
 	 * add a directive in the block end.
 	 * @param directive directive to be added.

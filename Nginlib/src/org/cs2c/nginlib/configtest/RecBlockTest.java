@@ -23,7 +23,7 @@ public class RecBlockTest {
 		//ReadConf ok
 		RecRemoteOperator rro = new RecRemoteOperator();
 		rro.SetLocalConfpath(path);
-		ConfText = rro.ReadConf();
+//		ConfText = rro.ReadConf();
 
 	}
 
@@ -51,18 +51,14 @@ public class RecBlockTest {
 		//ReadConf ok
 		RecRemoteOperator rro = new RecRemoteOperator();
 		rro.SetLocalConfpath(path);
-		String ConfText;
-		try {
-			ConfText = rro.ReadConf();
-			orb.SetConfText(ConfText);
-			orb.setName("server");
-			assertFalse(ConfText == orb.toString());
-			assertNotNull(orb.toString());
-			assertTrue(orb.toString()!="");
-			System.out.println(orb.toString());
-		} catch (RemoteException e) {
-			e.printStackTrace();
-		}
+		String ConfText = null;
+//			ConfText = rro.ReadConf();
+		orb.SetConfText(ConfText);
+		orb.setName("server");
+		assertFalse(ConfText == orb.toString());
+		assertNotNull(orb.toString());
+		assertTrue(orb.toString()!="");
+		System.out.println(orb.toString());
 	}
 
 	private void IntegrationTestInClass(){
@@ -70,16 +66,12 @@ public class RecBlockTest {
 		//ReadConf ok
 		RecRemoteOperator rro = new RecRemoteOperator();
 		rro.SetLocalConfpath(path);
-		String ConfText;
-		try {
-			ConfText = rro.ReadConf();
-			orb.SetConfText(ConfText);
-			assertNotNull(orb.toString());
-			assertTrue(orb.toString()!="");
+		String ConfText = "";
+//			ConfText = rro.ReadConf();
+		orb.SetConfText(ConfText);
+		assertNotNull(orb.toString());
+		assertTrue(orb.toString()!="");
 //			System.out.println(orb.toString());
-		} catch (RemoteException e) {
-			e.printStackTrace();
-		}
 	}
 	
 	@Test
@@ -235,7 +227,7 @@ public class RecBlockTest {
 	}
 
 	@Test
-	public final void testGetBlockText() {
+	public final void testGetBlockText() throws RemoteException {
 		orb.SetConfText(ConfText);
 		
 		String bltxt = orb.GetBlockText("http",1);
@@ -248,7 +240,7 @@ public class RecBlockTest {
 	}
 	
 	@Test
-	public final void testGetBlockText1() {
+	public final void testGetBlockText1() throws RemoteException {
 		orb.SetConfText(ConfText);
 		
 		String bltxt = orb.GetBlockText("server",1);
@@ -260,7 +252,7 @@ public class RecBlockTest {
 
 	}
 	@Test
-	public final void testGetBlockText2() {
+	public final void testGetBlockText2() throws RemoteException {
 		orb.SetConfText(ConfText);
 		
 		String bltxt = orb.GetBlockText("events",40);

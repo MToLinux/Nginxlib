@@ -107,7 +107,7 @@ public class RecConfiguratorTest {
 		testSetConfpathWithName();
 		
 		Block newBlock = orc.newBlock();
-		newBlock.setName("server");
+		newBlock.setName("testagain");
 		//make Directive : server_name
 			RecDirective rdserver_name = new RecDirective();
 			rdserver_name.setName("server_name");
@@ -133,7 +133,7 @@ public class RecConfiguratorTest {
 		if(list.size()>0){
 //			System.out.println("Start append");
 			// case1:
-			orc.append(newBlock, blockName);
+			orc.append(newBlock, "http:0|server:0");	//TODO
 			// case2:
 //			orc.append(newBlock, "http:0|server:0");
 			// case delete:
@@ -226,6 +226,19 @@ public class RecConfiguratorTest {
 		list= orc.getBlocks("InsertAfter", outerBlockNames);
 		assertEquals(1, list.size());
 	}
+	@Test
+	public final void testgetRootBlock() {
+		
+		try {
+			Block bl= orc.getRootBlock();
+//				System.out.println(list.get(i).getName());
+			System.out.println(bl.toString());
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
 
 	@Test
 	public final void testGetBlocks() {
@@ -244,6 +257,11 @@ public class RecConfiguratorTest {
 //			// case 2
 			blockName = "server";
 			list= orc.getBlocks(blockName, "http");
+			System.out.println(list.get(0).toString());
+			
+//			for(int i = 0;i< list.get(0).getDirectives().size();i++){
+//				System.out.println(list.get(0).getDirectives().get(i).toString());
+//			}
 //			System.out.println("list.size() :"+list.size());
 //			assertEquals(2, list.size());
 //			assertEquals(blockName, list.get(0).getName());
@@ -280,10 +298,11 @@ public class RecConfiguratorTest {
 	@Test
 	public final void testNewBlock() {
 		Block op = orc.newBlock();
-		
+		op.setName("test");
 		assertNotNull(op);
-		assertTrue(null == op.getName());
-		assertTrue(null == op.toString());
+//		assertTrue(null == op.getName());
+		
+		System.out.println(op.toString());
 	}
 
 	@Test

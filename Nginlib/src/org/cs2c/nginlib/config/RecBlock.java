@@ -57,51 +57,148 @@ public class RecBlock implements Block,Element {
 		String linetxt = null;
 		String tempdname = null;
 		String tempdtext = null;
-		
-	    BufferedReader br = new BufferedReader(new StringReader(blockValue));
-
 		try {
-			while( (linetxt  = br.readLine()) != null) {
-				tempdname = GetDirectiveName(linetxt);
-				if((null != tempdname)){
-					tempdtext = linetxt.trim();
-					//System.out.println("blname:" + blname);
-					RecDirective objDirective = new RecDirective();
-					objDirective.setName(tempdname);
-					objDirective.SetDirectiveText(tempdtext);
-		    		list.add(objDirective);
+
+			if(hasSubBlock(blockValue)){
+//				System.out.println(blockValue);
+				//blockValue count his own "{",so if Count "{" >1.
+				list = GetOwnDirectives(blockValue);
+			}else{
+			    BufferedReader br = new BufferedReader(new StringReader(blockValue));
+				while( (linetxt  = br.readLine()) != null) {
+					tempdname = GetDirectiveName(linetxt);
+					if((null != tempdname)){
+						tempdtext = linetxt.trim();
+						//System.out.println("blname:" + blname);
+						RecDirective objDirective = new RecDirective();
+						objDirective.setName(tempdname);
+						objDirective.SetDirectiveText(tempdtext);
+			    		list.add(objDirective);
+					}
 				}
 			}
 		} catch (IOException e) {
 			throw new RemoteException(e.getMessage());
+		}
+		return list;
+	}
+
+	private List<Directive> GetOwnDirectives(String strBlocktxt) throws IOException {
+
+	    int nblockstart = 0;
+	    int nblockEnd = 0;
+	    int nblockLineCount = 0;
+	    String linetxt = "";
+		List<Directive> list = new ArrayList<Directive>();
+		boolean bBlock = false;
+		
+	    BufferedReader br = new BufferedReader(new StringReader(strBlocktxt));
+		while( (linetxt  = br.readLine()) != null) {
+			nblockLineCount++;
+			if(nblockLineCount <= 1){
+				continue;
+			}
+
+			// ignore sub block's Directive
+			if(HasBlockName(linetxt)){
+				// make sure text start from the block name
+				bBlock = true;
+			}
+			if(bBlock){
+				if(IsNotComment(linetxt) && linetxt.contains("{")){
+					nblockstart++;
+				}
+				if(IsNotComment(linetxt) && linetxt.contains("}")){
+					nblockEnd++;
+				}
+			}
+			if((bBlock) && (nblockstart!=0) && (nblockstart == nblockEnd)){
+				//end sub block
+				bBlock = false;
+			}
+
+			if(!bBlock){
+				String tempdname = GetDirectiveName(linetxt);
+				if((null != tempdname)){
+					String tempdtext = linetxt.trim();
+					//System.out.println("DirectiveName:" + blname);
+					RecDirective objDirective = new RecDirective();
+					objDirective.setName(tempdname);
+					objDirective.SetDirectiveText(tempdtext);
+//					System.out.println("tempdtext:"+tempdtext);
+		    		list.add(objDirective);
+				}
+			}
 		}
 		
 		return list;
 	}
 
 	@Override
-	public void addBlock(Block block) {
+	public void addBlock(Block block) throws RemoteException {
 		StringBuilder sb = new StringBuilder();
 		String blalltext = null;
-		if((null == blockValue) || ("" == blockValue)){
-			sb.append(blockName+" ");
-			sb.append("{"+ "\n");
-			sb.append(block.toString());
-			sb.append("}"+ "\n");
-		}else{
-			blalltext = this.toString();
-			String bltext = blalltext.substring(0, blalltext.length()-2);
-			String blEndtext = blalltext.substring(blalltext.length()-2, blalltext.length()-1);
-//			System.out.println("bltext :"+bltext);
-			sb.append(bltext);
-			sb.append(block.toString());
-			sb.append("\n");
-//			System.out.println("blEndtext :"+blEndtext);
-			sb.append(blEndtext);
+		String linetxt = null;
+		String Endlinetxt = null;
+		int nBlockRowCount = 0;
+		boolean bEndlineBigslogan = false;
+		
+		try {
+			if((null == blockValue) || ("" == blockValue)){
+				sb.append(blockName+" ");
+				sb.append("{"+ "\n");
+				sb.append(block.toString());
+				sb.append("}"+ "\n");
+			}else{
+				blalltext = this.toString();
+				int linecount = GetBlockLenth(blalltext);
+			    BufferedReader br = new BufferedReader(new StringReader(blalltext));
+	
+				while( (linetxt = br.readLine()) != null) {
+					nBlockRowCount++;
+					if(nBlockRowCount == linecount){
+						if(linetxt.trim().equals("}"));{
+							bEndlineBigslogan = true;
+						}
+					}
+				}
+				if(bEndlineBigslogan){
+					//if last line trim() is "}"
+					nBlockRowCount = 0;
+					StringBuilder sbtemp = new StringBuilder();
+				    BufferedReader br1 = new BufferedReader(new StringReader(blalltext));
+					while( (linetxt = br1.readLine()) != null) {
+						nBlockRowCount++;
+						if(nBlockRowCount == linecount){
+							Endlinetxt = linetxt;
+						}else{
+							sbtemp.append(linetxt+"\n");
+						}
+					}
+//					System.out.println("nBlockRowCount :"+nBlockRowCount);
+//					System.out.println("linecount :"+linecount);
+					sb.append(sbtemp.toString());
+					sb.append(block.toString()+"\n");
+					sb.append(Endlinetxt);
+				}else{
+					// if end with "XXX}}"
+					String bltext = blalltext.substring(0, blalltext.length()-2);
+					String blEndtext = blalltext.substring(blalltext.length()-2, blalltext.length()-1);
+	//				System.out.println("bltext :"+bltext);
+					sb.append(bltext);
+					sb.append(block.toString());
+					sb.append("\n");
+					sb.append(blEndtext);
+				}
+			}
+	
+			// set blockValue
+			SetBlockText(sb.toString());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			throw new RemoteException(e.getMessage());
 		}
 
-		// set blockValue
-		SetBlockText(sb.toString());
 	}
 
 	@Override
@@ -133,19 +230,21 @@ public class RecBlock implements Block,Element {
 	}
 	
 	@Override
-	public String toString(){
-		String blocktext=null;
-		if((null != blockName) && ("" != blockValue)){
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		if((null != blockName) && ("" != blockValue) && (null != blockValue)){
 			return blockValue;
 		}else if((null != blockName) && (null == blockValue)){
-			blocktext = GetBlockText(blockName);
-			return blocktext;
+			sb.append(blockName+" ");
+			sb.append("{"+ "\n");
+			sb.append("}"+ "\n");
+			return sb.toString();
 		}else{
 			return confText;
 		}
 	}
 	 
-	private String GetBlockText(String gBlockName) {
+	private String GetBlockText(String gBlockName) throws RemoteException {
 		int StartLine = 1;
 		return GetBlockText(gBlockName,StartLine);
 	}
@@ -154,8 +253,9 @@ public class RecBlock implements Block,Element {
 	 * Get Block Text which Block Name is gBlockName.before GetBlockText you must set conf text.
 	 * @param gBlockName Block name to be search.
 	 * @return make sure StartLine's value > 0.
+	 * @throws RemoteException 
 	 * */
-	public String GetBlockText(String gBlockName,int StartLine) {
+	public String GetBlockText(String gBlockName,int StartLine) throws RemoteException {
 		String blText = null;
 	    String linetxt =null;
 	    int nblockstart = 0;
@@ -199,8 +299,7 @@ public class RecBlock implements Block,Element {
 				
 			return blText;
 		} catch (IOException e) {
-			e.printStackTrace();
-			return null;
+			throw new RemoteException(e.getMessage());
 		}
 	}
 
@@ -335,6 +434,20 @@ public class RecBlock implements Block,Element {
 		}
 	}
 
+	private int CountSubBlock(String value) throws IOException {
+		String linetxt = null;
+		int nBlockNameCount = 0;
+		
+	    BufferedReader br = new BufferedReader(new StringReader(value));
+		while( (linetxt = br.readLine()) != null) {
+			if(HasBlockName(linetxt)){
+				nBlockNameCount++;
+			}
+		}
+		
+		return nBlockNameCount;
+	}
+
 	private String GetBlockName(String linetxt) {
 		String bname = null;
 		boolean bret = IsComment(linetxt);
@@ -385,11 +498,14 @@ public class RecBlock implements Block,Element {
 	
 	private String GetDirectiveName(String linetxt) {
 		String dName = null;
+	    
+		// Comment ignore
 		boolean bCret = IsComment(linetxt);
 		if(bCret){
 			return null;
 		}
 		
+		// is not end with ; ignore
 		boolean bEret = NotEndWithSemicolon(linetxt);
 		if(bEret){
 			return null;
