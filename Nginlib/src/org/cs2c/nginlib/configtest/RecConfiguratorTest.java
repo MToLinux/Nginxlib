@@ -107,7 +107,7 @@ public class RecConfiguratorTest {
 		testSetConfpathWithName();
 		
 		Block newBlock = orc.newBlock();
-		newBlock.setName("server");
+		newBlock.setName("testagain");
 		//make Directive : server_name
 			RecDirective rdserver_name = new RecDirective();
 			rdserver_name.setName("server_name");
@@ -133,7 +133,7 @@ public class RecConfiguratorTest {
 		if(list.size()>0){
 //			System.out.println("Start append");
 			// case1:
-			orc.append(newBlock, blockName);
+			orc.append(newBlock, "http:0|server:0");	//TODO
 			// case2:
 //			orc.append(newBlock, "http:0|server:0");
 			// case delete:
@@ -298,10 +298,11 @@ public class RecConfiguratorTest {
 	@Test
 	public final void testNewBlock() {
 		Block op = orc.newBlock();
-		
+		op.setName("test");
 		assertNotNull(op);
-		assertTrue(null == op.getName());
-		assertTrue(null == op.toString());
+//		assertTrue(null == op.getName());
+		
+		System.out.println(op.toString());
 	}
 
 	@Test

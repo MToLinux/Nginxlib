@@ -94,6 +94,7 @@ public class RecRemoteOperator implements RemoteOperator{
 		RecBlock objRecBlock = new RecBlock();
 		objRecBlock.setName(objHashMap.get("lastblockname"));
 		objRecBlock.SetBlockText(BlockText);
+		System.out.println(element.toString());//TODO
 		if(element.toString().contains("{")){
 			//check element is directive or block type
 			objRecBlock.addBlock((Block)element);
@@ -101,9 +102,11 @@ public class RecRemoteOperator implements RemoteOperator{
 			objRecBlock.addDirective((Directive)element);
 		}
 		editBlString = objRecBlock.toString();
-//		System.out.println("GetSufBlockText:"+GetSufBlockText(confText,nblockNameNum+BlockLength));
+//		System.out.println("nblockNameNum:"+nblockNameNum);
+//		System.out.println("GetPreBlockText:"+GetPreBlockText(confText,nblockNameNum));
+//		System.out.println("editBlString:"+editBlString);
 		
-		String newConfText = GetPreBlockText(confText,nblockNameNum)+editBlString
+		String newConfText = GetPreBlockText(confText,nblockNameNum)+editBlString+"\n"
 				+GetSufBlockText(confText,nblockNameNum+BlockLength);
 
 		// write to local conf file

@@ -135,28 +135,70 @@ public class RecBlock implements Block,Element {
 	}
 
 	@Override
-	public void addBlock(Block block) {
+	public void addBlock(Block block) throws RemoteException {
 		StringBuilder sb = new StringBuilder();
 		String blalltext = null;
-		if((null == blockValue) || ("" == blockValue)){
-			sb.append(blockName+" ");
-			sb.append("{"+ "\n");
-			sb.append(block.toString());
-			sb.append("}"+ "\n");
-		}else{
-			blalltext = this.toString();
-			String bltext = blalltext.substring(0, blalltext.length()-2);
-			String blEndtext = blalltext.substring(blalltext.length()-2, blalltext.length()-1);
-//			System.out.println("bltext :"+bltext);
-			sb.append(bltext);
-			sb.append(block.toString());
-			sb.append("\n");
-//			System.out.println("blEndtext :"+blEndtext);
-			sb.append(blEndtext);
+		String linetxt = null;
+		String Endlinetxt = null;
+		int nBlockRowCount = 0;
+		boolean bEndlineBigslogan = false;
+		
+		try {
+			if((null == blockValue) || ("" == blockValue)){
+				sb.append(blockName+" ");
+				sb.append("{"+ "\n");
+				sb.append(block.toString());
+				sb.append("}"+ "\n");
+			}else{
+				blalltext = this.toString();
+				int linecount = GetBlockLenth(blalltext);
+			    BufferedReader br = new BufferedReader(new StringReader(blalltext));
+	
+				while( (linetxt = br.readLine()) != null) {
+					nBlockRowCount++;
+					if(nBlockRowCount == linecount){
+						if(linetxt.trim().equals("}"));{
+							bEndlineBigslogan = true;
+						}
+					}
+				}
+				if(bEndlineBigslogan){
+					//if last line trim() is "}"
+					nBlockRowCount = 0;
+					StringBuilder sbtemp = new StringBuilder();
+				    BufferedReader br1 = new BufferedReader(new StringReader(blalltext));
+					while( (linetxt = br1.readLine()) != null) {
+						nBlockRowCount++;
+						if(nBlockRowCount == linecount){
+							Endlinetxt = linetxt;
+						}else{
+							sbtemp.append(linetxt+"\n");
+						}
+					}
+//					System.out.println("nBlockRowCount :"+nBlockRowCount);
+//					System.out.println("linecount :"+linecount);
+					sb.append(sbtemp.toString());
+					sb.append(block.toString()+"\n");
+					sb.append(Endlinetxt);
+				}else{
+					// if end with "XXX}}"
+					String bltext = blalltext.substring(0, blalltext.length()-2);
+					String blEndtext = blalltext.substring(blalltext.length()-2, blalltext.length()-1);
+	//				System.out.println("bltext :"+bltext);
+					sb.append(bltext);
+					sb.append(block.toString());
+					sb.append("\n");
+					sb.append(blEndtext);
+				}
+			}
+	
+			// set blockValue
+			SetBlockText(sb.toString());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			throw new RemoteException(e.getMessage());
 		}
 
-		// set blockValue
-		SetBlockText(sb.toString());
 	}
 
 	@Override
@@ -189,17 +231,14 @@ public class RecBlock implements Block,Element {
 	
 	@Override
 	public String toString() {
-		String blocktext=null;
-		if((null != blockName) && ("" != blockValue)){
+		StringBuilder sb = new StringBuilder();
+		if((null != blockName) && ("" != blockValue) && (null != blockValue)){
 			return blockValue;
 		}else if((null != blockName) && (null == blockValue)){
-			try {
-				blocktext = GetBlockText(blockName);
-			} catch (RemoteException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			return blocktext;
+			sb.append(blockName+" ");
+			sb.append("{"+ "\n");
+			sb.append("}"+ "\n");
+			return sb.toString();
 		}else{
 			return confText;
 		}
