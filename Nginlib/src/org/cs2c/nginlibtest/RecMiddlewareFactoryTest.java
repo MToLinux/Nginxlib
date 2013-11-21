@@ -18,6 +18,7 @@ import org.cs2c.nginlib.config.Module;
 import org.cs2c.nginlib.config.RecConfigurator;
 import org.cs2c.nginlib.ctl.Controller;
 import org.cs2c.nginlib.ctl.RecController;
+import org.cs2c.nginlib.log.RecLogger;
 import org.cs2c.nginlib.monitor.RecMonitor;
 import org.junit.After;
 import org.junit.Before;
@@ -69,7 +70,12 @@ public class RecMiddlewareFactoryTest extends TestCase {
 		rmonitor=(RecMonitor)instance.getMonitor();
 		Assert.assertNotNull(rmonitor);
 	}
-
+	@Test
+	public void testGetLogger() {
+		RecLogger rlogger=null;
+		rlogger=(RecLogger)instance.getLogger();
+		Assert.assertNotNull(rlogger);
+	}
 
 
 	

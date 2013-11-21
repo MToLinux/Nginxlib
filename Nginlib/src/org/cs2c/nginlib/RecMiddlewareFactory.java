@@ -5,11 +5,14 @@ import java.io.IOException;
 import org.cs2c.nginlib.config.Configurator;
 import org.cs2c.nginlib.config.RecConfigurator;
 import org.cs2c.nginlib.ctl.RecController;
+import org.cs2c.nginlib.log.Logger;
+import org.cs2c.nginlib.log.RecLogger;
 import org.cs2c.nginlib.monitor.Monitor;
 import org.cs2c.nginlib.monitor.RecMonitor;
 import org.cs2c.nginlib.ctl.Controller;
 
 import com.trilead.ssh2.Connection;
+
 
 /**
  * @author LiuQin The implement class of AuthInfo
@@ -20,6 +23,7 @@ public class RecMiddlewareFactory extends MiddlewareFactory {
 	RecAuthInfo authInfo = null;
 	RecController controller = null;
 	RecMonitor monitor = null;
+	RecLogger logger=null;
 	RecConfigurator configurator = null;
 	Connection conn = null;
 	String midwarePath = "";
@@ -47,7 +51,12 @@ public class RecMiddlewareFactory extends MiddlewareFactory {
 	public Connection getConnection() throws IOException {
 		return conn;
 	}
-
+	@Override
+	public Logger getLogger()
+	{
+		this.logger = new RecLogger(conn,midwarePath);
+		return this.logger;
+	}
 	public void creatConnection() throws RemoteException {
 		/* Create a connection instance */
 		conn = new Connection(authInfo.getHostname());

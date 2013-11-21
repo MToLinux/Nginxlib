@@ -4,10 +4,13 @@
 package org.cs2c.nginlib;
 import org.cs2c.nginlib.config.*;
 import org.cs2c.nginlib.ctl.*;
+import org.cs2c.nginlib.log.Logger;
 import org.cs2c.nginlib.monitor.*;
 import org.cs2c.nginlib.RecMiddlewareFactory;
 
 import com.trilead.ssh2.Connection;
+
+
 
 import java.util.*;
 import java.io.*;
@@ -163,17 +166,23 @@ public abstract class MiddlewareFactory {
 	 * */
 	abstract public Configurator getConfigurator();
 	/**
+	 * Get the logger interface in order to fetch the remote log information. The Nginx is binded with the instance.
+	 * @return The logger interface of the middleware (Nginx).
+	 * */
+	abstract public Logger getLogger();
+	
+	/**
 	 * Get the monitor interface in order to fetch the remote host and middleware's running status. The Nginx is binded with the instance.
 	 * @return The monitor interface of the middleware (Nginx).
 	 * */
 	abstract public Monitor getMonitor();
-	
 	/**
 	 * Get the connection interface in order to fetch the connection to the remote host.
 	 * @return The connection of the current middleware instance.
 	 * @throws IOException 
 	 * */
 	abstract public Connection getConnection() throws IOException;
+	
 	/**
 	 * Create an instance of AuthInfo without any info.
 	 * Then you can set the instance info through AuthInfo interface.
