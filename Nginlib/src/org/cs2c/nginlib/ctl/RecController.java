@@ -185,7 +185,7 @@ public class RecController implements Controller {
 						zipFile.getName().substring(0,
 								zipFile.getName().toString().indexOf(".zip")),
 						"_bak") == false) {
-					System.out.println("112");
+					
 					throw new RemoteException(errorResult.toString());
 				}
 			}
