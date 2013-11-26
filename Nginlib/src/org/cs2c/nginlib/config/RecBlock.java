@@ -1,17 +1,17 @@
 package org.cs2c.nginlib.config;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
+//import java.io.File;
+//import java.io.FileReader;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.IdentityHashMap;
-import java.util.Iterator;
+//import java.util.HashMap;
+//import java.util.IdentityHashMap;
+//import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
+//import java.util.Map;
+//import java.util.Map.Entry;
 
 import org.cs2c.nginlib.RemoteException;
 
@@ -181,7 +181,7 @@ public class RecBlock implements Block,Element {
 					sb.append(block.toString()+"\n");
 					sb.append(Endlinetxt);
 				}else{
-					// if end with "XXX}}"
+					// if end with }}
 					String bltext = blalltext.substring(0, blalltext.length()-2);
 					String blEndtext = blalltext.substring(blalltext.length()-2, blalltext.length()-1);
 	//				System.out.println("bltext :"+bltext);
@@ -195,7 +195,6 @@ public class RecBlock implements Block,Element {
 			// set blockValue
 			SetBlockText(sb.toString());
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			throw new RemoteException(e.getMessage());
 		}
 
@@ -322,14 +321,23 @@ public class RecBlock implements Block,Element {
 	    String linetxt =null;
 	    int nblockstart = 0;
 	    int nblockEnd = 0;
+		int nlinecount = 0;
 	    boolean bBlock = false;
 		
 		try {
 		    BufferedReader br = new BufferedReader(new StringReader(Text));
 		    StringBuilder sb = new StringBuilder();
-		    		    
+
 			while( (linetxt = br.readLine()) != null) {
+				nlinecount++;
+//				System.out.println("nlinecount:" + nlinecount);
 				tempblname = GetBlockName(linetxt);
+				
+				//check if start with himself name
+				if((1 == nlinecount)&&(blockName.equals(tempblname))){
+					continue;
+				}
+
 				if((null != tempblname)&&(null == blname)){
 					blname = tempblname;
 					bBlock = true;
@@ -355,18 +363,17 @@ public class RecBlock implements Block,Element {
 			    		objblock.setName(blname);
 			    		objblock.SetBlockText(blText);
 			    		listGetBlocks.add(objblock);
-//						IhbMap.put(new String(blname), blText);
 //						System.out.println("blname:" + blname + "   blText:" + blText+"\n");
 						// close one block text,loop next.
 						bBlock = false;
 						blname = null;
 						sb.delete(0, sb.length());
-						
-						//get SubBlock and do recursion
-						String blockcontent = GetBlockContent(blText);
-			    		if(hasSubBlock(blockcontent)){
-			    			GetSubBlocks(blockcontent);//recursion
-			    		}
+
+//						//get SubBlock and do recursion
+//						String blockcontent = GetBlockContent(blText);
+//			    		if(hasSubBlock(blockcontent)){
+//			    			GetSubBlocks(blockcontent);//recursion
+//			    		}
 					}
 				}
 			}
@@ -432,20 +439,6 @@ public class RecBlock implements Block,Element {
 		}else{
 			return false;
 		}
-	}
-
-	private int CountSubBlock(String value) throws IOException {
-		String linetxt = null;
-		int nBlockNameCount = 0;
-		
-	    BufferedReader br = new BufferedReader(new StringReader(value));
-		while( (linetxt = br.readLine()) != null) {
-			if(HasBlockName(linetxt)){
-				nBlockNameCount++;
-			}
-		}
-		
-		return nBlockNameCount;
 	}
 
 	private String GetBlockName(String linetxt) {
