@@ -175,8 +175,6 @@ public class RecController implements Controller {
 		// copy the local file zipFile to targetPath of remote host
 		if (this.scopy(conncontroller, zipFile, targetPath) == true) {
 
-			// System.out.println(targetPath+zipFile.getName().substring(0,
-			// zipFile.getName().toString().indexOf(".zip")));
 			if (isExistedDirectory(
 					targetPath,
 					zipFile.getName().substring(0,
@@ -187,20 +185,21 @@ public class RecController implements Controller {
 						zipFile.getName().substring(0,
 								zipFile.getName().toString().indexOf(".zip")),
 						"_bak") == false) {
+					System.out.println("112");
 					throw new RemoteException(errorResult.toString());
 				}
 			}
-			// unzip the zipFile in the remote host
-			this.reauthInfo.execCommand(conncontroller, "unzip -q "
-					+ targetPath + zipFile.getName(), result, errorResult);
-			// System.out.println("unzip -q " + targetPath + zipFile.getName());
+
+			result.clear();
+			errorResult.clear();
+			this.reauthInfo.execCommand(conncontroller, "cd "+targetPath+" && unzip -q " + zipFile.getName(), result, errorResult);
 
 			if (result.isEmpty() && errorResult.isEmpty()) {
-				// System.out.println("Unzip successfully!");
+				 System.out.println("Unzip successfully!");
 				if (deleteFile(targetPath, zipFile.getName()) == false) {
 					throw new RemoteException("zipFile deleted failed.");
 				} else {
-					// System.out.println("zipFile deleted successfully!");
+					 System.out.println("zipFile deleted successfully!");
 				}
 			} else
 				throw new RemoteException("unzip failed");
@@ -271,9 +270,9 @@ public class RecController implements Controller {
 		ArrayList<String> errorResult = new ArrayList<String>(0);
 		String cmd = "cd " + targetPath + " && mv " + DirName + " " + DirName
 				+ subfix;
-		// System.out.println(cmd);
+		
 		this.reauthInfo.execCommand(conncontroller, cmd, result, errorResult);
-		// System.out.println(cmd);
+		
 		if (!errorResult.isEmpty()) {
 			return false;
 		}
@@ -361,7 +360,7 @@ public class RecController implements Controller {
 		if (pathstr.charAt(pathstr.length() - 1) != '/') {
 			pathstrend = pathstr + "/";
 		}
-		// System.out.println(pathstrend);
+		
 		return pathstrend;
 	}
 }
