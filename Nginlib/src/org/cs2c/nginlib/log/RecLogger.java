@@ -50,8 +50,11 @@ public class RecLogger implements Logger {
 				if(line==null){
 					break;
 				}
+				String[] attrs=line.split("[ ]+");
+				if(!attrs[7].endsWith(".log")){
+					continue;
+				}
 				LogProfile log=new LogProfile();
-				String[] attrs=line.split(" ");
 				log.setName(attrs[7]);
 				log.setOwner(attrs[2]);
 				log.setGroup(attrs[3]);
