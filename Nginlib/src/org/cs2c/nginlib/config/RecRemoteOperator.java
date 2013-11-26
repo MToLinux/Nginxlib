@@ -94,7 +94,7 @@ public class RecRemoteOperator implements RemoteOperator{
 		RecBlock objRecBlock = new RecBlock();
 		objRecBlock.setName(objHashMap.get("lastblockname"));
 		objRecBlock.SetBlockText(BlockText);
-		System.out.println(element.toString());//TODO
+//		System.out.println(element.toString());//TODO
 		if(element.toString().contains("{")){
 			//check element is directive or block type
 			objRecBlock.addBlock((Block)element);
@@ -337,6 +337,7 @@ public class RecRemoteOperator implements RemoteOperator{
 	@Override
 	public List<Block> getBlocks(String blockName, String outerBlockNames)
 			throws RemoteException {
+		String BlockName = null;
 		String BlockText = null;
 		
 		if( outerBlockNames == null){
@@ -354,6 +355,7 @@ public class RecRemoteOperator implements RemoteOperator{
 			if((null==confText) ||(""==confText) ){
 				confText = ReadConf();				
 			}
+		    BlockName = "allconfig";
 			BlockText = confText;
 		}
 		else{
@@ -362,10 +364,12 @@ public class RecRemoteOperator implements RemoteOperator{
 		    	outerBlockNames += ":0";
 		    }
 		    HashMap<String,String> objHashMap=EditCommon(outerBlockNames);
+		    BlockName = objHashMap.get("lastblockname");
 		    BlockText = objHashMap.get("blocktext");
 		}
 		
 		RecBlock objRecBlock = new RecBlock();
+		objRecBlock.setName(BlockName);
 		objRecBlock.SetBlockText(BlockText);
 		return objRecBlock.getBlocks(blockName);
 	}

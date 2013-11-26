@@ -231,6 +231,14 @@ public class RecConfiguratorTest {
 		
 		try {
 			Block bl= orc.getRootBlock();
+			//make Directive : server_name
+//			RecDirective rdserver_name = new RecDirective();
+//			rdserver_name.setName("server_name");
+//				RecStringParameter param1 = new RecStringParameter();
+//				param1.setValue("sernameval");
+//			rdserver_name.addParameter(param1);
+//			bl.addDirective(rdserver_name);
+//			System.out.println(bl.toString());
 //				System.out.println(list.get(i).getName());
 			System.out.println(bl.toString());
 		} catch (RemoteException e) {
@@ -257,7 +265,14 @@ public class RecConfiguratorTest {
 //			// case 2
 			blockName = "server";
 			list= orc.getBlocks(blockName, "http");
-			System.out.println(list.get(0).toString());
+//			System.out.println(list.get(0).toString());
+			
+			List<Block> listnew = list.get(0).getBlocks();
+			for(int i = 0;i< listnew.size();i++){
+				System.out.println(listnew.get(i).getName()+":"+
+						listnew.get(i).toString());
+			}
+
 			
 //			for(int i = 0;i< list.get(0).getDirectives().size();i++){
 //				System.out.println(list.get(0).getDirectives().get(i).toString());

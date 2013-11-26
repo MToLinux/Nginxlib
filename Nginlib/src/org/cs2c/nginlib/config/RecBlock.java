@@ -1,17 +1,17 @@
 package org.cs2c.nginlib.config;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
+//import java.io.File;
+//import java.io.FileReader;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.IdentityHashMap;
-import java.util.Iterator;
+//import java.util.HashMap;
+//import java.util.IdentityHashMap;
+//import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
+//import java.util.Map;
+//import java.util.Map.Entry;
 
 import org.cs2c.nginlib.RemoteException;
 
@@ -58,7 +58,6 @@ public class RecBlock implements Block,Element {
 		String tempdname = null;
 		String tempdtext = null;
 		try {
-
 			if(hasSubBlock(blockValue)){
 //				System.out.println(blockValue);
 				//blockValue count his own "{",so if Count "{" >1.
@@ -181,7 +180,7 @@ public class RecBlock implements Block,Element {
 					sb.append(block.toString()+"\n");
 					sb.append(Endlinetxt);
 				}else{
-					// if end with "XXX}}"
+					// if end with }}
 					String bltext = blalltext.substring(0, blalltext.length()-2);
 					String blEndtext = blalltext.substring(blalltext.length()-2, blalltext.length()-1);
 	//				System.out.println("bltext :"+bltext);
@@ -195,31 +194,71 @@ public class RecBlock implements Block,Element {
 			// set blockValue
 			SetBlockText(sb.toString());
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			throw new RemoteException(e.getMessage());
 		}
-
 	}
 
 	@Override
-	public void addDirective(Directive directive) {
+	public void addDirective(Directive directive) throws RemoteException {
 		StringBuilder sb = new StringBuilder();
-		if((null == blockValue) || ("" == blockValue)){
-			sb.append(blockName+" ");
-			sb.append("{"+ "\n");
-			sb.append("    " + directive.toString()+ "\n");
-			sb.append("    " + "}"+ "\n");
-		}else{
-			String bltext = blockValue.substring(0, blockValue.length()-2);
-			String blEndtext = blockValue.substring(blockValue.length()-2, blockValue.length()-1);
-			sb.append(bltext);
-//			sb.append("    ");
-			sb.append(directive.toString()+ "\n");
-			sb.append(blEndtext);
+		String blalltext = null;
+		String linetxt = null;
+		String Endlinetxt = null;
+		int nBlockRowCount = 0;
+		boolean bEndlineBigslogan = false;
+		try {
+			if((null == blockValue) || ("" == blockValue)){
+				sb.append(blockName+" ");
+				sb.append("{"+ "\n");
+				sb.append("    " + directive.toString()+ "\n");
+				sb.append("    " + "}"+ "\n");
+			}else{
+				blalltext = this.toString();
+				int linecount = GetBlockLenth(blalltext);
+			    BufferedReader br = new BufferedReader(new StringReader(blalltext));
+	
+				while( (linetxt = br.readLine()) != null) {
+					nBlockRowCount++;
+					if(nBlockRowCount == linecount){
+						if(linetxt.trim().equals("}"));{
+							bEndlineBigslogan = true;
+						}
+					}
+				}
+				if(bEndlineBigslogan){
+					//if last line trim() is "}"
+					nBlockRowCount = 0;
+					StringBuilder sbtemp = new StringBuilder();
+				    BufferedReader br1 = new BufferedReader(new StringReader(blalltext));
+					while( (linetxt = br1.readLine()) != null) {
+						nBlockRowCount++;
+						if(nBlockRowCount == linecount){
+							Endlinetxt = linetxt;
+						}else{
+							sbtemp.append(linetxt+"\n");
+						}
+					}
+	//				System.out.println("nBlockRowCount :"+nBlockRowCount);
+	//				System.out.println("linecount :"+linecount);
+					sb.append(sbtemp.toString());
+					sb.append(directive.toString()+"\n");
+					sb.append(Endlinetxt);
+				}else{
+					// if end with }}
+					String bltext = blalltext.substring(0, blalltext.length()-2);
+					String blEndtext = blalltext.substring(blalltext.length()-2, blalltext.length()-1);
+	//				System.out.println("bltext :"+bltext);
+					sb.append(bltext);
+					sb.append(directive.toString());
+					sb.append("\n");
+					sb.append(blEndtext);
+				}
+			}
+			// set blockValue
+			SetBlockText(sb.toString());
+		} catch (IOException e) {
+			throw new RemoteException(e.getMessage());
 		}
-
-		// set blockValue
-		SetBlockText(sb.toString());
 	}
 	
 	@Override
@@ -322,14 +361,23 @@ public class RecBlock implements Block,Element {
 	    String linetxt =null;
 	    int nblockstart = 0;
 	    int nblockEnd = 0;
+		int nlinecount = 0;
 	    boolean bBlock = false;
 		
 		try {
 		    BufferedReader br = new BufferedReader(new StringReader(Text));
 		    StringBuilder sb = new StringBuilder();
-		    		    
+
 			while( (linetxt = br.readLine()) != null) {
+				nlinecount++;
+//				System.out.println("nlinecount:" + nlinecount);
 				tempblname = GetBlockName(linetxt);
+				
+				//check if start with himself name
+				if((1 == nlinecount)&&(blockName.equals(tempblname))){
+					continue;
+				}
+
 				if((null != tempblname)&&(null == blname)){
 					blname = tempblname;
 					bBlock = true;
@@ -355,18 +403,17 @@ public class RecBlock implements Block,Element {
 			    		objblock.setName(blname);
 			    		objblock.SetBlockText(blText);
 			    		listGetBlocks.add(objblock);
-//						IhbMap.put(new String(blname), blText);
 //						System.out.println("blname:" + blname + "   blText:" + blText+"\n");
 						// close one block text,loop next.
 						bBlock = false;
 						blname = null;
 						sb.delete(0, sb.length());
-						
-						//get SubBlock and do recursion
-						String blockcontent = GetBlockContent(blText);
-			    		if(hasSubBlock(blockcontent)){
-			    			GetSubBlocks(blockcontent);//recursion
-			    		}
+
+//						//get SubBlock and do recursion
+//						String blockcontent = GetBlockContent(blText);
+//			    		if(hasSubBlock(blockcontent)){
+//			    			GetSubBlocks(blockcontent);//recursion
+//			    		}
 					}
 				}
 			}
@@ -432,20 +479,6 @@ public class RecBlock implements Block,Element {
 		}else{
 			return false;
 		}
-	}
-
-	private int CountSubBlock(String value) throws IOException {
-		String linetxt = null;
-		int nBlockNameCount = 0;
-		
-	    BufferedReader br = new BufferedReader(new StringReader(value));
-		while( (linetxt = br.readLine()) != null) {
-			if(HasBlockName(linetxt)){
-				nBlockNameCount++;
-			}
-		}
-		
-		return nBlockNameCount;
 	}
 
 	private String GetBlockName(String linetxt) {
