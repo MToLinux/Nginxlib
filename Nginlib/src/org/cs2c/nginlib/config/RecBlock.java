@@ -58,7 +58,6 @@ public class RecBlock implements Block,Element {
 		String tempdname = null;
 		String tempdtext = null;
 		try {
-
 			if(hasSubBlock(blockValue)){
 //				System.out.println(blockValue);
 				//blockValue count his own "{",so if Count "{" >1.
@@ -197,28 +196,69 @@ public class RecBlock implements Block,Element {
 		} catch (IOException e) {
 			throw new RemoteException(e.getMessage());
 		}
-
 	}
 
 	@Override
-	public void addDirective(Directive directive) {
+	public void addDirective(Directive directive) throws RemoteException {
 		StringBuilder sb = new StringBuilder();
-		if((null == blockValue) || ("" == blockValue)){
-			sb.append(blockName+" ");
-			sb.append("{"+ "\n");
-			sb.append("    " + directive.toString()+ "\n");
-			sb.append("    " + "}"+ "\n");
-		}else{
-			String bltext = blockValue.substring(0, blockValue.length()-2);
-			String blEndtext = blockValue.substring(blockValue.length()-2, blockValue.length()-1);
-			sb.append(bltext);
-//			sb.append("    ");
-			sb.append(directive.toString()+ "\n");
-			sb.append(blEndtext);
+		String blalltext = null;
+		String linetxt = null;
+		String Endlinetxt = null;
+		int nBlockRowCount = 0;
+		boolean bEndlineBigslogan = false;
+		try {
+			if((null == blockValue) || ("" == blockValue)){
+				sb.append(blockName+" ");
+				sb.append("{"+ "\n");
+				sb.append("    " + directive.toString()+ "\n");
+				sb.append("    " + "}"+ "\n");
+			}else{
+				blalltext = this.toString();
+				int linecount = GetBlockLenth(blalltext);
+			    BufferedReader br = new BufferedReader(new StringReader(blalltext));
+	
+				while( (linetxt = br.readLine()) != null) {
+					nBlockRowCount++;
+					if(nBlockRowCount == linecount){
+						if(linetxt.trim().equals("}"));{
+							bEndlineBigslogan = true;
+						}
+					}
+				}
+				if(bEndlineBigslogan){
+					//if last line trim() is "}"
+					nBlockRowCount = 0;
+					StringBuilder sbtemp = new StringBuilder();
+				    BufferedReader br1 = new BufferedReader(new StringReader(blalltext));
+					while( (linetxt = br1.readLine()) != null) {
+						nBlockRowCount++;
+						if(nBlockRowCount == linecount){
+							Endlinetxt = linetxt;
+						}else{
+							sbtemp.append(linetxt+"\n");
+						}
+					}
+	//				System.out.println("nBlockRowCount :"+nBlockRowCount);
+	//				System.out.println("linecount :"+linecount);
+					sb.append(sbtemp.toString());
+					sb.append(directive.toString()+"\n");
+					sb.append(Endlinetxt);
+				}else{
+					// if end with }}
+					String bltext = blalltext.substring(0, blalltext.length()-2);
+					String blEndtext = blalltext.substring(blalltext.length()-2, blalltext.length()-1);
+	//				System.out.println("bltext :"+bltext);
+					sb.append(bltext);
+					sb.append(directive.toString());
+					sb.append("\n");
+					sb.append(blEndtext);
+				}
+			}
+			// set blockValue
+			SetBlockText(sb.toString());
+		} catch (IOException e) {
+			throw new RemoteException(e.getMessage());
 		}
-
-		// set blockValue
-		SetBlockText(sb.toString());
 	}
 	
 	@Override

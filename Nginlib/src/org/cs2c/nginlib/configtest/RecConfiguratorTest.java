@@ -231,6 +231,14 @@ public class RecConfiguratorTest {
 		
 		try {
 			Block bl= orc.getRootBlock();
+			//make Directive : server_name
+//			RecDirective rdserver_name = new RecDirective();
+//			rdserver_name.setName("server_name");
+//				RecStringParameter param1 = new RecStringParameter();
+//				param1.setValue("sernameval");
+//			rdserver_name.addParameter(param1);
+//			bl.addDirective(rdserver_name);
+//			System.out.println(bl.toString());
 //				System.out.println(list.get(i).getName());
 			System.out.println(bl.toString());
 		} catch (RemoteException e) {
