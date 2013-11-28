@@ -36,4 +36,6 @@ public interface Element extends Cloneable {
 	 * @return the cloned instance with a deep copy.
 	 * */
 	Element clone() throws CloneNotSupportedException;
+	String getComment();
+	void setComment(String comment);
 }

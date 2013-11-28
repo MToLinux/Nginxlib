@@ -7,7 +7,8 @@ public class RecDirective implements Directive,Element{
 
 	private String directiveName=null;
 	private String directiveValue=null;
-	
+	private String directiveComment = null;
+
 	public void SetDirectiveText(String DirectiveText) {
 		directiveValue = DirectiveText;
 	}
@@ -77,6 +78,18 @@ public class RecDirective implements Directive,Element{
 		RecDirective obj=null;
 		obj=(RecDirective) super.clone();
 		return obj;
+	}
+
+	@Override
+	public String getComment() {
+		// TODO Auto-generated method stub
+		return directiveComment;
+	}
+
+	@Override
+	public void setComment(String comment) {
+		// TODO Auto-generated method stub
+		directiveComment = comment;
 	}
 
 }

@@ -1,6 +1,7 @@
 package org.cs2c.nginlib.config;
 
 import java.util.List;
+import java.util.Map;
 
 import org.cs2c.nginlib.RemoteException;
 import org.cs2c.nginlib.AuthInfo;
@@ -60,7 +61,7 @@ public class RecConfigurator implements Configurator {
 	}
 
 	@Override
-	public List<Block> getBlocks(String blockName, String outerBlockNames)
+	public Map<Integer, Block> getBlocks(String blockName, String outerBlockNames)
 			throws RemoteException {
 		return rro.getBlocks(blockName, outerBlockNames);
 	}

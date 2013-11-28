@@ -335,7 +335,7 @@ public class RecRemoteOperator implements RemoteOperator{
 	}
 	
 	@Override
-	public List<Block> getBlocks(String blockName, String outerBlockNames)
+	public Map<Integer,Block> getBlocks(String blockName, String outerBlockNames)
 			throws RemoteException {
 		String BlockName = null;
 		String BlockText = null;

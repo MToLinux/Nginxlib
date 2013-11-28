@@ -2,7 +2,10 @@ package org.cs2c.nginlib.configtest;
 
 import static org.junit.Assert.*;
 
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.cs2c.nginlib.AuthInfo;
 import org.cs2c.nginlib.MiddlewareFactory;
@@ -46,7 +49,7 @@ public class RecConfiguratorTest {
 		String blockName = null;
 //		outerBlockNames can be "http:0|server:0"
 		String outerBlockNames = "";
-		List<Block> list= null;
+		Map<Integer,Block> list= null;
 		try {
 			setUp();
 			testSetConfpathWithName();
@@ -74,7 +77,7 @@ public class RecConfiguratorTest {
 		String blockName = null;
 //		outerBlockNames can be "http:0|server:0"
 		String outerBlockNames = "";
-		List<Block> list= null;
+		Map<Integer,Block> list= null;
 		
 		testSetConfpathWithName();
 		
@@ -85,7 +88,7 @@ public class RecConfiguratorTest {
 		String BlockText="events {"+"\n"
 						+"    worker_connections  2000;"+"\n"
 						+"}";
-		bl.SetBlockText(BlockText);
+//		bl.SetBlockText(BlockText);
 		
 		list= orc.getBlocks(blockName, outerBlockNames);
 		assertEquals(1, list.size());
@@ -126,8 +129,8 @@ public class RecConfiguratorTest {
 		//add the new server to conf,first do getBlocks and get datastamp
 		blockName = "http";
 
-//		List<Block> list= orc.getBlocks(blockName, outerBlockNames);
-		List<Block> list= orc.getBlocks("server", "http:0");
+//		Map<Integer,Block> list= orc.getBlocks(blockName, outerBlockNames);
+		Map<Integer,Block> list= orc.getBlocks("server", "http:0");
 		
 //		System.out.println("getBlocks:"+list.size());
 		if(list.size()>0){
@@ -147,7 +150,7 @@ public class RecConfiguratorTest {
 		String blockName = null;
 //		outerBlockNames can be "http:0|server:0"
 		String outerBlockNames = "";
-		List<Block> list= null;
+		Map<Integer,Block> list= null;
 		
 		testSetConfpathWithName();
 		
@@ -176,7 +179,7 @@ public class RecConfiguratorTest {
 		String blockName = null;
 //		outerBlockNames can be "http:0|server:0"
 		String outerBlockNames = "";
-		List<Block> list= null;
+		Map<Integer,Block> list= null;
 		
 		testSetConfpathWithName();
 		
@@ -187,7 +190,7 @@ public class RecConfiguratorTest {
 		String BlockText="   InsertAfter {"+"\n"
 						+"        InsertAfter worker_connections  2000;"+"\n"
 						+"   }";
-		bl.SetBlockText(BlockText);
+//		bl.SetBlockText(BlockText);
 		
 		list= orc.getBlocks("server", outerBlockNames);
 		
@@ -204,7 +207,7 @@ public class RecConfiguratorTest {
 		String blockName = null;
 //		outerBlockNames can be "http:0|server:0"
 		String outerBlockNames = "";
-		List<Block> list= null;
+		Map<Integer,Block> list= null;
 		
 		testSetConfpathWithName();
 		
@@ -215,7 +218,7 @@ public class RecConfiguratorTest {
 		String BlockText="   InsertAfter {"+"\n"
 						+"        InsertAfter worker_connections  2000;"+"\n"
 						+"   }"+"\n";
-		bl.SetBlockText(BlockText);
+//		bl.SetBlockText(BlockText);
 		
 		list= orc.getBlocks("events", outerBlockNames);
 		
@@ -252,7 +255,7 @@ public class RecConfiguratorTest {
 	public final void testGetBlocks() {
 		String blockName = null;
 		String outerBlockNames = "";
-		List<Block> list= null;
+		Map<Integer,Block> myBlocks= null;
 		try {
 //			testSetConfpathWithName();
 
@@ -264,13 +267,15 @@ public class RecConfiguratorTest {
 			
 //			// case 2
 			blockName = "server";
-			list= orc.getBlocks(blockName, "http");
+			myBlocks= orc.getBlocks(blockName, "http");
 //			System.out.println(list.get(0).toString());
-			
-			List<Block> listnew = list.get(0).getBlocks();
-			for(int i = 0;i< listnew.size();i++){
-				System.out.println(listnew.get(i).getName()+":"+
-						listnew.get(i).toString());
+			Iterator<Entry<Integer, Block>> it = myBlocks.entrySet().iterator();
+			while(it.hasNext()){
+				Entry<Integer, Block> entry = (Entry<Integer, Block>)it.next();
+				String blname = entry.getValue().getName();
+
+				System.out.println(blname+":"+
+						entry.getKey());
 			}
 
 			
@@ -293,23 +298,67 @@ public class RecConfiguratorTest {
 		}
 	}
 	@Test
-	public final void testGetBlocks1() {
-		String blockName = null;
-		String outerBlockNames = "http:0";
-		List<Block> list= null;
+	public final void testGetAllBlocks() {
+		Block blhttp = null;
+		Map<Integer,Block> myBlocks= null;
 		try {
-			testSetConfpathWithName();
+			Block bl= orc.getRootBlock();
+			myBlocks = bl.getBlocks();
+			Iterator<Entry<Integer, Block>> it = myBlocks.entrySet().iterator();
+			while(it.hasNext()){
+				Entry<Integer, Block> entry = (Entry<Integer, Block>)it.next();
+				String blname = entry.getValue().getName();
+				blhttp = entry.getValue();
+				System.out.println(blname+":"+
+						entry.getKey());
+			}
 			
-			// case 2
-			blockName = "server";
-			list= orc.getBlocks(blockName, outerBlockNames);
-			assertEquals(1, list.size());
-			assertEquals(blockName, list.get(0).getName());
-
+			//get again
+			Map<Integer, Block> myBlockshttp = blhttp.getBlocks();
+			Iterator<Entry<Integer, Block>> ithttp = myBlockshttp.entrySet().iterator();
+			while(ithttp.hasNext()){
+				Entry<Integer, Block> entry = (Entry<Integer, Block>)ithttp.next();
+				String blname1 = entry.getValue().getName();
+				blhttp = entry.getValue();
+				System.out.println(blname1+":"+
+						entry.getKey());
+			}
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		}
 	}
+	
+	@Test
+	public final void testGetAllDirectives() {
+		Block blhttp = null;
+		Map<Integer,Block> myBlocks= null;
+		try {
+			Block bl= orc.getRootBlock();
+			myBlocks = bl.getBlocks();
+			Iterator<Entry<Integer, Block>> it = myBlocks.entrySet().iterator();
+			while(it.hasNext()){
+				Entry<Integer, Block> entry = (Entry<Integer, Block>)it.next();
+				String blname = entry.getValue().getName();
+				blhttp = entry.getValue();
+				System.out.println(blname+":"+
+						entry.getKey());
+			}
+			
+			//get again
+			Map<Integer, Directive> myBlockshttp = blhttp.getDirectives();
+			Iterator<Entry<Integer, Directive>> ithttp = myBlockshttp.entrySet().iterator();
+			while(ithttp.hasNext()){
+				Entry<Integer, Directive> entry = (Entry<Integer, Directive>)ithttp.next();
+				String diname1 = entry.getValue().getName();
+//				blhttp = entry.getValue();
+				System.out.println(diname1+":"+
+						entry.getKey());
+			}
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	@Test
 	public final void testNewBlock() {
 		Block op = orc.newBlock();

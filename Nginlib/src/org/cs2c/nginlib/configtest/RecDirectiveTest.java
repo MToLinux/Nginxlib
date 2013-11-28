@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.cs2c.nginlib.RemoteException;
 import org.cs2c.nginlib.config.*;
@@ -56,9 +57,9 @@ public class RecDirectiveTest {
 		List<Block> list= null;
 		String path = "D:\\eclipseWorkspace\\confpath\\nginx.conf";
 		rro.SetLocalConfpath(path);
-		list= rro.getBlocks("server", "");
+//		list= rro.getBlocks("server", "");
 		
-		List<Directive> listd = new ArrayList<Directive>();
+		Map<Integer, Directive> listd = null;
 		listd = list.get(0).getDirectives();
 		
 		//real test

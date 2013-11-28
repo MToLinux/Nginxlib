@@ -25,16 +25,17 @@ import org.cs2c.nginlib.RemoteException;
 public interface Block extends Element{
 	/**
 	 * Get sub block list with in the instance.
-	 * @return sub blocks with list container. If the block have no sub block, an empty list should be returned.
+	 * @return sub blocks with list container. If the block have no sub block, an empty Map should be returned.
+	 * @return Map：Integer indicate sub Block in elements location index.
 	 * @throws RemoteException 
 	 * */
-	List<Block> getBlocks() throws RemoteException;
+	Map<Integer, Block> getBlocks() throws RemoteException;
 	/**
 	 * Get all directives directly in the block.
 	 * @return directives with list container. If the block have no directive, an empty list should be returned.
 	 * @throws RemoteException 
 	 * */
-	List<Directive> getDirectives() throws RemoteException;
+	Map<Integer, Directive> getDirectives() throws RemoteException;
 	/**
 	 * Add a block in the block end.
 	 * @param block block to be added.
@@ -47,4 +48,19 @@ public interface Block extends Element{
 	 * @throws RemoteException 
 	 * */
 	void addDirective(Directive directive) throws RemoteException;
+	/**
+	 * delete a element in the block location eleindex.
+	 * @param eleindex: element's index which element to be delete.
+	 * @throws RemoteException 
+	 * */
+	void deleteElement(Integer eleindex) throws RemoteException;
+	/**
+	 * replace a element in the eleindex location.
+	 * @param newElement block to be replace.
+	 * @param eleindex: element index to be replace location.
+	 * @throws RemoteException 
+	 * */
+	void replaceElement(Element newElement, Integer eleindex)
+			throws RemoteException;
+
 }

@@ -3,8 +3,13 @@ package org.cs2c.nginlib.configtest;
 import static org.junit.Assert.*;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
+import org.cs2c.nginlib.AuthInfo;
+import org.cs2c.nginlib.MiddlewareFactory;
 import org.cs2c.nginlib.RemoteException;
 import org.cs2c.nginlib.config.*;
 import org.junit.Before;
@@ -15,7 +20,8 @@ import org.junit.Test;
 public class RecBlockTest {
 	RecBlock orb = new RecBlock();
 	static String ConfText = null;
-	
+	RecConfigurator orc = null;
+
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
 
@@ -24,13 +30,89 @@ public class RecBlockTest {
 		RecRemoteOperator rro = new RecRemoteOperator();
 		rro.SetLocalConfpath(path);
 //		ConfText = rro.ReadConf();
-
 	}
 
 	@Before
 	public void setUp() throws Exception {
-	}
+		AuthInfo authInfo;
+		authInfo=MiddlewareFactory.newAuthInfo();
+		authInfo.setHost("10.1.50.4");
+		authInfo.setUsername("root");
+		authInfo.setPassword("cs2csolutions");
+		MiddlewareFactory instance= null;
 
+		instance = MiddlewareFactory.getInstance(authInfo, "/usr/local/nginx/");
+		orc = (RecConfigurator) instance.getConfigurator();
+
+	}
+	
+	@Test
+	public final void testGetBlocks() {
+		Block blhttp = null;
+		Map<Integer,Block> myBlocks= null;
+		try {
+			Block bl= orc.getRootBlock();
+			myBlocks = bl.getBlocks();
+			Iterator<Entry<Integer, Block>> it = myBlocks.entrySet().iterator();
+			while(it.hasNext()){
+				Entry<Integer, Block> entry = (Entry<Integer, Block>)it.next();
+				String blname = entry.getValue().getName();
+				blhttp = entry.getValue();
+//				System.out.println(blname+":"+
+//						entry.getKey());
+			}
+			
+			//get again
+			Map<Integer, Block> myBlockshttp = blhttp.getBlocks();
+			Iterator<Entry<Integer, Block>> ithttp = myBlockshttp.entrySet().iterator();
+			while(ithttp.hasNext()){
+				Entry<Integer, Block> entry = (Entry<Integer, Block>)ithttp.next();
+				String blname1 = entry.getValue().getName();
+				Block blsubhttpele = entry.getValue();
+				System.out.println(blname1+":"+
+						entry.getValue().toString());
+			}
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	@Test
+	public final void testdeleteBlock() {
+		Block blhttp = null;
+		Map<Integer,Block> myBlocks= null;
+		try {
+			Block bl= orc.getRootBlock();
+			myBlocks = bl.getBlocks();
+			Iterator<Entry<Integer, Block>> it = myBlocks.entrySet().iterator();
+			while(it.hasNext()){
+				Entry<Integer, Block> entry = (Entry<Integer, Block>)it.next();
+				String blname = entry.getValue().getName();
+				blhttp = entry.getValue();
+//				System.out.println(blname+":"+
+//						entry.getKey());
+			}
+			
+			//get again
+			Map<Integer, Block> myBlockshttp = blhttp.getBlocks();
+			Entry<Integer, Block> entry =null;
+			Iterator<Entry<Integer, Block>> ithttp = myBlockshttp.entrySet().iterator();
+			while(ithttp.hasNext()){
+				entry = (Entry<Integer, Block>)ithttp.next();
+//				String blname1 = entry.getValue().getName();
+//				Block blsubhttpele = entry.getValue();
+//				System.out.println(entry.getKey()+":"+
+//						entry.getValue());
+			}
+			
+			blhttp.deleteElement(1);
+			System.out.println("blhttp:"+
+					blhttp.toString());
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	@Test
 	public final void testSetName() {
 		String name = "http";
@@ -53,7 +135,7 @@ public class RecBlockTest {
 		rro.SetLocalConfpath(path);
 		String ConfText = null;
 //			ConfText = rro.ReadConf();
-		orb.SetConfText(ConfText);
+//		orb.SetConfText(ConfText);
 		orb.setName("server");
 		assertFalse(ConfText == orb.toString());
 		assertNotNull(orb.toString());
@@ -68,7 +150,7 @@ public class RecBlockTest {
 		rro.SetLocalConfpath(path);
 		String ConfText = "";
 //			ConfText = rro.ReadConf();
-		orb.SetConfText(ConfText);
+//		orb.SetConfText(ConfText);
 		assertNotNull(orb.toString());
 		assertTrue(orb.toString()!="");
 //			System.out.println(orb.toString());
@@ -78,7 +160,8 @@ public class RecBlockTest {
 	public final void testSetConfText() {
 		IntegrationTestInClass();
 	}
-
+	
+/*
 	@Test
 	public final void testGetBlocks() {
 		orb.SetConfText(ConfText);
@@ -263,4 +346,5 @@ public class RecBlockTest {
 		assertNotEquals(BlockText,bltxt);
 
 	}
+	*/
 }
