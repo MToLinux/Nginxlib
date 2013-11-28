@@ -84,6 +84,7 @@ public class RecBlockTest {
 		try {
 			Block bl= orc.getRootBlock();
 			myBlocks = bl.getBlocks();
+			
 			Iterator<Entry<Integer, Block>> it = myBlocks.entrySet().iterator();
 			while(it.hasNext()){
 				Entry<Integer, Block> entry = (Entry<Integer, Block>)it.next();
@@ -93,7 +94,7 @@ public class RecBlockTest {
 //						entry.getKey());
 			}
 			
-			//get again
+			//delete block
 			Map<Integer, Block> myBlockshttp = blhttp.getBlocks();
 			Entry<Integer, Block> entry =null;
 			Iterator<Entry<Integer, Block>> ithttp = myBlockshttp.entrySet().iterator();
@@ -103,11 +104,49 @@ public class RecBlockTest {
 //				Block blsubhttpele = entry.getValue();
 //				System.out.println(entry.getKey()+":"+
 //						entry.getValue());
+				blhttp.deleteElement(entry.getKey());
+			}
+			blhttp.deleteElement(7);
+			blhttp.deleteElement(9);
+			System.out.println("blhttp :" + blhttp.toString());
+			
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	@Test
+	public final void testdeleteDirectives() {
+		Block blhttp = null;
+		Map<Integer,Block> myBlocks= null;
+		try {
+			Block bl= orc.getRootBlock();
+			myBlocks = bl.getBlocks();
+			
+			Iterator<Entry<Integer, Block>> it = myBlocks.entrySet().iterator();
+			while(it.hasNext()){
+				Entry<Integer, Block> entry = (Entry<Integer, Block>)it.next();
+				String blname = entry.getValue().getName();
+				blhttp = entry.getValue();
+//				System.out.println(blname+":"+
+//						entry.getKey());
 			}
 			
-			blhttp.deleteElement(1);
-			System.out.println("blhttp:"+
-					blhttp.toString());
+			//delete block
+			Map<Integer, Directive> myBlockshttp = blhttp.getDirectives();
+			Entry<Integer, Directive> entry =null;
+			Iterator<Entry<Integer, Directive>> ithttp = myBlockshttp.entrySet().iterator();
+			while(ithttp.hasNext()){
+				entry = (Entry<Integer, Directive>)ithttp.next();
+//				String blname1 = entry.getValue().getName();
+//				Block blsubhttpele = entry.getValue();
+//				System.out.println(entry.getKey()+":"+
+//						entry.getValue());
+				blhttp.deleteElement(entry.getKey());
+			}
+		
+			System.out.println("blhttp :" + blhttp.toString());
+			
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		}

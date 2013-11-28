@@ -5,14 +5,14 @@ import java.io.BufferedReader;
 //import java.io.FileReader;
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.ArrayList;
+//import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
 //import java.util.HashMap;
 //import java.util.IdentityHashMap;
 //import java.util.Iterator;
-import java.util.List;
+//import java.util.List;
 //import java.util.Map;
 //import java.util.Map.Entry;
 
@@ -23,13 +23,14 @@ import org.cs2c.nginlib.RemoteException;
 
 public class RecBlock implements Block,Element {
 	
-	private String blockComment = null;
+	private String blockComment = new String();
 	
 	private String blockName = null;
 	private String blockValue = null;
-	private String confText = null;
+//	private String confText = null;
 //	List<Element> listElements = new ArrayList<Element>();
 	private Hashtable<Integer,Element> myElements = new Hashtable<Integer,Element>();
+	int myElementsSize = 0;
 	
 	private Map<Integer,Block> myBlocks = new HashMap<Integer,Block>();
 	private Map<Integer,Directive> myDirectives = new HashMap<Integer,Directive>();
@@ -60,26 +61,35 @@ public class RecBlock implements Block,Element {
 		blockValue = BlockText;
 	}
 	
-	protected void SetConfText(String outConfText) {
-		confText = outConfText;
-	}
+//	protected void SetConfText(String outConfText) {
+//		confText = outConfText;
+//	}
 	
 	@Override
 	public Map<Integer,Block> getBlocks() throws RemoteException {
-		myBlocks.clear();
-		myElements.clear();
-		GetSubElements(blockValue);
-
+		GetBlSubElements();
 		return myBlocks;
 	}
 
 	@Override
 	public Map<Integer, Directive> getDirectives() throws RemoteException {
-		myDirectives.clear();
-		myElements.clear();
+		GetBlSubElements();
+		return myDirectives;
+	}
+	
+	private void GetBlSubElements() throws RemoteException {
+		if(!myDirectives.isEmpty()){
+			myDirectives.clear();
+		}
+		if(!myBlocks.isEmpty()){
+			myBlocks.clear();
+		}
+		if(!myElements.isEmpty()){
+			myElements.clear();
+		}
 
 		GetSubElements(blockValue);
-		return myDirectives;
+		myElementsSize = myElements.size();
 	}
 
 	/* by new data type map
@@ -154,15 +164,27 @@ public class RecBlock implements Block,Element {
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		if((null != blockName) && ("" != blockValue) && (null != blockValue)){
-			return blockValue;
-		}else if((null != blockName) && (null == blockValue)){
-			sb.append(blockName+" ");
-			sb.append("{"+ "\n");
-			sb.append("}"+ "\n");
-			return sb.toString();
+		if((null != blockName) && ("" != blockName)){
+			if("nginx.conf" == blockName){
+				// all nginx.conf
+				if(null != blockValue){
+					return blockValue;
+				}else{
+					return "";
+				}
+			}else{
+				if(null == blockValue){
+					sb.append(blockName+" ");
+					sb.append("{"+ "\n");
+					sb.append("}"+ "\n");
+					return sb.toString();
+				}else{
+					return blockValue;
+				}
+			}
 		}else{
-			return confText;
+			// blockName == null
+			return null;
 		}
 	}
 	 
@@ -187,7 +209,7 @@ public class RecBlock implements Block,Element {
 	    boolean bStartBlock = false;
 	    
 		try {
-		    BufferedReader br = new BufferedReader(new StringReader(confText));
+		    BufferedReader br = new BufferedReader(new StringReader(blockValue));
 		    StringBuilder sb = new StringBuilder();
 		    
 			while( (linetxt = br.readLine()) != null) {
@@ -254,7 +276,7 @@ public class RecBlock implements Block,Element {
 				if((1 == nlinecount)&&(blockName.equals(tempblname))){
 					continue;
 				}
-				
+
 				if((null != tempblname)&&(null == blname)){
 					blname = tempblname;
 					bBlock = true;
@@ -268,12 +290,15 @@ public class RecBlock implements Block,Element {
 						nelementscount++;
 						//System.out.println("blname:" + blname);
 						RecDirective objDirective = new RecDirective();
+						objDirective.setComment(sbcomment.toString());
 						objDirective.setName(tempdname);
-						objDirective.SetDirectiveText(linetxt);
+						objDirective.SetDirectiveText(linetxt + "\n");
 						myElements.put(nelementscount, objDirective);
 						myDirectives.put(nelementscount, objDirective);
+						sbcomment.delete(0, sbcomment.length());
 					}else{
-						sbcomment.append(linetxt);
+						//make all sub element's comment
+						sbcomment.append(linetxt + "\n");
 					}
 				}
 				
@@ -295,6 +320,8 @@ public class RecBlock implements Block,Element {
 			    		// get name
 			    		objblock.setName(blname);
 			    		objblock.SetBlockText(blText);
+			    		objblock.setComment(sbcomment.toString());
+						sbcomment.delete(0, sbcomment.length());
 						nelementscount++;
 						//put block Elements
 						myElements.put(nelementscount, objblock);
@@ -313,7 +340,8 @@ public class RecBlock implements Block,Element {
 			throw new RemoteException(e.getMessage());
 		}
 	}
-	
+
+/*
 	private String GetBlockContent(String blText) throws IOException {
 		String linetxt = null;
 		int nBlockRowCount = 0;
@@ -337,6 +365,7 @@ public class RecBlock implements Block,Element {
 		}
 		return sb.toString();
 	}
+*/
 	
 	private int GetBlockLenth(String BlockText) {
 	    int nBlockLineCount = 0;
@@ -354,6 +383,7 @@ public class RecBlock implements Block,Element {
 			return 0;
 		}
 	}
+	
 	private boolean hasSubBlock(String value) throws IOException {
 		String linetxt = null;
 		int nBlockNameCount = 0;
@@ -475,7 +505,8 @@ public class RecBlock implements Block,Element {
 	 * Query all blocks with the specific block name in the block
 	 * */
 	protected Map<Integer,Block> getBlocks(String gBblockName) throws RemoteException{
-		GetSubElements(blockValue);
+		GetBlSubElements();
+
 		Map<Integer,Block> retBlocks = new HashMap<Integer,Block>();
 		
 		Iterator<Entry<Integer, Block>> it = myBlocks.entrySet().iterator();
@@ -497,8 +528,61 @@ public class RecBlock implements Block,Element {
 		RecBlock retBlock = new RecBlock();
 		retBlock.setName(blockName);
 
-		for(int i=0;i<myElements.size();i++){
+		for(int i=0;i<myElementsSize;i++){
 			if(!eleindex.equals(i)){
+				if(null != myElements.get(i)){
+					retBlock.AddString(myElements.get(i).getComment());
+					retBlock.AddString(myElements.get(i).toString());
+
+//		            System.out.println(i+" Elements:" + myElements.get(i).toString());
+//		            System.out.println(" addElement:" + i);
+				}
+			}else{
+				myElements.remove(i);
+//	            System.out.println(" deleteElement:" + i);
+			}
+		}
+		// set blockValue
+		SetBlockText(retBlock.toString());
+	}
+
+	private void AddString(String element) throws RemoteException {
+		StringBuilder sb = new StringBuilder();
+		
+		//TODO
+//        System.out.println(" blockName:" + blockName);
+//        System.out.println(" blockValue:" + blockValue);
+//        System.out.println(" this.toString():" + this.toString());
+
+		// func : if blockName is "nginx.conf" means all conf
+		if("nginx.conf" == blockName){
+			String conftxt = this.toString();
+			if("" == conftxt){
+				sb.append(element);
+			}else{
+				sb.append(conftxt);
+				sb.append(element);
+			}
+		}else{
+			// real block(except nginx.conf root block)
+			sb.append(AppendElement(element));
+		}
+
+		// set blockValue
+		SetBlockText(sb.toString());
+	}
+	
+/*
+	@Override
+	public void replaceElement(Element newElement, Integer eleindex)
+			throws RemoteException {
+		RecBlock retBlock = new RecBlock();
+		retBlock.setName(blockName);
+
+		for(int i=0;i<myElements.size();i++){
+			if(eleindex.equals(i)){
+				retBlock.AddString(newElement.toString());
+			}else{
 				retBlock.AddString(myElements.get(i).getComment());
 				retBlock.AddString(myElements.get(i).toString());
 			}
@@ -507,23 +591,25 @@ public class RecBlock implements Block,Element {
 		// set blockValue
 		SetBlockText(retBlock.toString());
 	}
+*/
 
-	private void AddString(String element) throws RemoteException {
+	private String AppendElement(String element) throws RemoteException {
 		StringBuilder sb = new StringBuilder();
 		String blalltext = null;
 		String linetxt = null;
 		String Endlinetxt = null;
 		int nBlockRowCount = 0;
 		boolean bEndlineBigslogan = false;
-		
 		try {
-			if((null == blockValue) || ("" == blockValue)){
+			// func : blockValue is null
+			if(null == blockValue){
 				sb.append(blockName+" ");
 				sb.append("{"+ "\n");
 				sb.append(element+ "\n");
 				sb.append("}"+ "\n");
 			}else{
 				blalltext = this.toString();
+//				System.out.println("bltext :"+blalltext);
 				//check if last line trim() is "}"
 				int linecount = GetBlockLenth(blalltext);
 			    BufferedReader br = new BufferedReader(new StringReader(blalltext));
@@ -563,32 +649,9 @@ public class RecBlock implements Block,Element {
 					sb.append(blEndtext);
 				}
 			}
-	
-			// set blockValue
-			SetBlockText(sb.toString());
+			return sb.toString();
 		} catch (IOException e) {
 			throw new RemoteException(e.getMessage());
 		}
 	}
-	
-	@Override
-	public void replaceElement(Element newElement, Integer eleindex)
-			throws RemoteException {
-		RecBlock retBlock = new RecBlock();
-		retBlock.setName(blockName);
-
-		for(int i=0;i<myElements.size();i++){
-			if(eleindex.equals(i)){
-				retBlock.AddString(newElement.toString());
-			}else{
-				//TODO
-				retBlock.AddString(myElements.get(i).getComment());
-				retBlock.AddString(myElements.get(i).toString());
-			}
-		}
-		
-		// set blockValue
-		SetBlockText(retBlock.toString());
-	}
-
 }

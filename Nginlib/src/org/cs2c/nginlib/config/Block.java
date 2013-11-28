@@ -50,17 +50,8 @@ public interface Block extends Element{
 	void addDirective(Directive directive) throws RemoteException;
 	/**
 	 * delete a element in the block location eleindex.
-	 * @param eleindex: element's index which element to be delete.
+	 * @param eleindex: element's index which element to be delete. eleindex start from 0.
 	 * @throws RemoteException 
 	 * */
 	void deleteElement(Integer eleindex) throws RemoteException;
-	/**
-	 * replace a element in the eleindex location.
-	 * @param newElement block to be replace.
-	 * @param eleindex: element index to be replace location.
-	 * @throws RemoteException 
-	 * */
-	void replaceElement(Element newElement, Integer eleindex)
-			throws RemoteException;
-
 }
