@@ -20,4 +20,5 @@ public interface Directive extends Element{
 	 * @param parameter parameter to be added.
 	 * */
 	void addParameter(Parameter parameter);
+	void deleteParameter(Parameter parameter);
 }

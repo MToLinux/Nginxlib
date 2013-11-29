@@ -335,7 +335,7 @@ public class RecRemoteOperator implements RemoteOperator{
 	}
 	
 	@Override
-	public Map<Integer,Block> getBlocks(String blockName, String outerBlockNames)
+	public List<Block> getBlocks(String blockName, String outerBlockNames)
 			throws RemoteException {
 		String BlockName = null;
 		String BlockText = null;
@@ -686,6 +686,7 @@ public class RecRemoteOperator implements RemoteOperator{
 	private String GetBlockTextWithIndex(String blname,int Index) throws RemoteException{
 		
 		RecBlock rb = new RecBlock();
+		rb.setName("nginx.conf");
 		rb.SetBlockText(confText);
 		
 		String BlockText = rb.GetBlockText(blname,Index);

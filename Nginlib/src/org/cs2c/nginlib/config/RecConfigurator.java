@@ -61,7 +61,7 @@ public class RecConfigurator implements Configurator {
 	}
 
 	@Override
-	public Map<Integer, Block> getBlocks(String blockName, String outerBlockNames)
+	public List<Block> getBlocks(String blockName, String outerBlockNames)
 			throws RemoteException {
 		return rro.getBlocks(blockName, outerBlockNames);
 	}

@@ -64,7 +64,7 @@ public class RecRemoteOperatorTest {
 		String blockName = null;
 //		outerBlockNames can be "http:0|server:0"
 		String outerBlockNames = "";
-		Map<Integer,Block> list= null;
+		List<Block> list= null;
 		
 		
 		try {
@@ -90,7 +90,7 @@ public class RecRemoteOperatorTest {
 //		String blockName = null;
 ////		outerBlockNames can be "http:0|server:0"
 //		String outerBlockNames = "";
-//		Map<Integer,Block> list= null;
+//		List<Block> list= null;
 //		
 ////		String path = "D:\\eclipseWorkspace\\confpath\\nginx.conf";
 ////
@@ -118,7 +118,7 @@ public class RecRemoteOperatorTest {
 		String blockName = null;
 //		outerBlockNames can be "http:0|server:0"
 		String outerBlockNames = "";
-		Map<Integer,Block> list= null;
+		List<Block> list= null;
 		
 //		String path = "D:\\eclipseWorkspace\\confpath\\nginx.conf";
 //
@@ -129,7 +129,7 @@ public class RecRemoteOperatorTest {
 //			String oldStr = rro.ReadConf();
 			blockName = "events";
 			list= rro.getBlocks(blockName, outerBlockNames);
-			Map<Integer, Directive> listdi = list.get(0).getDirectives();
+			List<Directive> listdi = list.get(0).getDirectives();
 			
 			outerBlockNames = "events";
 			rro.append(list.get(0), outerBlockNames);
@@ -147,7 +147,7 @@ public class RecRemoteOperatorTest {
 		String blockName = null;
 //		outerBlockNames can be "http:0|server:0"
 		String outerBlockNames = "";
-		Map<Integer,Block> list= null;
+		List<Block> list= null;
 		
 //		String path = "D:\\eclipseWorkspace\\confpath\\nginx.conf";
 //
@@ -161,7 +161,7 @@ public class RecRemoteOperatorTest {
 		String blockName = null;
 //		outerBlockNames can be "http:0|server:0"
 		String outerBlockNames = "http:0|server:0|location /:0";
-		Map<Integer,Block> list= null;
+		List<Block> list= null;
 		
 //		String path = "D:\\eclipseWorkspace\\confpath\\nginx.conf";
 //
@@ -186,7 +186,7 @@ public class RecRemoteOperatorTest {
 		String blockName = null;
 //		outerBlockNames can be "http:0|server:0"
 		String outerBlockNames = "";
-		Map<Integer,Block> list= null;
+		List<Block> list= null;
 		
 //		String oldStr = rro.ReadConf();
 		
@@ -215,7 +215,7 @@ public class RecRemoteOperatorTest {
 		String blockName = null;
 //		outerBlockNames can be "http:0|server:0"
 		String outerBlockNames = "";
-		Map<Integer,Block> list= null;
+		List<Block> list= null;
 		
 //		testSetConfpathWithName();
 		
@@ -239,7 +239,7 @@ public class RecRemoteOperatorTest {
 	public final void testGetBlocks() {
 		String blockName = null;
 		String outerBlockNames = "";
-		Map<Integer,Block> list= null;
+		List<Block> list= null;
 		try {
 			// case 1
 			blockName = "events";
@@ -270,7 +270,7 @@ public class RecRemoteOperatorTest {
 	public final void testGetBlocks1() {
 		String blockName = null;
 		String outerBlockNames = "http";
-		Map<Integer,Block> list= null;
+		List<Block> list= null;
 		try {
 			// case 1
 			blockName = "events";

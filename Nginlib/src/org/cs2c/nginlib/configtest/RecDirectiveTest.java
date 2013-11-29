@@ -29,7 +29,7 @@ public class RecDirectiveTest {
 		String name = "worker_connections";
 		rd.setName(name);
 		String text = "    worker_connections  1024;";
-		rd.SetDirectiveText(text);
+//		rd.SetDirectiveText(text);
 		assertEquals(text, rd.toString());
 		System.out.println(rd.toString());
 	}
@@ -59,7 +59,7 @@ public class RecDirectiveTest {
 		rro.SetLocalConfpath(path);
 //		list= rro.getBlocks("server", "");
 		
-		Map<Integer, Directive> listd = null;
+		List<Directive> listd = null;
 		listd = list.get(0).getDirectives();
 		
 		//real test
@@ -81,7 +81,7 @@ public class RecDirectiveTest {
 		String name = "error_page";
 		rd.setName(name);
 		String text = "    error_page  500;";
-		rd.SetDirectiveText(text);
+//		rd.SetDirectiveText(text);
 		
 		// case 1
 		RecOption pa = new RecOption();
@@ -108,7 +108,7 @@ public class RecDirectiveTest {
 		String name = "worker_connections";
 		rd.setName(name);
 		String text = "    worker_connections  1024;";
-		rd.SetDirectiveText(text);
+//		rd.SetDirectiveText(text);
 		
 		Element el = rd.clone();
 		

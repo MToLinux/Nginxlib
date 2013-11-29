@@ -8,27 +8,30 @@ public class RecDirective implements Directive,Element{
 	private String directiveName=null;
 	private String directiveValue=null;
 	private String directiveComment = null;
+	
+	private String diNameAndupspace=null;
 
-	public void SetDirectiveText(String DirectiveText) {
+	private List<Parameter> listParam = new  ArrayList<Parameter>();
+
+	protected void SetDirectiveText(String DirectiveText) {
 		directiveValue = DirectiveText;
+		GetSubParameters();
 	}
 	
-	@Override
-	public void setName(String name) {
-		directiveName = name;
+	private void GetSubParameters() {
+		if(!listParam.isEmpty()){
+			listParam.clear();
+		}
+
+		GetSubParam(directiveValue);
 	}
 
-	@Override
-	public String getName() {
-		return directiveName;
-	}
-
-	@Override
-	public List<Parameter> getParameters() {
+	private void GetSubParam(String directiveValue2) {
+		
+		SetNameupspace(directiveValue2);
 		// Directive_name Option=9 StringParameter $Variable
-		String divalue = directiveValue.substring(0, directiveValue.length()-1);
+		String divalue = directiveValue2.substring(0, directiveValue2.length()-1);
 		String[] lineArray=divalue.split(" ");
-		List<Parameter> listParam = new  ArrayList<Parameter>();
 		
 		for(int i=1;i<lineArray.length;i++){
 			if(lineArray[i].contains("=")){
@@ -49,30 +52,70 @@ public class RecDirective implements Directive,Element{
 				listParam.add(objStringParameter);
 			}
 		}
+	}
 
+	private void SetNameupspace(String directiveV) {
+		int n = directiveV.lastIndexOf(directiveName);
+		String divalue = directiveV.substring(0, n);
+		divalue = divalue+directiveName;
+		setNameAndupspace(divalue);
+	}
+
+	@Override
+	public void setName(String name) {
+		directiveName = name;
+	}
+
+	@Override
+	public String getName() {
+		return directiveName;
+	}
+
+	@Override
+	public List<Parameter> getParameters() {
 		return listParam;
 	}
 	
 	@Override
 	public String toString(){
-		return directiveValue;
+		StringBuilder sb = new StringBuilder();
+
+		// start line
+		String name = this.getNameAndupspace();
+		if(null!=name){
+			sb.append(name+" ");
+		}else{
+			// please set directiveName
+			return null;
+		}
+		
+		for(int i=0;i<listParam.size();i++){
+			if(null != listParam.get(i)){
+				String sbin = listParam.get(i).toString();
+//	            System.out.println(i+" Elements:" + myElements.get(i).toString());
+				sb.append(" "+sbin);
+			}
+		}
+		//end directive
+		sb.append(";");
+		
+		return sb.toString();		
 	}
 	
 	@Override
 	public void addParameter(Parameter parameter) {
-		StringBuilder sb = new StringBuilder();
-		if((null == directiveValue) || ("" == directiveValue)){
-			sb.append(directiveName+"  ");
-			sb.append(parameter.toString()+";");
-		}else{
-			sb.append(directiveValue.substring(0, directiveValue.length()-1)+" ");
-			sb.append(parameter.toString());
-			sb.append(directiveValue.substring(directiveValue.length()-1, directiveValue.length()));
-		}
-
-		directiveValue = sb.toString();
+		int index = listParam.size();
+		listParam.add(index, parameter);
 	}
 	
+	@Override
+	public void deleteParameter(Parameter parameter) {
+		for(int i=0;i<listParam.size();i++){
+			if(listParam.get(i) == parameter){
+				listParam.remove(i);
+			}
+		}
+	}
 	@Override
 	public Element clone() throws CloneNotSupportedException{
 		RecDirective obj=null;
@@ -82,14 +125,18 @@ public class RecDirective implements Directive,Element{
 
 	@Override
 	public String getComment() {
-		// TODO Auto-generated method stub
 		return directiveComment;
 	}
 
 	@Override
 	public void setComment(String comment) {
-		// TODO Auto-generated method stub
 		directiveComment = comment;
 	}
-
+	
+	public String getNameAndupspace() {
+		return diNameAndupspace;
+	}
+	public void setNameAndupspace(String NameAndupspace) {
+		diNameAndupspace = NameAndupspace;
+	}
 }

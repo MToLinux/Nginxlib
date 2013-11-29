@@ -29,13 +29,13 @@ public interface Block extends Element{
 	 * @return Map：Integer indicate sub Block in elements location index.
 	 * @throws RemoteException 
 	 * */
-	Map<Integer, Block> getBlocks() throws RemoteException;
+	List<Block> getBlocks() throws RemoteException;
 	/**
 	 * Get all directives directly in the block.
 	 * @return directives with list container. If the block have no directive, an empty list should be returned.
 	 * @throws RemoteException 
 	 * */
-	Map<Integer, Directive> getDirectives() throws RemoteException;
+	List<Directive> getDirectives() throws RemoteException;
 	/**
 	 * Add a block in the block end.
 	 * @param block block to be added.
@@ -53,5 +53,5 @@ public interface Block extends Element{
 	 * @param eleindex: element's index which element to be delete. eleindex start from 0.
 	 * @throws RemoteException 
 	 * */
-	void deleteElement(Integer eleindex) throws RemoteException;
+	void deleteElement(Element element) throws RemoteException;
 }

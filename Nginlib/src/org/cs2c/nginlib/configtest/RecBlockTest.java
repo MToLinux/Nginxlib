@@ -19,6 +19,7 @@ import org.junit.Test;
 
 public class RecBlockTest {
 	RecBlock orb = new RecBlock();
+
 	static String ConfText = null;
 	RecConfigurator orc = null;
 
@@ -43,71 +44,60 @@ public class RecBlockTest {
 
 		instance = MiddlewareFactory.getInstance(authInfo, "/usr/local/nginx/");
 		orc = (RecConfigurator) instance.getConfigurator();
-
 	}
 	
 	@Test
 	public final void testGetBlocks() {
 		Block blhttp = null;
-		Map<Integer,Block> myBlocks= null;
+		List<Block> myBlocks= null;
 		try {
 			Block bl= orc.getRootBlock();
 			myBlocks = bl.getBlocks();
-			Iterator<Entry<Integer, Block>> it = myBlocks.entrySet().iterator();
-			while(it.hasNext()){
-				Entry<Integer, Block> entry = (Entry<Integer, Block>)it.next();
-				String blname = entry.getValue().getName();
-				blhttp = entry.getValue();
-//				System.out.println(blname+":"+
-//						entry.getKey());
-			}
+			
+//			assertTrue(6 ==myBlocks.size());
+			
+//			for(int i = 0;i<myBlocks.size(); i++){
+//				System.out.println(myBlocks.get(i).getName()+":"+myBlocks.get(i).toString());
+//			}
 			
 			//get again
-			Map<Integer, Block> myBlockshttp = blhttp.getBlocks();
-			Iterator<Entry<Integer, Block>> ithttp = myBlockshttp.entrySet().iterator();
-			while(ithttp.hasNext()){
-				Entry<Integer, Block> entry = (Entry<Integer, Block>)ithttp.next();
-				String blname1 = entry.getValue().getName();
-				Block blsubhttpele = entry.getValue();
-				System.out.println(blname1+":"+
-						entry.getValue().toString());
+			blhttp = myBlocks.get(myBlocks.size()-1);
+			List<Block>  myBlockshttp = blhttp.getBlocks();
+			for(int i = 0;i<myBlockshttp.size(); i++){
+				System.out.println(myBlockshttp.get(i).getName()+":"+myBlockshttp.get(i).toString());
 			}
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		}
 	}
+
 	
 	@Test
 	public final void testdeleteBlock() {
 		Block blhttp = null;
-		Map<Integer,Block> myBlocks= null;
+		List<Block> myBlocks= null;
 		try {
 			Block bl= orc.getRootBlock();
 			myBlocks = bl.getBlocks();
 			
-			Iterator<Entry<Integer, Block>> it = myBlocks.entrySet().iterator();
-			while(it.hasNext()){
-				Entry<Integer, Block> entry = (Entry<Integer, Block>)it.next();
-				String blname = entry.getValue().getName();
-				blhttp = entry.getValue();
-//				System.out.println(blname+":"+
-//						entry.getKey());
-			}
+//			assertTrue(6 ==myBlocks.size());
 			
-			//delete block
-			Map<Integer, Block> myBlockshttp = blhttp.getBlocks();
-			Entry<Integer, Block> entry =null;
-			Iterator<Entry<Integer, Block>> ithttp = myBlockshttp.entrySet().iterator();
-			while(ithttp.hasNext()){
-				entry = (Entry<Integer, Block>)ithttp.next();
-//				String blname1 = entry.getValue().getName();
-//				Block blsubhttpele = entry.getValue();
-//				System.out.println(entry.getKey()+":"+
-//						entry.getValue());
-				blhttp.deleteElement(entry.getKey());
-			}
-			blhttp.deleteElement(7);
-			blhttp.deleteElement(9);
+//			for(int i = 0;i<myBlocks.size(); i++){
+//				System.out.println(myBlocks.get(i).getName()+":"+myBlocks.get(i).toString());
+//			}
+			
+			//get again
+			blhttp = myBlocks.get(myBlocks.size()-1);
+			List<Block>  myBlockshttp = blhttp.getBlocks();
+//			for(int i = 0;i<myBlockshttp.size(); i++){
+//				System.out.println(myBlockshttp.get(i).getName()+":"+myBlockshttp.get(i).toString());
+//			}
+			blhttp.deleteElement(myBlockshttp.get(0));
+			blhttp.deleteElement(myBlockshttp.get(1));
+			blhttp.deleteElement(myBlockshttp.get(2));
+			blhttp.deleteElement(myBlockshttp.get(3));
+			blhttp.deleteElement(myBlockshttp.get(4));
+//			blhttp.deleteElement(9);
 			System.out.println("blhttp :" + blhttp.toString());
 			
 		} catch (RemoteException e) {
@@ -115,6 +105,34 @@ public class RecBlockTest {
 		}
 	}
 	
+	@Test
+	public final void testdeleteDirectives() {
+		Block blhttp = null;
+		List<Block> myBlocks= null;
+		try {
+			Block bl= orc.getRootBlock();
+//			System.out.println("bl :" + bl.toString());
+			myBlocks = bl.getBlocks();
+//			List<Directive> di = bl.getDirectives();
+//			for(int i = 0;i<di.size(); i++){
+//				System.out.println(di.get(i).getName()+":"+di.get(i).toString());
+//			}
+			
+			//get again
+			blhttp = myBlocks.get(myBlocks.size()-1);
+			List<Directive>  myBlockshttp = blhttp.getDirectives();
+			for(int i = 0;i<myBlockshttp.size(); i++){
+				blhttp.deleteElement(myBlockshttp.get(i));
+//				System.out.println(myBlockshttp.get(i).getName()+":"+myBlockshttp.get(i).toString());
+			}
+
+			System.out.println("blhttp :" + blhttp.toString());
+			
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
+	}
+/*
 	@Test
 	public final void testdeleteDirectives() {
 		Block blhttp = null;
@@ -158,7 +176,7 @@ public class RecBlockTest {
 		orb.setName(name);
 		assertEquals(name, orb.getName());
 	}
-
+*/
 	@Test
 	public final void testGetName() {
 		String name = "server";

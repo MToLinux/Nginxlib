@@ -66,7 +66,7 @@ public interface RemoteOperator {
 	 * @return All blocks in a list, which have the block name in the block outerBlockNames specifying.
 	 * @throws RemoteException When this remote operation fails for any non-local reason.
 	 * */
-	Map<Integer, Block> getBlocks(String blockName, String outerBlockNames) throws RemoteException;
+	List<Block> getBlocks(String blockName, String outerBlockNames) throws RemoteException;
 	/**
 	 * Query all blocks in nginx.conf.
 	 * @return All blocks in a list.

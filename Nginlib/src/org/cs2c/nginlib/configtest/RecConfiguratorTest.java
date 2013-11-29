@@ -49,7 +49,7 @@ public class RecConfiguratorTest {
 		String blockName = null;
 //		outerBlockNames can be "http:0|server:0"
 		String outerBlockNames = "";
-		Map<Integer,Block> list= null;
+		List<Block> list= null;
 		try {
 			setUp();
 			testSetConfpathWithName();
@@ -77,7 +77,7 @@ public class RecConfiguratorTest {
 		String blockName = null;
 //		outerBlockNames can be "http:0|server:0"
 		String outerBlockNames = "";
-		Map<Integer,Block> list= null;
+		List<Block> list= null;
 		
 		testSetConfpathWithName();
 		
@@ -129,8 +129,8 @@ public class RecConfiguratorTest {
 		//add the new server to conf,first do getBlocks and get datastamp
 		blockName = "http";
 
-//		Map<Integer,Block> list= orc.getBlocks(blockName, outerBlockNames);
-		Map<Integer,Block> list= orc.getBlocks("server", "http:0");
+//		List<Block> list= orc.getBlocks(blockName, outerBlockNames);
+		List<Block> list= orc.getBlocks("server", "http:0");
 		
 //		System.out.println("getBlocks:"+list.size());
 		if(list.size()>0){
@@ -150,7 +150,7 @@ public class RecConfiguratorTest {
 		String blockName = null;
 //		outerBlockNames can be "http:0|server:0"
 		String outerBlockNames = "";
-		Map<Integer,Block> list= null;
+		List<Block> list= null;
 		
 		testSetConfpathWithName();
 		
@@ -179,7 +179,7 @@ public class RecConfiguratorTest {
 		String blockName = null;
 //		outerBlockNames can be "http:0|server:0"
 		String outerBlockNames = "";
-		Map<Integer,Block> list= null;
+		List<Block> list= null;
 		
 		testSetConfpathWithName();
 		
@@ -207,7 +207,7 @@ public class RecConfiguratorTest {
 		String blockName = null;
 //		outerBlockNames can be "http:0|server:0"
 		String outerBlockNames = "";
-		Map<Integer,Block> list= null;
+		List<Block> list= null;
 		
 		testSetConfpathWithName();
 		
@@ -255,7 +255,7 @@ public class RecConfiguratorTest {
 	public final void testGetBlocks() {
 		String blockName = null;
 		String outerBlockNames = "";
-		Map<Integer,Block> myBlocks= null;
+		List<Block> myBlocks= null;
 		try {
 //			testSetConfpathWithName();
 
@@ -268,15 +268,6 @@ public class RecConfiguratorTest {
 //			// case 2
 			blockName = "server";
 			myBlocks= orc.getBlocks(blockName, "http");
-//			System.out.println(list.get(0).toString());
-			Iterator<Entry<Integer, Block>> it = myBlocks.entrySet().iterator();
-			while(it.hasNext()){
-				Entry<Integer, Block> entry = (Entry<Integer, Block>)it.next();
-				String blname = entry.getValue().getName();
-
-				System.out.println(blname+":"+
-						entry.getKey());
-			}
 
 			
 //			for(int i = 0;i< list.get(0).getDirectives().size();i++){
@@ -297,10 +288,12 @@ public class RecConfiguratorTest {
 			e.printStackTrace();
 		}
 	}
+	
+	/*
 	@Test
 	public final void testGetAllBlocks() {
 		Block blhttp = null;
-		Map<Integer,Block> myBlocks= null;
+		List<Block> myBlocks= null;
 		try {
 			Block bl= orc.getRootBlock();
 			myBlocks = bl.getBlocks();
@@ -331,7 +324,7 @@ public class RecConfiguratorTest {
 	@Test
 	public final void testGetAllDirectives() {
 		Block blhttp = null;
-		Map<Integer,Block> myBlocks= null;
+		List<Block> myBlocks= null;
 		try {
 			Block bl= orc.getRootBlock();
 			myBlocks = bl.getBlocks();
@@ -358,6 +351,7 @@ public class RecConfiguratorTest {
 			e.printStackTrace();
 		}
 	}
+	*/
 	
 	@Test
 	public final void testNewBlock() {
