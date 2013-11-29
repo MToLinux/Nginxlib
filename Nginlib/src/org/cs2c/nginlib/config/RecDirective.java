@@ -30,7 +30,8 @@ public class RecDirective implements Directive,Element{
 		
 		SetNameupspace(directiveValue2);
 		// Directive_name Option=9 StringParameter $Variable
-		String divalue = directiveValue2.substring(0, directiveValue2.length()-1);
+		String temdi = directiveValue2.trim();
+		String divalue = temdi.substring(0, temdi.length()-1);
 		String[] lineArray=divalue.split(" ");
 		
 		for(int i=1;i<lineArray.length;i++){

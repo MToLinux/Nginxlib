@@ -120,13 +120,16 @@ public class RecBlockTest {
 			
 			//get again
 			blhttp = myBlocks.get(myBlocks.size()-1);
-			List<Directive>  myBlockshttp = blhttp.getDirectives();
-			for(int i = 0;i<myBlockshttp.size(); i++){
-				blhttp.deleteElement(myBlockshttp.get(i));
-//				System.out.println(myBlockshttp.get(i).getName()+":"+myBlockshttp.get(i).toString());
+			List<Directive>  myDirective = blhttp.getDirectives();
+//			for(int i = 0;i<myDirective.size(); i++){
+//				blhttp.deleteElement(myBlockshttp.get(i));
+////				System.out.println(myBlockshttp.get(i).getName()+":"+myBlockshttp.get(i).toString());
+//			}
+			 List<Parameter> pa = myDirective.get(0).getParameters();
+			for(int i = 0;i<pa.size(); i++){
+				System.out.println(pa.get(i)+":"+pa.get(i).toString());
 			}
-
-			System.out.println("blhttp :" + blhttp.toString());
+//			System.out.println("blhttp :" + blhttp.toString());
 			
 		} catch (RemoteException e) {
 			e.printStackTrace();
