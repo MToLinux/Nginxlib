@@ -80,8 +80,8 @@ public class RecBlock implements Block,Element {
 	public String getName() {
 		return blockName;
 	}
-
-	protected void SetBlockText(String BlockText) throws RemoteException {
+	
+	public void SetBlockText(String BlockText) throws RemoteException {
 		blockValue = BlockText;
 		GetBlSubElements();
 	}
@@ -170,14 +170,14 @@ public class RecBlock implements Block,Element {
 	}
 */
 	@Override
-	public void addBlock(Block block) throws RemoteException {
+	public void addBlock(Block block){
 //		AddString(block.toString());
 		int index = myElements.size();
 		myElements.add(index, block);
 	}
 
 	@Override
-	public void addDirective(Directive directive) throws RemoteException {
+	public void addDirective(Directive directive){
 //		AddString(directive.toString());
 		int index = myElements.size();
 		myElements.add(index, directive);
@@ -204,11 +204,14 @@ public class RecBlock implements Block,Element {
 		}
 		
 		for(int i=0;i<myElements.size();i++){
-			if(null != myElements.get(i)){
-				String sbinComment = myElements.get(i).getComment();
-				String sbin = myElements.get(i).toString();
-//	            System.out.println(i+" Elements:" + myElements.get(i).toString());
+			String sbinComment = myElements.get(i).getComment();
+			if(null != sbinComment){
+//	            System.out.println(i+" sbinComment:" + sbinComment);
 				sb.append(sbinComment);
+			}
+			if(null != myElements.get(i)){
+				String sbin = myElements.get(i).toString();
+//	            System.out.println(i+" Elements:" + sbin);
 				sb.append(sbin);
 			}
 		}
@@ -352,6 +355,10 @@ public class RecBlock implements Block,Element {
 
 		try {
 			int getlinecount = GetBlockLenth(Text);
+			if(0 == getlinecount){
+				// throw
+				return;
+			}
 			
 		    BufferedReader br = new BufferedReader(new StringReader(Text));
 		    StringBuilder sb = new StringBuilder();
@@ -464,6 +471,10 @@ public class RecBlock implements Block,Element {
 	    int nBlockLineCount = 0;
 
 		try {
+			if(("" == BlockText)||(null == BlockText)){
+				return 0;
+			}
+			
 		    BufferedReader br = new BufferedReader(new StringReader(BlockText));
 		    
 			while( br.readLine() != null) {
@@ -585,11 +596,11 @@ public class RecBlock implements Block,Element {
 
 	    for (int i = 0;i<myBlocks.size();i++) {
             RecBlock objblock = new RecBlock();
-
+//            System.out.println("myBlocks.get(i):" + myBlocks.get(i).getName());
     		// get name
             if(gBblockName.equals(myBlocks.get(i).getName())){
 	    		objblock = (RecBlock) myBlocks.get(i);
-//	            System.out.println("objblock:" + objblock);
+//	            System.out.println("objblock:" + objblock.toString());
 	            listBlWithBName.add(objblock);
             }
 	    }
@@ -597,8 +608,7 @@ public class RecBlock implements Block,Element {
 	}
 
 	@Override
-	public void deleteElement(Element element)
-			throws RemoteException {
+	public void deleteElement(Element element){
 		for(int i=0;i<myElements.size();i++){
 			if(myElements.get(i) == element){
 				myElements.remove(i);
@@ -607,11 +617,14 @@ public class RecBlock implements Block,Element {
 		// set blockValue
 //		SetBlockText(retBlock.toString());
 	}
-
+	
+	
+	/*
+	 * 
+	 * 
 	private String AddString(String element) throws RemoteException {
 		StringBuilder sb = new StringBuilder();
-		
-		//TODO
+
 //        System.out.println(" blockName:" + blockName);
 //        System.out.println(" blockValue:" + blockValue);
 //        System.out.println(" this.toString():" + this.toString());
@@ -635,7 +648,7 @@ public class RecBlock implements Block,Element {
 //		SetBlockText(sb.toString());
 	}
 	
-/*
+
 	@Override
 	public void replaceElement(Element newElement, Integer eleindex)
 			throws RemoteException {
@@ -654,7 +667,6 @@ public class RecBlock implements Block,Element {
 		// set blockValue
 		SetBlockText(retBlock.toString());
 	}
-*/
 
 	private String AppendElement(String element) throws RemoteException {
 		StringBuilder sb = new StringBuilder();
@@ -717,4 +729,6 @@ public class RecBlock implements Block,Element {
 			throw new RemoteException(e.getMessage());
 		}
 	}
+	*/
+	
 }

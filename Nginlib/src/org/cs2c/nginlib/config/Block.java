@@ -39,19 +39,17 @@ public interface Block extends Element{
 	/**
 	 * Add a block in the block end.
 	 * @param block block to be added.
-	 * @throws RemoteException 
 	 * */
-	void addBlock(Block block) throws RemoteException;
+	void addBlock(Block block);
 	/**
 	 * add a directive in the block end.
 	 * @param directive directive to be added.
-	 * @throws RemoteException 
 	 * */
-	void addDirective(Directive directive) throws RemoteException;
+	void addDirective(Directive directive);
 	/**
 	 * delete a element in the block location eleindex.
 	 * @param eleindex: element's index which element to be delete. eleindex start from 0.
 	 * @throws RemoteException 
 	 * */
-	void deleteElement(Element element) throws RemoteException;
+	void deleteElement(Element element);
 }

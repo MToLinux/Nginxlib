@@ -371,6 +371,7 @@ public class RecRemoteOperator implements RemoteOperator{
 		RecBlock objRecBlock = new RecBlock();
 		objRecBlock.setName(BlockName);
 		objRecBlock.SetBlockText(BlockText);
+//		System.out.println("BlockText:"+BlockText);//TODO
 		return objRecBlock.getBlocks(blockName);
 	}
 	

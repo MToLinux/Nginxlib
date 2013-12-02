@@ -52,7 +52,7 @@ public class RecConfiguratorTest {
 		List<Block> list= null;
 		try {
 			setUp();
-			testSetConfpathWithName();
+//			testSetConfpathWithName();
 			// case 1:
 			blockName = "events";
 			list= orc.getBlocks(blockName, outerBlockNames);
@@ -106,37 +106,30 @@ public class RecConfiguratorTest {
 		String blockName = null;
 //		outerBlockNames can be "http:0|server:0"
 		String outerBlockNames = "";
+//		testSetConfpathWithName();
 		
-		testSetConfpathWithName();
-		
-		Block newBlock = orc.newBlock();
-		newBlock.setName("testagain");
-		//make Directive : server_name
-			RecDirective rdserver_name = new RecDirective();
-			rdserver_name.setName("server_name");
-				RecStringParameter param1 = new RecStringParameter();
-				param1.setValue("sernameval");
-			rdserver_name.addParameter(param1);
-		newBlock.addDirective(rdserver_name);
-		//make Directive : listen
-			RecDirective rd = new RecDirective();
-			rd.setName("listen");
-				RecStringParameter param = new RecStringParameter();
-				param.setValue("80");
-			rd.addParameter(param);
-		newBlock.addDirective(rd);
+		Block op = orc.newBlock();
+		op.setName("test");
+		Directive rdserver_name = orc.newDirective();
+		rdserver_name.setName("server_name");
+			StringParameter param1 = orc.newStringParameter();
+			param1.setValue("80");
+		rdserver_name.addParameter(param1);
+		op.addDirective(rdserver_name);
+		op.addDirective(rdserver_name);
+
 		
 		//add the new server to conf,first do getBlocks and get datastamp
 		blockName = "http";
 
 //		List<Block> list= orc.getBlocks(blockName, outerBlockNames);
-		List<Block> list= orc.getBlocks("server", "http:0");
+		List<Block> list= orc.getBlocks("http", "");
 		
 //		System.out.println("getBlocks:"+list.size());
 		if(list.size()>0){
 //			System.out.println("Start append");
 			// case1:
-			orc.append(newBlock, "http:0|server:0");	//TODO
+			orc.append(op, "http");	//TODO
 			// case2:
 //			orc.append(newBlock, "http:0|server:0");
 			// case delete:
@@ -163,10 +156,12 @@ public class RecConfiguratorTest {
 //						+"}";
 //		bl.SetBlockText(BlockText);
 		
-		list= orc.getBlocks(blockName, outerBlockNames);
-		assertEquals(2, list.size());
+		list= orc.getBlocks("test", "http:0");
+////		assertEquals(2, list.size());
+//		System.out.println("list.size():"+list.size());
 
-		orc.delete(list.get(0), outerBlockNames);
+//		System.out.println("events:"+list.get(0).toString());
+		orc.delete(list.get(0), "http:0");
 
 //		outerBlockNames = "";
 //		list= orc.getBlocks(blockName, outerBlockNames);
@@ -354,12 +349,21 @@ public class RecConfiguratorTest {
 	*/
 	
 	@Test
-	public final void testNewBlock() {
+	public final void testNewBlock() throws RemoteException {
 		Block op = orc.newBlock();
 		op.setName("test");
-		assertNotNull(op);
-//		assertTrue(null == op.getName());
+//		assertNotNull(op);
+//		
+		Directive rdserver_name = orc.newDirective();
+		rdserver_name.setName("server_name");
+			StringParameter param1 = orc.newStringParameter();
+			param1.setValue("80");
+		rdserver_name.addParameter(param1);
+		op.addDirective(rdserver_name);
+		op.addDirective(rdserver_name);
 		
+//		assertTrue(null == op.getName());
+//		System.out.println(rdserver_name.toString());
 		System.out.println(op.toString());
 	}
 

@@ -99,7 +99,8 @@ public class RecDirective implements Directive,Element{
 		}
 		//end directive
 		sb.append(";");
-		
+		sb.append("\n");
+//        System.out.println("sb.toString():" + sb.toString());
 		return sb.toString();		
 	}
 	
@@ -135,7 +136,11 @@ public class RecDirective implements Directive,Element{
 	}
 	
 	public String getNameAndupspace() {
-		return diNameAndupspace;
+		if(null != diNameAndupspace){
+			return diNameAndupspace;
+		}else{
+			return directiveName;
+		}
 	}
 	public void setNameAndupspace(String NameAndupspace) {
 		diNameAndupspace = NameAndupspace;
