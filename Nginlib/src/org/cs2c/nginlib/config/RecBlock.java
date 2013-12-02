@@ -86,10 +86,6 @@ public class RecBlock implements Block,Element {
 		GetBlSubElements();
 	}
 	
-//	protected void SetConfText(String outConfText) {
-//		confText = outConfText;
-//	}
-	
 	@Override
 	public List<Block> getBlocks() throws RemoteException {
 		GetBlSubElements();
@@ -117,58 +113,6 @@ public class RecBlock implements Block,Element {
 //		myElementsSize = myElements.size();
 	}
 
-	/* by new data type map
-	private List<Directive> GetOwnDirectives(String strBlocktxt) throws IOException {
-
-	    int nblockstart = 0;
-	    int nblockEnd = 0;
-	    int nblockLineCount = 0;
-	    String linetxt = "";
-		List<Directive> list = new ArrayList<Directive>();
-		boolean bBlock = false;
-		
-	    BufferedReader br = new BufferedReader(new StringReader(strBlocktxt));
-		while( (linetxt  = br.readLine()) != null) {
-			nblockLineCount++;
-			if(nblockLineCount <= 1){
-				continue;
-			}
-
-			// ignore sub block's Directive
-			if(HasBlockName(linetxt)){
-				// make sure text start from the block name
-				bBlock = true;
-			}
-			if(bBlock){
-				if(IsNotComment(linetxt) && linetxt.contains("{")){
-					nblockstart++;
-				}
-				if(IsNotComment(linetxt) && linetxt.contains("}")){
-					nblockEnd++;
-				}
-			}
-			if((bBlock) && (nblockstart!=0) && (nblockstart == nblockEnd)){
-				//end sub block
-				bBlock = false;
-			}
-
-			if(!bBlock){
-				String tempdname = GetDirectiveName(linetxt);
-				if((null != tempdname)){
-					String tempdtext = linetxt.trim();
-					//System.out.println("DirectiveName:" + blname);
-					RecDirective objDirective = new RecDirective();
-					objDirective.setName(tempdname);
-					objDirective.SetDirectiveText(tempdtext);
-//					System.out.println("tempdtext:"+tempdtext);
-		    		list.add(objDirective);
-				}
-			}
-		}
-		
-		return list;
-	}
-*/
 	@Override
 	public void addBlock(Block block){
 //		AddString(block.toString());
@@ -247,36 +191,6 @@ public class RecBlock implements Block,Element {
 			}
 		}
 	}
-	
-	
-	
-/*
-	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		if((null != blockName) && ("" != blockName)){
-			if("nginx.conf" == blockName){
-				// all nginx.conf
-				if(null != blockValue){
-					return blockValue;
-				}else{
-					return "";
-				}
-			}else{
-				if(null == blockValue){
-					sb.append(blockName+" ");
-					sb.append("{"+ "\n");
-					sb.append("}"+ "\n");
-					return sb.toString();
-				}else{
-					return blockValue;
-				}
-			}
-		}else{
-			// blockName == null
-			return null;
-		}
-	}
-*/
 	
 	private String GetBlockText(String gBlockName) throws RemoteException {
 		int StartLine = 1;
@@ -617,118 +531,4 @@ public class RecBlock implements Block,Element {
 		// set blockValue
 //		SetBlockText(retBlock.toString());
 	}
-	
-	
-	/*
-	 * 
-	 * 
-	private String AddString(String element) throws RemoteException {
-		StringBuilder sb = new StringBuilder();
-
-//        System.out.println(" blockName:" + blockName);
-//        System.out.println(" blockValue:" + blockValue);
-//        System.out.println(" this.toString():" + this.toString());
-
-		// func : if blockName is "nginx.conf" means all conf
-		if("nginx.conf" == blockName){
-			String conftxt = this.toString();
-			if("" == conftxt){
-				sb.append(element);
-			}else{
-				sb.append(conftxt);
-				sb.append(element);
-			}
-		}else{
-			// real block(except nginx.conf root block)
-			sb.append(AppendElement(element));
-		}
-
-		return sb.toString();
-		// set blockValue
-//		SetBlockText(sb.toString());
-	}
-	
-
-	@Override
-	public void replaceElement(Element newElement, Integer eleindex)
-			throws RemoteException {
-		RecBlock retBlock = new RecBlock();
-		retBlock.setName(blockName);
-
-		for(int i=0;i<myElements.size();i++){
-			if(eleindex.equals(i)){
-				retBlock.AddString(newElement.toString());
-			}else{
-				retBlock.AddString(myElements.get(i).getComment());
-				retBlock.AddString(myElements.get(i).toString());
-			}
-		}
-		
-		// set blockValue
-		SetBlockText(retBlock.toString());
-	}
-
-	private String AppendElement(String element) throws RemoteException {
-		StringBuilder sb = new StringBuilder();
-		String blalltext = null;
-		String linetxt = null;
-		String Endlinetxt = null;
-		int nBlockRowCount = 0;
-		boolean bEndlineBigslogan = false;
-		try {
-			// func : blockValue is null
-			if(null == blockValue){
-				sb.append(blockName+" ");
-				sb.append("{"+ "\n");
-				sb.append(element+ "\n");
-				sb.append("}"+ "\n");
-			}else{
-				blalltext = this.toString();
-//				System.out.println("bltext :"+blalltext);
-				//check if last line trim() is "}"
-				int linecount = GetBlockLenth(blalltext);
-			    BufferedReader br = new BufferedReader(new StringReader(blalltext));
-				while( (linetxt = br.readLine()) != null) {
-					nBlockRowCount++;
-					if(nBlockRowCount == linecount){
-						if(linetxt.trim().equals("}"));{
-							bEndlineBigslogan = true;
-						}
-					}
-				}
-				
-				if(bEndlineBigslogan){
-					//if last line trim() is "}"
-					nBlockRowCount = 0;
-					StringBuilder sbtemp = new StringBuilder();
-				    BufferedReader br1 = new BufferedReader(new StringReader(blalltext));
-					while( (linetxt = br1.readLine()) != null) {
-						nBlockRowCount++;
-						if(nBlockRowCount == linecount){
-							Endlinetxt = linetxt;
-						}else{
-							sbtemp.append(linetxt+"\n");
-						}
-					}
-					sb.append(sbtemp.toString());
-					sb.append(element);
-					sb.append(Endlinetxt);
-				}else{
-					// if end with }}
-					String bltext = blalltext.substring(0, blalltext.length()-2);
-					String blEndtext = blalltext.substring(blalltext.length()-2, blalltext.length()-1);
-	//				System.out.println("bltext :"+bltext);
-					sb.append(bltext);
-					sb.append(element);
-					sb.append("\n");
-					sb.append(blEndtext);
-				}
-			}
-			return sb.toString();
-		} catch (IOException e) {
-			throw new RemoteException(e.getMessage());
-		}
-	}
-	*/
-	
 }

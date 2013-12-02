@@ -15,6 +15,7 @@ public class RecDirective implements Directive,Element{
 
 	protected void SetDirectiveText(String DirectiveText) {
 		directiveValue = DirectiveText;
+//		System.out.println("DirectiveText:"+DirectiveText);
 		GetSubParameters();
 	}
 	
@@ -50,15 +51,22 @@ public class RecDirective implements Directive,Element{
 			}else{
 				RecStringParameter objStringParameter = new RecStringParameter();
 				objStringParameter.setValue(lineArray[i]);
+//				System.out.println("StringParameter:"+lineArray[i]);
 				listParam.add(objStringParameter);
 			}
 		}
 	}
 
 	private void SetNameupspace(String directiveV) {
-		int n = directiveV.lastIndexOf(directiveName);
+		int n = directiveV.indexOf(directiveName);
+//		String temdi = directiveV.trim();
+//		String divalue = temdi.substring(0, temdi.length()-1);
+//		String[] lineArray=divalue.split(" ");
+
 		String divalue = directiveV.substring(0, n);
 		divalue = divalue+directiveName;
+//		System.out.println("setNameAndupspace:"+divalue);//TODO
+
 		setNameAndupspace(divalue);
 	}
 
