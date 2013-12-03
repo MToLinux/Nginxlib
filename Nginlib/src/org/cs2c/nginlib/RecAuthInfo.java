@@ -96,10 +96,11 @@ public class RecAuthInfo implements AuthInfo {
 	 *            printed in the terminal after executing the "cmd" if there
 	 *            are. errorList the error information printed in the terminal
 	 *            after executing the "cmd" if there are.
+	 * @throws RemoteException 
 	 * 
 	 * */
 	public void execCommand(Connection conn, String cmd,
-			ArrayList<String> list, ArrayList<String> errorList) {
+			ArrayList<String> list, ArrayList<String> errorList) throws RemoteException {
 
 		try {
 			/* Create a session */
@@ -132,8 +133,8 @@ public class RecAuthInfo implements AuthInfo {
 			sess.close();
 
 		} catch (IOException e) {
-			e.printStackTrace(System.err);
-			System.exit(2);
+			throw new RemoteException(e.getMessage());
+			
 		}
 	}
 }

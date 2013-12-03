@@ -85,10 +85,11 @@ public class RecMiddlewareFactoryTest extends TestCase {
 
 	}
 
+	@SuppressWarnings("deprecation")
 	@Test
 	public void testInstall() throws IOException, RemoteException {
 		File gzFile=new File("d:/nginx-1.0.15.tar.gz");
-		
+		List <Module> para=null;
 		if(gzFile.exists()==false)
 			try {
 				throw new IOException();
@@ -99,7 +100,7 @@ public class RecMiddlewareFactoryTest extends TestCase {
 				
 		String targetPath="/root/nginx/";
 		
-		Assert.assertNotNull(instance.install(authInfo, gzFile, targetPath, null));
+		Assert.assertNotNull(MiddlewareFactory.install(authInfo, gzFile, targetPath,para ));
 	}
 
 	@Test
