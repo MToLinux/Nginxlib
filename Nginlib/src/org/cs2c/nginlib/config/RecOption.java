@@ -4,7 +4,16 @@ public class RecOption implements Option,Parameter {
 
 	private String optionName = null;
 	private String optionValue = null;
-	
+	private String optionUpSpace = null;
+	@Override
+	public void setUpSpace(String UpSpace) {
+		optionUpSpace = UpSpace;
+	}
+	@Override
+	public String getUpSpace() {
+		return optionUpSpace;
+	}
+
 	@Override
 	public void setName(String name) {
 		optionName = name;

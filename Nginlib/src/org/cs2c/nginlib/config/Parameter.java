@@ -17,4 +17,13 @@ public interface Parameter {
 	 * @return the parameter content string
 	 * */
 	String toString();
+	/**
+	 * Set the up space of the parameter
+	 * @param up space to be set
+	 * */
+	void setUpSpace(String UpSpace);
+	/**
+	 * get the up space of the parameter
+	 * */
+	String getUpSpace();
 }

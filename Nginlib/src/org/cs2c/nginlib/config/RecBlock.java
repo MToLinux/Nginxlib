@@ -31,8 +31,6 @@ public class RecBlock implements Block,Element {
 	
 	private String blockName = null;
 	private String blockValue = null;
-//	private String confText = null;
-//	List<Element> listElements = new ArrayList<Element>();
 	private List<Element> myElements = new ArrayList<Element>();
 //	int myElementsSize = 0;
 	
@@ -88,13 +86,13 @@ public class RecBlock implements Block,Element {
 	
 	@Override
 	public List<Block> getBlocks() throws RemoteException {
-		GetBlSubElements();
+//		GetBlSubElements();
 		return myBlocks;
 	}
 
 	@Override
 	public List<Directive> getDirectives() throws RemoteException {
-		GetBlSubElements();
+//		GetBlSubElements();
 		return myDirectives;
 	}
 	
@@ -115,14 +113,14 @@ public class RecBlock implements Block,Element {
 
 	@Override
 	public void addBlock(Block block){
-//		AddString(block.toString());
+
 		int index = myElements.size();
 		myElements.add(index, block);
 	}
 
 	@Override
 	public void addDirective(Directive directive){
-//		AddString(directive.toString());
+
 		int index = myElements.size();
 		myElements.add(index, directive);
 	}

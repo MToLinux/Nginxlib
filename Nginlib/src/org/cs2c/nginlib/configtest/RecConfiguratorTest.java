@@ -109,14 +109,14 @@ public class RecConfiguratorTest {
 //		testSetConfpathWithName();
 		
 		Block op = orc.newBlock();
-		op.setName("test");
+		op.setName("testserver");
 		Directive rdserver_name = orc.newDirective();
 		rdserver_name.setName("server_name");
 			StringParameter param1 = orc.newStringParameter();
 			param1.setValue("80");
 		rdserver_name.addParameter(param1);
 		op.addDirective(rdserver_name);
-		op.addDirective(rdserver_name);
+//		op.addDirective(rdserver_name);
 
 		
 		//add the new server to conf,first do getBlocks and get datastamp
