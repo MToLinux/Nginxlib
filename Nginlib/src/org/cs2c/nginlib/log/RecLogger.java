@@ -83,6 +83,7 @@ public class RecLogger implements Logger {
 			String line=null;
 			while((line=br.readLine())!=null){
 				sb.append(line);
+				sb.append("\n");
 			}
 			br.close();
 			session.close();

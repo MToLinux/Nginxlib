@@ -1,6 +1,7 @@
 package org.cs2c.nginlib.config;
 
 import java.util.List;
+import java.util.Map;
 
 import org.cs2c.nginlib.RemoteException;
 import org.cs2c.nginlib.AuthInfo;
@@ -66,9 +67,9 @@ public class RecConfigurator implements Configurator {
 	}
 
 	@Override
-	public Block newBlock() {
-		Block opBlock = new RecBlock();
-		
+	public Block newBlock() throws RemoteException {
+		RecBlock opBlock = new RecBlock();
+		opBlock.SetBlockText("");
 		return opBlock;
 	}
 

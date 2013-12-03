@@ -3,6 +3,8 @@
  */
 package org.cs2c.nginlib.config;
 
+import org.cs2c.nginlib.RemoteException;
+
 /**
  * @author Mikes
  * <P/>The Configurator interface contains all methods to operate remote nginx configuration file.
@@ -13,8 +15,9 @@ public interface Configurator extends RemoteOperator{
 	/**
 	 * Create an empty block object.
 	 * @return An empty block object.
+	 * @throws RemoteException 
 	 * */
-	Block newBlock();
+	Block newBlock() throws RemoteException;
 	/**
 	 * Create an empty directive object.
 	 * @return An empty directive object.

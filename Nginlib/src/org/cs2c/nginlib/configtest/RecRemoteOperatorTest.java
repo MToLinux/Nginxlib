@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 import org.cs2c.nginlib.AuthInfo;
 import org.cs2c.nginlib.RecAuthInfo;
@@ -196,7 +197,7 @@ public class RecRemoteOperatorTest {
 		String BlockText="   InsertAfter {"+"\n"
 						+"        InsertAfter worker_connections  2000;"+"\n"
 						+"   }";
-		bl.SetBlockText(BlockText);
+//		bl.SetBlockText(BlockText);
 		
 		list= rro.getBlocks("events", outerBlockNames);
 		
@@ -225,7 +226,7 @@ public class RecRemoteOperatorTest {
 		String BlockText="   InsertAfter {"+"\n"
 						+"        InsertAfter worker_connections  2000;"+"\n"
 						+"   }"+"\n";
-		bl.SetBlockText(BlockText);
+//		bl.SetBlockText(BlockText);
 		
 		list= rro.getBlocks("events", outerBlockNames);
 		
