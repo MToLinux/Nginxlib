@@ -12,6 +12,9 @@ import com.trilead.ssh2.Connection;
 
 
 
+
+
+
 import java.util.*;
 import java.io.*;
 /**
@@ -67,10 +70,12 @@ public abstract class MiddlewareFactory {
 		//Instantiate the RecController,and call scopy() to copy local file to the remote target path
 		//RecController controller=new RecController(recAuthInfo,pathStrConvert(targetPath),recmiddleware.getConnection());
 		RecController controller=(RecController) recmiddleware.getController();
+		//System.out.println(gzFile+" ------  "+targetPath);
 		controller.scopy(recmiddleware.getConnection(),gzFile, targetPath);
 		
 		//uncompress the gzFile in the remote host
-		String cmd="cd "+targetPath+" && tar zxf "+gzFile.getName()+" && cd "+gzFile.getName().substring(0,gzFile.getName().indexOf(".tar.gz"))+"&& pwd";
+		String cmd="mkdir -p "+targetPath+" && cd "+targetPath+" && tar zxf "+gzFile.getName()+" && cd "+gzFile.getName().substring(0,gzFile.getName().indexOf(".tar.gz"))+"&& pwd";
+		//System.out.println(cmd);
 		recAuthInfo.execCommand(recmiddleware.getConnection(),cmd,result,errorResult);
 		//the result is similar to "/usr/local/nginx/nginx-1.0.5"
 		if(result.isEmpty()) 
@@ -134,11 +139,18 @@ public abstract class MiddlewareFactory {
 						recAuthInfo.execCommand(recmiddleware.getConnection(),cmd,result,errorResult);
 						if(result.toString().isEmpty())
 							throw new RemoteException(result.toString());
-						else
-						{
-							//System.out.println("Nginx is installed successfully2");
-						}
-						}
+						
+					}
+					cmd="cd "+targetPath+" && rm -f "+gzFile.getName()+" && rm -rf "+gzFile.getName().substring(0,gzFile.getName().indexOf(".tar.gz"));
+					//System.out.println(cmd);
+					result.clear();
+					errorResult.clear();
+					recAuthInfo.execCommand(recmiddleware.getConnection(),cmd,result,errorResult);
+					if(!result.toString().equals("[]"))
+					{
+						throw new RemoteException(result.toString());
+					}
+					
 				}
 				else
 				{
@@ -193,22 +205,24 @@ public abstract class MiddlewareFactory {
 		 RecAuthInfo recauthinfo=new RecAuthInfo();
 			return recauthinfo;
 	}
+	/*
 	static public void main(String[] args){
 		AuthInfo authInfo=MiddlewareFactory.newAuthInfo();
 		authInfo.setHost("10.1.50.4");
-		authInfo.setUsername("git");
-		authInfo.setPassword("qwer1234");
+		authInfo.setUsername("root");
+		authInfo.setPassword("cs2csolutions");
 		try{
-			MiddlewareFactory middleware=MiddlewareFactory.getInstance(authInfo, "/usr/local/nginx/");
-			Monitor monitor=middleware.getMonitor();
-			CPUStatus cpu=monitor.getCPUStatus();
-			int num=cpu.getBlockingNum();
-			System.out.println(num);
+			//MiddlewareFactory middleware=MiddlewareFactory.getInstance(authInfo, "/usr/local/nginx/");
+			//Monitor monitor=middleware.getMonitor();
+			//CPUStatus cpu=monitor.getCPUStatus();
+			//int num=cpu.getBlockingNum();
+			//System.out.println(num);
+			MiddlewareFactory middleware=MiddlewareFactory.install(authInfo, new File("d:/nginx-1.0.15.tar.gz"), "/root/test/nginx/",null);
 		}
 		catch(Exception e){
 			e.printStackTrace();
 		}
-	}
+	}*/
 	static String pathStrConvert(String pathstr)
 	{
 		String pathstrend = pathstr;
