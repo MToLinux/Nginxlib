@@ -15,6 +15,7 @@ import com.trilead.ssh2.Connection;
 
 
 
+
 import java.util.*;
 import java.io.*;
 /**
@@ -74,7 +75,7 @@ public abstract class MiddlewareFactory {
 		controller.scopy(recmiddleware.getConnection(),gzFile, targetPath);
 		
 		//uncompress the gzFile in the remote host
-		String cmd="mkdir -p "+targetPath+" && cd "+targetPath+" && tar zxf "+gzFile.getName()+" && cd "+gzFile.getName().substring(0,gzFile.getName().indexOf(".tar.gz"))+"&& pwd";
+		String cmd="cd "+targetPath+" && tar zxf "+gzFile.getName()+" && cd "+gzFile.getName().substring(0,gzFile.getName().indexOf(".tar.gz"))+"&& pwd";
 		//System.out.println(cmd);
 		recAuthInfo.execCommand(recmiddleware.getConnection(),cmd,result,errorResult);
 		//the result is similar to "/usr/local/nginx/nginx-1.0.5"
@@ -137,7 +138,7 @@ public abstract class MiddlewareFactory {
 						result.clear();
 						errorResult.clear();
 						recAuthInfo.execCommand(recmiddleware.getConnection(),cmd,result,errorResult);
-						if(result.toString().isEmpty())
+						if(result.isEmpty())
 							throw new RemoteException(result.toString());
 						
 					}
@@ -146,7 +147,8 @@ public abstract class MiddlewareFactory {
 					result.clear();
 					errorResult.clear();
 					recAuthInfo.execCommand(recmiddleware.getConnection(),cmd,result,errorResult);
-					if(!result.toString().equals("[]"))
+					
+					if(!result.isEmpty())
 					{
 						throw new RemoteException(result.toString());
 					}
@@ -217,12 +219,13 @@ public abstract class MiddlewareFactory {
 			//CPUStatus cpu=monitor.getCPUStatus();
 			//int num=cpu.getBlockingNum();
 			//System.out.println(num);
-			MiddlewareFactory middleware=MiddlewareFactory.install(authInfo, new File("d:/nginx-1.0.15.tar.gz"), "/root/test/nginx/",null);
+			MiddlewareFactory middleware=MiddlewareFactory.install(authInfo, new File("d:/nginx-1.0.15.tar.gz"), "/root/test/nginx1/",null);
 		}
 		catch(Exception e){
 			e.printStackTrace();
 		}
-	}*/
+	}
+	*/
 	static String pathStrConvert(String pathstr)
 	{
 		String pathstrend = pathstr;

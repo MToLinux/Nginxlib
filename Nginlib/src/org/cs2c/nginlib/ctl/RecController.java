@@ -12,7 +12,8 @@ import org.cs2c.nginlib.RemoteException;
 import org.cs2c.nginlib.RecAuthInfo;
 
 /**
- * @author LiuQin The implement class of AuthInfo
+ * @author LiuQin 
+ *         The implement class of AuthInfo
  * @see AuthInfo
  */
 public class RecController implements Controller {
@@ -171,11 +172,12 @@ public class RecController implements Controller {
 		targetPath = pathStrConvert(targetPath);
 		ArrayList<String> result = new ArrayList<String>(0);
 		ArrayList<String> errorResult = new ArrayList<String>(0);
-
+		
 		// copy the local file zipFile to targetPath of remote host
 		if (this.scopy(conncontroller, zipFile, targetPath) == true) {
-
-			if (isExistedDirectory(
+			//System.out.println("222---"+targetPath+zipFile.getName().substring(0,zipFile.getName().toString().indexOf(".zip")));
+		boolean unzipflag=isUnzipAddDirectory(targetPath,zipFile.getName());
+		if (isExistedDirectory(
 					targetPath,
 					zipFile.getName().substring(0,
 							zipFile.getName().toString().indexOf(".zip")))) {
@@ -189,13 +191,25 @@ public class RecController implements Controller {
 					throw new RemoteException(errorResult.toString());
 				}
 			}
-
+			//System.out.println(zipFile.getName());
+			
 			result.clear();
 			errorResult.clear();
-			this.reauthInfo.execCommand(conncontroller, "cd "+targetPath+" && unzip -q " + zipFile.getName(), result, errorResult);
+			String cmd;
+			if(unzipflag==false)
+			{
+				cmd="cd "+targetPath+" && unzip -q "+ zipFile.getName();
+			}
+			else
+			{
+				cmd="cd "+targetPath+" && unzip -q -d "+ zipFile.getName().substring(0,
+						zipFile.getName().toString().indexOf(".zip"))+" " + zipFile.getName();
+			}
+			//System.out.println("333----"+cmd);
+			this.reauthInfo.execCommand(conncontroller, cmd, result, errorResult);
 
 			if (result.isEmpty() && errorResult.isEmpty()) {
-				 //System.out.println("Unzip successfully!");
+				// System.out.println("Unzip successfully!");
 				if (deleteFile(targetPath, zipFile.getName()) == false) {
 					throw new RemoteException("zipFile deleted failed.");
 				} else {
@@ -282,7 +296,7 @@ public class RecController implements Controller {
 		ArrayList<String> errorResult = new ArrayList<String>(0);
 		String cmd = "cd " + targetPath + " && mv " + DirName + " " + DirName
 				+ subfix;
-		
+		//System.out.println(cmd);
 		this.reauthInfo.execCommand(conncontroller, cmd, result, errorResult);
 		
 		if (!errorResult.isEmpty()) {
@@ -304,8 +318,9 @@ public class RecController implements Controller {
 		// execution
 		ArrayList<String> errorResult = new ArrayList<String>(0);
 
-		// To determine whether the configuration file exists
-		String cmd = "ls " + targetPath + " | grep " + fileName;
+	
+		String cmd = "cd " + targetPath + " && find -name " + "\""+fileName+"\"";
+		//String cmd = "ls " + targetPath + " | grep " + fileName;
 		// System.out.println(cmd);
 		this.reauthInfo.execCommand(conncontroller, cmd, result, errorResult);
 		if (result.isEmpty())
@@ -323,14 +338,14 @@ public class RecController implements Controller {
 	boolean isExistedDirectory(String targetPath, String DirName) throws RemoteException {
 		ArrayList<String> result = new ArrayList<String>(0);
 		ArrayList<String> errorResult = new ArrayList<String>(0);
-		String cmd = "cd " + targetPath + " && ls -l | grep ^d | grep "
-				+ DirName;
-		// System.out.println(cmd);
+		//String cmd = "cd " + targetPath + " && ls -l | grep ^d | grep "
+		//		+ DirName;
+		String cmd = "cd " + targetPath + " && find -name "
+						+"\"" +DirName+"\"";
+
 		this.reauthInfo.execCommand(conncontroller, cmd, result, errorResult);
-		// System.out.println(result.toString());
-		// System.out.println(errorResult.toString());
+		
 		if ((!result.isEmpty()) && errorResult.isEmpty()) {
-			// System.out.println(result.toString());
 			return true;
 		} else
 			return false;
@@ -346,7 +361,7 @@ public class RecController implements Controller {
 		ArrayList<String> result = new ArrayList<String>(0);
 		ArrayList<String> errorResult = new ArrayList<String>(0);
 		String cmd = "cd " + targetPath + " && rm -rf " + dirName;
-		// System.out.println(cmd);
+
 		this.reauthInfo.execCommand(conncontroller, cmd, result, errorResult);
 		if (result.isEmpty() && errorResult.isEmpty())
 			return true;
@@ -378,6 +393,35 @@ public class RecController implements Controller {
 		}
 		
 		return pathstrend;
+	}
+	
+	
+	boolean isUnzipAddDirectory(String targetPath, String fileName) throws RemoteException {
+		// result:Used to store the result information of the command execution
+		ArrayList<String> result = new ArrayList<String>(0);
+		// errorResult:Used to store the error information of the command
+		// execution
+		ArrayList<String> errorResult = new ArrayList<String>(0);
+
+		String cmd = "cd " + targetPath + " && zipinfo -1 " +fileName;
+	
+		this.reauthInfo.execCommand(conncontroller, cmd, result, errorResult);
+		if (result.isEmpty())
+			return false;
+		else 
+		{
+			for(int i=0;i<result.size();i++)
+			{
+				if(result.get(i).contains("/"))
+				{
+					if(!result.get(i).startsWith(fileName.substring(0,fileName.indexOf(".zip"))))
+					{
+						return true;
+					}
+				}
+			}
+			return false;
+		}
 	}
 	
 	

@@ -73,6 +73,7 @@ public class RecMiddlewareFactory extends MiddlewareFactory {
 					authInfo.getUsername(), authInfo.getPassword());
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
+			
 			throw new RemoteException(e);
 		}
 	}

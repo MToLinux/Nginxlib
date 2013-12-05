@@ -56,7 +56,7 @@ public class RecControllerTest extends TestCase {
 
 	@Test
 	public void testDeploy() throws IOException, RemoteException {
-		File gzFile=new File("d:/Server.zip");
+		File gzFile=new File("d:/test.zip");
 		testController.deploy(gzFile, "/usr/local/");
 	}
 
