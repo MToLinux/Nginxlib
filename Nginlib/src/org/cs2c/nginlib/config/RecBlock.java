@@ -16,7 +16,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -113,13 +112,18 @@ public class RecBlock implements Block,Element {
 
 	@Override
 	public void addBlock(Block block){
-
+		
+		int indexadd = myBlocks.size();
+		myBlocks.add(indexadd, block);
+		
 		int index = myElements.size();
 		myElements.add(index, block);
 	}
 
 	@Override
 	public void addDirective(Directive directive){
+		int indexadd = myDirectives.size();
+		myDirectives.add(indexadd, directive);
 
 		int index = myElements.size();
 		myElements.add(index, directive);
@@ -521,6 +525,21 @@ public class RecBlock implements Block,Element {
 
 	@Override
 	public void deleteElement(Element element){
+		if(element instanceof Block){
+			//check element is directive or block type
+			for(int i=0;i<myBlocks.size();i++){
+				if(myBlocks.get(i) == element){
+					myBlocks.remove(i);
+				}
+			}
+		}else{
+			for(int i=0;i<myDirectives.size();i++){
+				if(myDirectives.get(i) == element){
+					myDirectives.remove(i);
+				}
+			}
+		}
+
 		for(int i=0;i<myElements.size();i++){
 			if(myElements.get(i) == element){
 				myElements.remove(i);
