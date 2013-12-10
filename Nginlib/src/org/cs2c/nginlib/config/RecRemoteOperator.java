@@ -89,7 +89,7 @@ public class RecRemoteOperator implements RemoteOperator{
 		RecBlock objRecBlock = new RecBlock();
 		objRecBlock.setName(objHashMap.get("lastblockname"));
 		objRecBlock.SetBlockText(BlockText);
-//		System.out.println(element.toString());//TODO
+//		System.out.println(element.toString());
 		if(element instanceof Block){
 			//check element is directive or block type
 			objRecBlock.addBlock((Block)element);
@@ -97,9 +97,6 @@ public class RecRemoteOperator implements RemoteOperator{
 			objRecBlock.addDirective((Directive)element);
 		}
 		editBlString = objRecBlock.toString();
-//		System.out.println("nblockNameNum:"+nblockNameNum);
-//		System.out.println("GetPreBlockText:"+GetPreBlockText(confText,nblockNameNum));
-//		System.out.println("editBlString:"+editBlString);
 		
 		String newConfText = GetPreBlockText(confText,nblockNameNum)+editBlString+"\n"
 				+GetSufBlockText(confText,nblockNameNum+BlockLength);
@@ -366,7 +363,7 @@ public class RecRemoteOperator implements RemoteOperator{
 		RecBlock objRecBlock = new RecBlock();
 		objRecBlock.setName(BlockName);
 		objRecBlock.SetBlockText(BlockText);
-//		System.out.println("BlockText:"+BlockText);//TODO
+//		System.out.println("BlockText:"+BlockText);
 		return objRecBlock.getBlocks(blockName);
 	}
 	
@@ -507,7 +504,9 @@ public class RecRemoteOperator implements RemoteOperator{
 			String remoteConfDirectory = remoteConf.substring(0,
 					remoteConf.lastIndexOf("/"));
 			scpc.put(localFile, remoteConfDirectory);
-
+			
+			//update local datetimestamp
+			oldConfDatestamp = getFileModifyTime();
 		} catch (IOException e) {
 			throw new RemoteException(e.getMessage());
 		}
@@ -516,7 +515,6 @@ public class RecRemoteOperator implements RemoteOperator{
 	private boolean CanCommitFile() throws RemoteException{
 		String nowConfDatestamp = getFileModifyTime();
 		if(StringToDate(oldConfDatestamp).compareTo(StringToDate(nowConfDatestamp)) != 0){
-//			System.out.println("!=");
 			return false;
 		}else{
 			return true;
