@@ -26,7 +26,6 @@ import com.trilead.ssh2.StreamGobbler;
 public class RecRemoteOperator implements RemoteOperator{
 	private String confText = null;
 	private String localConfPath = null;
-//	private String confPathWithName = null;
 	private String oldConfDatestamp = null;
 	private RecAuthInfo creauthInfo = null;
 	private String remoteConf = null;
@@ -294,7 +293,17 @@ public class RecRemoteOperator implements RemoteOperator{
 	@Override
 	public void replace(Element oldElement, Element newElement,
 			String outerBlockNames) throws RemoteException {
-		
+	    // outerBlockNames is "" search all conf
+	    if("".equals(outerBlockNames.trim())){
+	    	confText = ReadConf();
+	    	//confText not contains element, return @
+			String editconfText =BlockReplaceElement(confText,oldElement, newElement);
+			// write to local conf file
+			WriteConf(editconfText);
+			WriteRemoteConf();
+			return;
+	    }
+
 	    if(CheckOuterBlockNames(outerBlockNames)){
 	    	throw new RemoteException("outerBlockNames is not correct,outerBlockNames ="+outerBlockNames);
 	    }
