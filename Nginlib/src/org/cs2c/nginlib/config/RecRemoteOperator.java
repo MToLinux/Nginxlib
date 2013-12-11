@@ -12,17 +12,12 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.IdentityHashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
+
 
 import org.cs2c.nginlib.AuthInfo;
 import org.cs2c.nginlib.RecAuthInfo;
 import org.cs2c.nginlib.RemoteException;
-import org.cs2c.nginlib.monitor.MemoryStatus;
-
 import com.trilead.ssh2.Connection;
 import com.trilead.ssh2.SCPClient;
 import com.trilead.ssh2.Session;
@@ -31,7 +26,6 @@ import com.trilead.ssh2.StreamGobbler;
 public class RecRemoteOperator implements RemoteOperator{
 	private String confText = null;
 	private String localConfPath = null;
-//	private String confPathWithName = null;
 	private String oldConfDatestamp = null;
 	private RecAuthInfo creauthInfo = null;
 	private String remoteConf = null;
@@ -94,7 +88,7 @@ public class RecRemoteOperator implements RemoteOperator{
 		RecBlock objRecBlock = new RecBlock();
 		objRecBlock.setName(objHashMap.get("lastblockname"));
 		objRecBlock.SetBlockText(BlockText);
-//		System.out.println(element.toString());//TODO
+//		System.out.println(element.toString());
 		if(element instanceof Block){
 			//check element is directive or block type
 			objRecBlock.addBlock((Block)element);
@@ -102,9 +96,6 @@ public class RecRemoteOperator implements RemoteOperator{
 			objRecBlock.addDirective((Directive)element);
 		}
 		editBlString = objRecBlock.toString();
-//		System.out.println("nblockNameNum:"+nblockNameNum);
-//		System.out.println("GetPreBlockText:"+GetPreBlockText(confText,nblockNameNum));
-//		System.out.println("editBlString:"+editBlString);
 		
 		String newConfText = GetPreBlockText(confText,nblockNameNum)+editBlString+"\n"
 				+GetSufBlockText(confText,nblockNameNum+BlockLength);
@@ -302,7 +293,17 @@ public class RecRemoteOperator implements RemoteOperator{
 	@Override
 	public void replace(Element oldElement, Element newElement,
 			String outerBlockNames) throws RemoteException {
-		
+	    // outerBlockNames is "" search all conf
+	    if("".equals(outerBlockNames.trim())){
+	    	confText = ReadConf();
+	    	//confText not contains element, return @
+			String editconfText =BlockReplaceElement(confText,oldElement, newElement);
+			// write to local conf file
+			WriteConf(editconfText);
+			WriteRemoteConf();
+			return;
+	    }
+
 	    if(CheckOuterBlockNames(outerBlockNames)){
 	    	throw new RemoteException("outerBlockNames is not correct,outerBlockNames ="+outerBlockNames);
 	    }
@@ -371,7 +372,7 @@ public class RecRemoteOperator implements RemoteOperator{
 		RecBlock objRecBlock = new RecBlock();
 		objRecBlock.setName(BlockName);
 		objRecBlock.SetBlockText(BlockText);
-//		System.out.println("BlockText:"+BlockText);//TODO
+//		System.out.println("BlockText:"+BlockText);
 		return objRecBlock.getBlocks(blockName);
 	}
 	
@@ -512,7 +513,9 @@ public class RecRemoteOperator implements RemoteOperator{
 			String remoteConfDirectory = remoteConf.substring(0,
 					remoteConf.lastIndexOf("/"));
 			scpc.put(localFile, remoteConfDirectory);
-
+			
+			//update local datetimestamp
+			oldConfDatestamp = getFileModifyTime();
 		} catch (IOException e) {
 			throw new RemoteException(e.getMessage());
 		}
@@ -521,7 +524,6 @@ public class RecRemoteOperator implements RemoteOperator{
 	private boolean CanCommitFile() throws RemoteException{
 		String nowConfDatestamp = getFileModifyTime();
 		if(StringToDate(oldConfDatestamp).compareTo(StringToDate(nowConfDatestamp)) != 0){
-//			System.out.println("!=");
 			return false;
 		}else{
 			return true;

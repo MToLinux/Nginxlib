@@ -169,6 +169,10 @@ public class RecController implements Controller {
 	public void deploy(File zipFile, String targetPath) throws IOException,
 			RemoteException {
 		// TODO Auto-generated method stub
+		if(!zipFile.exists())
+		{
+			throw new RemoteException(zipFile+" is not exist.");
+		}
 		targetPath = pathStrConvert(targetPath);
 		ArrayList<String> result = new ArrayList<String>(0);
 		ArrayList<String> errorResult = new ArrayList<String>(0);

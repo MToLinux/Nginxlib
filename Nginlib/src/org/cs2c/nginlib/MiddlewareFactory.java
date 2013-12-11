@@ -53,6 +53,11 @@ public abstract class MiddlewareFactory {
 	//static public MiddlewareFactory install(AuthInfo authInfo, File gzFile, String targetPath, String s1,String s2) 
 	//		throws IOException, RemoteException{
 		// TODO
+		if(!gzFile.exists())
+		{
+			throw new RemoteException(gzFile+" is not exist.");
+		}
+		
 		targetPath=pathStrConvert(targetPath);
 		//result:Used to store the result information of the command execution
 		ArrayList<String> result=new ArrayList<String>(0);	
