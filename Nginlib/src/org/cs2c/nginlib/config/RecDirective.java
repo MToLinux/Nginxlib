@@ -12,12 +12,6 @@ public class RecDirective implements Directive,Element{
 	private String diNameAndupspace=null;
 
 	private List<Parameter> listParam = new  ArrayList<Parameter>();
-
-	protected void SetDirectiveText(String DirectiveText) {
-		directiveValue = DirectiveText;
-//		System.out.println("DirectiveText:"+DirectiveText);
-		GetSubParameters();
-	}
 	
 	private void GetSubParameters() {
 		if(!listParam.isEmpty()){
@@ -103,7 +97,13 @@ public class RecDirective implements Directive,Element{
 	public void setName(String name) {
 		directiveName = name;
 	}
-
+	
+	public void SetDirectiveText(String DirectiveText) {
+		directiveValue = DirectiveText;
+//		System.out.println("DirectiveText:"+DirectiveText);
+		GetSubParameters();
+	}
+	
 	@Override
 	public String getName() {
 		return directiveName;

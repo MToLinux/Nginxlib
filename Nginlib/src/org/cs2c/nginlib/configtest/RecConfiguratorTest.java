@@ -113,28 +113,29 @@ public class RecConfiguratorTest {
 		Directive rdserver_name = orc.newDirective();
 		rdserver_name.setName("server_name");
 			StringParameter param1 = orc.newStringParameter();
-			param1.setValue("80");
+			param1.setValue(" ");
 		rdserver_name.addParameter(param1);
 		op.addDirective(rdserver_name);
 //		op.addDirective(rdserver_name);
+	System.out.println("op:"+op.toString());
 
 		
 		//add the new server to conf,first do getBlocks and get datastamp
-		blockName = "http";
-
-//		List<Block> list= orc.getBlocks(blockName, outerBlockNames);
-		List<Block> list= orc.getBlocks("http", "");
-		
-//		System.out.println("getBlocks:"+list.size());
-		if(list.size()>0){
-//			System.out.println("Start append");
-			// case1:
-			orc.append(op, "http");	//TODO
+//		blockName = "http";
+//
+////		List<Block> list= orc.getBlocks(blockName, outerBlockNames);
+//		List<Block> list= orc.getBlocks("http", "");
+//		
+////		System.out.println("getBlocks:"+list.size());
+//		if(list.size()>0){
+////			System.out.println("Start append");
+//			// case1:
+//			orc.append(op, "http");	//TODO
 			// case2:
 //			orc.append(newBlock, "http:0|server:0");
 			// case delete:
 //			orc.delete(newBlock, "http:0");
-		}
+//		}
 //		assertEquals(2, list.size());
 	}
 	

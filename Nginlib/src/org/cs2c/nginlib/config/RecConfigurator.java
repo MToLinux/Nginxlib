@@ -1,7 +1,6 @@
 package org.cs2c.nginlib.config;
 
 import java.util.List;
-import java.util.Map;
 
 import org.cs2c.nginlib.RemoteException;
 import org.cs2c.nginlib.AuthInfo;
