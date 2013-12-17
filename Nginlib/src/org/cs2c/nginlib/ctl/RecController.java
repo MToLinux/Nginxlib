@@ -314,8 +314,8 @@ public class RecController implements Controller {
 		ArrayList<String> errorResult = new ArrayList<String>(0);
 
 		// To determine whether the configuration file exists
-		String cmd = "ls " + targetPath + " | grep " + fileName;
-		 System.out.println(cmd);
+		String cmd = "find " + targetPath + " -name " + fileName+" -type f";
+		// System.out.println(cmd);
 		this.reauthInfo.execCommand(conncontroller, cmd, result, errorResult);
 		if (result.isEmpty())
 			return false;
@@ -332,9 +332,10 @@ public class RecController implements Controller {
 	public boolean isExistedDirectory(String targetPath, String DirName) throws RemoteException {
 		ArrayList<String> result = new ArrayList<String>(0);
 		ArrayList<String> errorResult = new ArrayList<String>(0);
-		String cmd = "cd " + targetPath + " && ls -l | grep ^d | grep "
-				+ DirName;
-		// System.out.println(cmd);
+		//String cmd = "cd " + targetPath + " && ls -l | grep ^d | grep "
+		//		+ DirName;
+		String cmd = "find " + targetPath + " -name " + DirName+" -type d";
+		 System.out.println(cmd);
 		this.reauthInfo.execCommand(conncontroller, cmd, result, errorResult);
 		// System.out.println(result.toString());
 		// System.out.println(errorResult.toString());
