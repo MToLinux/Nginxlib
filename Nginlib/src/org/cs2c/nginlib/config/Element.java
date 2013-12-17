@@ -3,8 +3,6 @@
  */
 package org.cs2c.nginlib.config;
 
-import org.cs2c.nginlib.RemoteException;
-
 /**
  * @author Mikes
  * <P/>Element represents a part of nginx's configuration file. There are two kinds of Element: Block and Directive.
@@ -36,6 +34,14 @@ public interface Element extends Cloneable {
 	 * @return the cloned instance with a deep copy.
 	 * */
 	Element clone() throws CloneNotSupportedException;
+	/**
+	 * Get the Element's comment.
+	 * @return Element's comment.
+	 * */
 	String getComment();
+	/**
+	 * set the Element's comment.
+	 * @param name Element's comment.
+	 * */
 	void setComment(String comment);
 }
