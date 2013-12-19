@@ -13,11 +13,11 @@ public class RecNetworkStatus implements NetworkStatus {
 		return InputKbPerSec;
 	}
 
-	public void setOutputPerSec(float OutputPerSec) {
+	public void setOutputKbPerSec(float OutputPerSec) {
 		this.OutputPerSec = OutputPerSec;
 	}
 	@Override
-	public float getOutputPerSec() {
+	public float getOutputKbPerSec() {
 		return OutputPerSec;
 	}
 

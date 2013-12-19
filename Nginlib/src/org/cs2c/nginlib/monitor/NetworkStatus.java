@@ -19,5 +19,5 @@ public interface NetworkStatus {
 	 * Get current network output rate (kbps) which has already fetched from remote host.
 	 * @return The current network output rate (kbps).
 	 * */
-	float getOutputPerSec();
+	float getOutputKbPerSec();
 }

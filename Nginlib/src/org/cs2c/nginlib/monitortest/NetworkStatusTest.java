@@ -28,7 +28,7 @@ public class NetworkStatusTest {
 	public void setUp() throws Exception {
 		
 		((RecNetworkStatus)nwstat).setInputKbPerSec(InputKbPerSec);
-		((RecNetworkStatus)nwstat).setOutputPerSec(OutputPerSec);
+		((RecNetworkStatus)nwstat).setOutputKbPerSec(OutputPerSec);
 		
 	}
 
@@ -43,7 +43,7 @@ public class NetworkStatusTest {
 
 	@Test
 	public void testGetOutputPerSec() {
-		assertEquals(OutputPerSec, nwstat.getOutputPerSec(), 0);
+		assertEquals(OutputPerSec, nwstat.getOutputKbPerSec(), 0);
 	}
 
 }
