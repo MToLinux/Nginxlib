@@ -15,6 +15,7 @@ import com.trilead.ssh2.Connection;
 
 
 
+
 import java.util.*;
 import java.io.*;
 /**
@@ -52,6 +53,11 @@ public abstract class MiddlewareFactory {
 	//static public MiddlewareFactory install(AuthInfo authInfo, File gzFile, String targetPath, String s1,String s2) 
 	//		throws IOException, RemoteException{
 		// TODO
+		if(!gzFile.exists())
+		{
+			throw new IOException(gzFile+" is not exist.");//abliuqin1217
+		}
+		
 		targetPath=pathStrConvert(targetPath);
 		//result:Used to store the result information of the command execution
 		ArrayList<String> result=new ArrayList<String>(0);	
@@ -71,10 +77,17 @@ public abstract class MiddlewareFactory {
 		//RecController controller=new RecController(recAuthInfo,pathStrConvert(targetPath),recmiddleware.getConnection());
 		RecController controller=(RecController) recmiddleware.getController();
 		//System.out.println(gzFile+" ------  "+targetPath);
-		controller.scopy(recmiddleware.getConnection(),gzFile, targetPath);
 		
+		try{
+		controller.scopy(recmiddleware.getConnection(),gzFile, targetPath);
+		}catch(IOException e)
+		{
+			recmiddleware.closeConnection();
+			throw new RemoteException(e);
+		}
+
 		//uncompress the gzFile in the remote host
-		String cmd="mkdir -p "+targetPath+" && cd "+targetPath+" && tar zxf "+gzFile.getName()+" && cd "+gzFile.getName().substring(0,gzFile.getName().indexOf(".tar.gz"))+"&& pwd";
+		String cmd="cd "+targetPath+" && tar zxf "+gzFile.getName()+" && cd "+gzFile.getName().substring(0,gzFile.getName().indexOf(".tar.gz"))+" && pwd";
 		//System.out.println(cmd);
 		recAuthInfo.execCommand(recmiddleware.getConnection(),cmd,result,errorResult);
 		//the result is similar to "/usr/local/nginx/nginx-1.0.5"
@@ -84,6 +97,15 @@ public abstract class MiddlewareFactory {
 			if(!errorResult.isEmpty())
 			{
 				//System.out.println("debug location 1");
+				if(controller.isExistedDirectory(targetPath, gzFile.getName().substring(0,gzFile.getName().indexOf(".tar.gz"))))
+				{
+					controller.deleteDirectory(targetPath, gzFile.getName().substring(0,gzFile.getName().indexOf(".tar.gz")));
+				}
+				if(controller.isExistedFile(targetPath, gzFile.getName()))
+				{
+					controller.deleteFile(targetPath, gzFile.getName());
+				}
+				recmiddleware.closeConnection();
 				throw new RemoteException(errorResult.toString());
 			}
 			
@@ -127,7 +149,15 @@ public abstract class MiddlewareFactory {
 							}
 						else 
 						{
-							
+							if(controller.isExistedDirectory(targetPath, gzFile.getName().substring(0,gzFile.getName().indexOf(".tar.gz"))))
+							{
+								controller.deleteDirectory(targetPath, gzFile.getName().substring(0,gzFile.getName().indexOf(".tar.gz")));
+							}
+							if(controller.isExistedFile(targetPath, gzFile.getName()))
+							{
+								controller.deleteFile(targetPath, gzFile.getName());
+							}
+							recmiddleware.closeConnection();
 							throw new RemoteException(errorResult.toString());
 						}
 					}
@@ -137,8 +167,19 @@ public abstract class MiddlewareFactory {
 						result.clear();
 						errorResult.clear();
 						recAuthInfo.execCommand(recmiddleware.getConnection(),cmd,result,errorResult);
-						if(result.toString().isEmpty())
+						if(result.isEmpty())
+						{
+							if(controller.isExistedDirectory(targetPath, gzFile.getName().substring(0,gzFile.getName().indexOf(".tar.gz"))))
+							{
+								controller.deleteDirectory(targetPath, gzFile.getName().substring(0,gzFile.getName().indexOf(".tar.gz")));
+							}
+							if(controller.isExistedFile(targetPath, gzFile.getName()))
+							{
+								controller.deleteFile(targetPath, gzFile.getName());
+							}
+							recmiddleware.closeConnection();
 							throw new RemoteException(result.toString());
+						}
 						
 					}
 					cmd="cd "+targetPath+" && rm -f "+gzFile.getName()+" && rm -rf "+gzFile.getName().substring(0,gzFile.getName().indexOf(".tar.gz"));
@@ -146,14 +187,32 @@ public abstract class MiddlewareFactory {
 					result.clear();
 					errorResult.clear();
 					recAuthInfo.execCommand(recmiddleware.getConnection(),cmd,result,errorResult);
-					if(!result.toString().equals("[]"))
+					if(!result.isEmpty())
 					{
+						if(controller.isExistedDirectory(targetPath, gzFile.getName().substring(0,gzFile.getName().indexOf(".tar.gz"))))
+						{
+							controller.deleteDirectory(targetPath, gzFile.getName().substring(0,gzFile.getName().indexOf(".tar.gz")));
+						}
+						if(controller.isExistedFile(targetPath, gzFile.getName()))
+						{
+							controller.deleteFile(targetPath, gzFile.getName());
+						}
+						recmiddleware.closeConnection();
 						throw new RemoteException(result.toString());
 					}
 					
 				}
 				else
 				{
+					if(controller.isExistedDirectory(targetPath, gzFile.getName().substring(0,gzFile.getName().indexOf(".tar.gz"))))
+					{
+						controller.deleteDirectory(targetPath, gzFile.getName().substring(0,gzFile.getName().indexOf(".tar.gz")));
+					}
+					if(controller.isExistedFile(targetPath, gzFile.getName()))
+					{
+						controller.deleteFile(targetPath, gzFile.getName());
+					}
+					recmiddleware.closeConnection();
 						throw new RemoteException(result.toString());//"There is no nginx.conf"
 				}
 			}
@@ -194,7 +253,8 @@ public abstract class MiddlewareFactory {
 	 * @throws IOException 
 	 * */
 	abstract public Connection getConnection() throws IOException;
-	
+	//abliuqin1217
+	abstract public void closeConnection(); 
 	/**
 	 * Create an instance of AuthInfo without any info.
 	 * Then you can set the instance info through AuthInfo interface.

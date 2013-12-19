@@ -52,6 +52,11 @@ public class RecController implements Controller {
 
 			throw new RemoteException("There is no " + confFile);
 		}
+		//System.out.println(serverName);
+		if (isExistedFile(midwarePath + "sbin", serverName) == false) {
+
+			throw new RemoteException("There is no " + serverName);
+		}
 		// determine the server is running or not
 		if (isRunning() == true) {
 
@@ -168,6 +173,10 @@ public class RecController implements Controller {
 	public void deploy(File zipFile, String targetPath) throws IOException,
 			RemoteException {
 		// TODO Auto-generated method stub
+		if(!zipFile.exists())
+		{
+			throw new RemoteException(zipFile+" is not exist.");
+		}
 		targetPath = pathStrConvert(targetPath);
 		ArrayList<String> result = new ArrayList<String>(0);
 		ArrayList<String> errorResult = new ArrayList<String>(0);
@@ -251,7 +260,7 @@ public class RecController implements Controller {
 	 * @throws RemoteException 
 	 * */
 
-	boolean isRunning() throws RemoteException {
+	public boolean isRunning() throws RemoteException {
 		ArrayList<String> result = new ArrayList<String>(0);
 		ArrayList<String> errorResult = new ArrayList<String>(0);
 
@@ -270,7 +279,7 @@ public class RecController implements Controller {
 	 * 
 	 * @return Rename successfully return true;or else return false
 	 * */
-	boolean reDirName(String targetPath, String DirName, String subfix)
+	public boolean reDirName(String targetPath, String DirName, String subfix)
 			throws RemoteException {
 
 		if (isExistedDirectory(targetPath, DirName + subfix) == true) {
@@ -297,7 +306,7 @@ public class RecController implements Controller {
 	 * @return The file exists return true;or else return false
 	 * @throws RemoteException 
 	 * */
-	boolean isExistedFile(String targetPath, String fileName) throws RemoteException {
+	public boolean isExistedFile(String targetPath, String fileName) throws RemoteException {
 		// result:Used to store the result information of the command execution
 		ArrayList<String> result = new ArrayList<String>(0);
 		// errorResult:Used to store the error information of the command
@@ -305,7 +314,7 @@ public class RecController implements Controller {
 		ArrayList<String> errorResult = new ArrayList<String>(0);
 
 		// To determine whether the configuration file exists
-		String cmd = "ls " + targetPath + " | grep " + fileName;
+		String cmd = "find " + targetPath + " -name " + fileName+" -type f";
 		// System.out.println(cmd);
 		this.reauthInfo.execCommand(conncontroller, cmd, result, errorResult);
 		if (result.isEmpty())
@@ -320,12 +329,13 @@ public class RecController implements Controller {
 	 * @return The directory exists return true;or else return false
 	 * @throws RemoteException 
 	 * */
-	boolean isExistedDirectory(String targetPath, String DirName) throws RemoteException {
+	public boolean isExistedDirectory(String targetPath, String DirName) throws RemoteException {
 		ArrayList<String> result = new ArrayList<String>(0);
 		ArrayList<String> errorResult = new ArrayList<String>(0);
-		String cmd = "cd " + targetPath + " && ls -l | grep ^d | grep "
-				+ DirName;
-		// System.out.println(cmd);
+		//String cmd = "cd " + targetPath + " && ls -l | grep ^d | grep "
+		//		+ DirName;
+		String cmd = "find " + targetPath + " -name " + DirName+" -type d";
+		 System.out.println(cmd);
 		this.reauthInfo.execCommand(conncontroller, cmd, result, errorResult);
 		// System.out.println(result.toString());
 		// System.out.println(errorResult.toString());
@@ -342,7 +352,7 @@ public class RecController implements Controller {
 	 * @return Delete successfully return true;or else return false
 	 * @throws RemoteException 
 	 * */
-	boolean deleteDirectory(String targetPath, String dirName) throws RemoteException {
+	public boolean deleteDirectory(String targetPath, String dirName) throws RemoteException {
 		ArrayList<String> result = new ArrayList<String>(0);
 		ArrayList<String> errorResult = new ArrayList<String>(0);
 		String cmd = "cd " + targetPath + " && rm -rf " + dirName;
@@ -360,7 +370,7 @@ public class RecController implements Controller {
 	 * @return Delete successfully return true;or else return false
 	 * @throws RemoteException 
 	 * */
-	boolean deleteFile(String targetPath, String fileName) throws RemoteException {
+	public boolean deleteFile(String targetPath, String fileName) throws RemoteException {
 		ArrayList<String> result = new ArrayList<String>(0);
 		ArrayList<String> errorResult = new ArrayList<String>(0);
 		this.reauthInfo.execCommand(conncontroller, "cd " + targetPath
@@ -381,7 +391,7 @@ public class RecController implements Controller {
 	}
 	
 	
-	boolean mkdirTargetPath(String targetPath) throws RemoteException {
+	public boolean mkdirTargetPath(String targetPath) throws RemoteException {
 		ArrayList<String> result = new ArrayList<String>(0);
 		ArrayList<String> errorResult = new ArrayList<String>(0);
 

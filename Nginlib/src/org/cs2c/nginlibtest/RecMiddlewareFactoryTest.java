@@ -36,9 +36,9 @@ public class RecMiddlewareFactoryTest extends TestCase {
 	@Before
 	protected void setUp() throws Exception {
 		super.setUp();
-		authInfo.setHost("10.1.50.4");
+		authInfo.setHost("10.1.50.3");
 		authInfo.setUsername("root");
-		authInfo.setPassword("cs2csolutions");
+		authInfo.setPassword("qwe123");
 		
 		instance = MiddlewareFactory.getInstance(authInfo, "/usr/local/nginx");
 		

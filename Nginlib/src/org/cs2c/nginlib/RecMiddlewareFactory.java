@@ -48,7 +48,7 @@ public class RecMiddlewareFactory extends MiddlewareFactory {
 	}
 
 	@Override
-	public Connection getConnection() throws IOException {
+	public Connection getConnection()  {
 		return conn;
 	}
 	@Override
@@ -63,13 +63,7 @@ public class RecMiddlewareFactory extends MiddlewareFactory {
 		/* Now connect */
 		try {
 			conn.connect();
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			throw new RemoteException(e1);
-
-		}
-		try {
-			conn.authenticateWithPassword(
+		    conn.authenticateWithPassword(
 					authInfo.getUsername(), authInfo.getPassword());
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -92,7 +86,7 @@ public class RecMiddlewareFactory extends MiddlewareFactory {
 		return monitor;
 		// return null;
 	}
-
+	@Override
 	public void closeConnection() {
 		conn.close();
 	}

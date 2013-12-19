@@ -423,20 +423,20 @@ public class RecBlock implements Block,Element {
 		return bHasBlockName;
 	}
 	
-	private boolean HasBlockName(String linetxt) {
-		boolean bHasBlockName=false;
-		boolean bret = IsComment(linetxt);
-		if(bret){
-			return false;
-		}
-		
-		if(null != GetBlockName(linetxt)){
-			bHasBlockName = true;
-		}else{
-			bHasBlockName = false;
-		}
-		return bHasBlockName;
-	}
+//	private boolean HasBlockName(String linetxt) {
+//		boolean bHasBlockName=false;
+//		boolean bret = IsComment(linetxt);
+//		if(bret){
+//			return false;
+//		}
+//		
+//		if(null != GetBlockName(linetxt)){
+//			bHasBlockName = true;
+//		}else{
+//			bHasBlockName = false;
+//		}
+//		return bHasBlockName;
+//	}
 	
 	private String GetDirectiveName(String linetxt) {
 		String dName = null;
