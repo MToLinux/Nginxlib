@@ -26,7 +26,6 @@ public interface Block extends Element{
 	/**
 	 * Get sub block list with in the instance.
 	 * @return sub blocks with list container. If the block have no sub block, an empty Map should be returned.
-	 * @return Map：Integer indicate sub Block in elements location index.
 	 * @throws RemoteException 
 	 * */
 	List<Block> getBlocks() throws RemoteException;
@@ -48,8 +47,7 @@ public interface Block extends Element{
 	void addDirective(Directive directive);
 	/**
 	 * delete a element in the block location eleindex.
-	 * @param eleindex: element's index which element to be delete. eleindex start from 0.
-	 * @throws RemoteException 
+	 * @param element element to be delete.
 	 * */
 	void deleteElement(Element element);
 }

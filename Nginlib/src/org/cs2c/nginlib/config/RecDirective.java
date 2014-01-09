@@ -13,6 +13,9 @@ public class RecDirective implements Directive,Element{
 
 	private List<Parameter> listParam = new  ArrayList<Parameter>();
 	
+	/**
+	 * Get Sub Parameters which in the directive
+	 */
 	private void GetSubParameters() {
 		if(!listParam.isEmpty()){
 			listParam.clear();
@@ -21,6 +24,10 @@ public class RecDirective implements Directive,Element{
 		GetSubParam(directiveValue);
 	}
 
+	/**
+	 * get all parameters which includes in the directive .
+	 * @param diValue directive's text
+	 */
 	private void GetSubParam(String diValue) {
 		int Indexfrom = 0;
 		int Indexto = 0;
@@ -85,6 +92,10 @@ public class RecDirective implements Directive,Element{
 		}
 	}
 
+	/**
+	 * set the content which has directive's Name And upper space
+	 * @param directiveV Indicates all directive's text
+	 */
 	private void SetNameupspace(String directiveV) {
 		int n = directiveV.indexOf(directiveName);
 		String divalue = directiveV.substring(0, n);
@@ -98,6 +109,10 @@ public class RecDirective implements Directive,Element{
 		directiveName = name;
 	}
 	
+	/**
+	 * Set Directive's Text that contains all string line content
+	 * @param DirectiveText:Directive's Text
+	 */
 	public void SetDirectiveText(String DirectiveText) {
 		directiveValue = DirectiveText;
 //		System.out.println("DirectiveText:"+DirectiveText);
@@ -134,7 +149,7 @@ public class RecDirective implements Directive,Element{
 				if(null == listParam.get(i).getUpSpace()){
 					sb.append("  ");
 				}else{
-					sb.append(listParam.get(i).getUpSpace());//TODO
+					sb.append(listParam.get(i).getUpSpace());
 				}
 				sb.append(sbin);
 			}
@@ -177,6 +192,10 @@ public class RecDirective implements Directive,Element{
 		directiveComment = comment;
 	}
 	
+	/**
+	 * get directive's Name And upper space
+	 * @return directive's Name And upper space
+	 */
 	public String getNameAndupspace() {
 		if(null != diNameAndupspace){
 			return diNameAndupspace;
@@ -184,6 +203,11 @@ public class RecDirective implements Directive,Element{
 			return directiveName;
 		}
 	}
+	
+	/**
+	 * set directive's Name And upper space
+	 * @param NameAndupspace
+	 */
 	public void setNameAndupspace(String NameAndupspace) {
 		diNameAndupspace = NameAndupspace;
 	}

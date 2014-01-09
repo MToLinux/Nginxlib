@@ -15,7 +15,6 @@ public interface Configurator extends RemoteOperator{
 	/**
 	 * Create an empty block object.
 	 * @return An empty block object.
-	 * @throws RemoteException 
 	 * */
 	Block newBlock() throws RemoteException;
 	/**

@@ -35,21 +35,34 @@ public class RecBlock implements Block,Element {
 		return blockComment;
 	}
 	
-	// blockNameline
+	/**
+	 * set the line content which has block name. 
+	 * @param Nameline :line content
+	 */
 	public void setNameline(String Nameline) {
 		blockNameline = Nameline;
 	}
-	// blockNameline
+	/**
+	 * Get the block's name line text.
+	 * name line text indicate all text of the line which contains block name.
+	 * @return name line text
+	 */
 	public String getNameline() {
 		return blockNameline;
 	}
 	
-	// blockEndline
+	/**
+	 * set the block's last line text.
+	 * @param blEndline the block's last line text
+	 */
 	public void setblockEndline(String blEndline) {
 		blockEndline = blEndline;
 	}
 
-	// blockEndline
+	/**
+	 * Get the block's last line text.
+	 * @return the block's last line text.
+	 * */
 	public String getblockEndline() {
 		return blockEndline;
 	}
@@ -64,6 +77,11 @@ public class RecBlock implements Block,Element {
 		return blockName;
 	}
 	
+	/**
+	 * set Block’s content、and analysis the elements of the internal Block。
+	 * @param BlockText Block’s content text
+	 * @throws RemoteException
+	 */
 	public void SetBlockText(String BlockText) throws RemoteException {
 		blockValue = BlockText;
 		GetBlSubElements();
@@ -81,6 +99,10 @@ public class RecBlock implements Block,Element {
 		return myDirectives;
 	}
 	
+	/**
+	 * get the elements in the Block。
+	 * @throws RemoteException
+	 */
 	private void GetBlSubElements() throws RemoteException {
 		if(!myDirectives.isEmpty()){
 			myDirectives.clear();
@@ -160,6 +182,10 @@ public class RecBlock implements Block,Element {
 		return sb.toString();
 	}
 	
+	/**
+	 * get the text of block's name line.
+	 * @return the text of block's name line.
+	 */
 	private String GetBlockNameLinetxt(){
 		StringBuilder sb = new StringBuilder();
 		if("nginx.conf" == blockName){
@@ -180,14 +206,15 @@ public class RecBlock implements Block,Element {
 		}
 	}
 	
-	private String GetBlockText(String gBlockName) throws RemoteException {
-		int StartLine = 1;
-		return GetBlockText(gBlockName,StartLine);
-	}
+//	private String GetBlockText(String gBlockName) throws RemoteException {
+//		int StartLine = 1;
+//		return GetBlockText(gBlockName,StartLine);
+//	}
 	
 	/**
-	 * Get Block Text which Block Name is gBlockName.before GetBlockText you must set conf text.
+	 * Get Block Text which Block Name is gBlockName.before call GetBlockText you must set conf text.
 	 * @param gBlockName Block name to be search.
+	 * @param StartLine :start location.
 	 * @return make sure StartLine's value > 0.
 	 * @throws RemoteException 
 	 * */
@@ -369,6 +396,11 @@ public class RecBlock implements Block,Element {
 	}
 */
 	
+	/**
+	 * get the line count of block's text.
+	 * @param BlockText the block's text
+	 * @return the line count of block's text.
+	 */
 	private int GetBlockLenth(String BlockText) {
 	    int nBlockLineCount = 0;
 
@@ -390,6 +422,11 @@ public class RecBlock implements Block,Element {
 		}
 	}
 
+	/**
+	 * get the block's name
+	 * @param linetxt may contain the block's name,or not return null.
+	 * @return block's name,if linetxt do not have block's name return null
+	 */
 	private String GetBlockName(String linetxt) {
 		String bname = null;
 		boolean bret = IsComment(linetxt);
@@ -438,6 +475,11 @@ public class RecBlock implements Block,Element {
 //		return bHasBlockName;
 //	}
 	
+	/***
+	 * Get directive Name from name line
+	 * @param linetxt :name line
+	 * @return directive Name
+	 */
 	private String GetDirectiveName(String linetxt) {
 		String dName = null;
 	    
@@ -459,6 +501,11 @@ public class RecBlock implements Block,Element {
 		return dName;
 	}
 	
+	/**
+	 * Check the text is comment or not
+	 * @param s :target text
+	 * @return true:is comment,false:is not comment
+	 */
 	private boolean IsComment(String s) {
 		String prefix = "#";
 		if(s.trim().startsWith(prefix)){
@@ -469,6 +516,11 @@ public class RecBlock implements Block,Element {
 		}
 	}
 	
+	/**
+	 * Check the text is comment or not
+	 * @param s :target text
+	 * @return true:is comment,false:is not comment
+	 */
 	private boolean IsNotComment(String linetxt) {
 		String prefix = "#";
 		if(linetxt.trim().startsWith(prefix)){
@@ -479,6 +531,11 @@ public class RecBlock implements Block,Element {
 		}
 	}
 
+	/**
+	 * Check the text is end with ”;” or not，if not return null
+	 * @param linetxt: check target text
+	 * @return boolean
+	 */
 	private boolean NotEndWithSemicolon(String linetxt) {
 		String suffix = ";";
 		if(linetxt.trim().endsWith(suffix)){
@@ -489,16 +546,18 @@ public class RecBlock implements Block,Element {
 		}
 	}
 
-	/*
-	 * Query all blocks with the specific block name in the block
-	 * */
+	/**
+	 * get all blocks with the specific block name gBblockName in the block
+	 * @param gBblockName indicate the block's name which want to query. 
+	 * @return Block list that contain all blocks which name is gBblockName in the block field
+	 * @throws RemoteException
+	 */
 	protected List<Block> getBlocks(String gBblockName) throws RemoteException{
 		GetBlSubElements();
 		List<Block> listBlWithBName = new ArrayList<Block>();
 
 	    for (int i = 0;i<myBlocks.size();i++) {
             RecBlock objblock = new RecBlock();
-//            System.out.println("myBlocks.get(i):" + myBlocks.get(i).getName());
     		// get name
             if(gBblockName.equals(myBlocks.get(i).getName())){
 	    		objblock = (RecBlock) myBlocks.get(i);
