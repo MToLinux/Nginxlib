@@ -45,6 +45,11 @@ public class RecRemoteOperator implements RemoteOperator{
 //		System.out.println(localConfPath);
 	}
 	
+	/**
+	 * add nginx server path with "conf/nginx.conf"
+	 * @param pathstr indicates nginx server path
+	 * @return nginx server path add "conf/nginx.conf"
+	 */
 	private String ConvertfullPath(String pathstr)
 	{
 		String pathstrend = pathstr;
@@ -57,7 +62,10 @@ public class RecRemoteOperator implements RemoteOperator{
 		return pathstrend;
 	}
 	
-	//Set local Confpath With full Name
+	/**
+	 * Set local Confpath With full Name which parameter loPath indicates
+	 * @param loPath local config path With full Name
+	 */
 	public void SetLocalConfpath(String loPath){
 		this.localConfPath = loPath;
 	}
@@ -158,6 +166,13 @@ public class RecRemoteOperator implements RemoteOperator{
 		
 		return strRtn;
 	}
+	/**
+	 * ReplaceString strFrom with strTo in the text strSource.
+	 * @param strSource
+	 * @param strFrom
+	 * @param strTo
+	 * @return the text after replace
+	 */
 	private String ReplaceString(String strSource, String strFrom, String strTo) {
 		 if (strSource == null) {
 		   return null;
@@ -223,11 +238,18 @@ public class RecRemoteOperator implements RemoteOperator{
 		WriteRemoteConf();
 	}
 	
-	// 把 after 放于BlockText的子元素element之后，
+	/**
+	 * put after element after BlockText's element element
+	 * @param BlockText target Block Text
+	 * @param element BlockText's element element
+	 * @param after insert element
+	 * @return edited Block Text
+	 * @throws RemoteException
+	 */
 	private String BlockInsertAfter(String BlockText,Element element, Element after) throws RemoteException {
 	    StringBuilder sbtext = new StringBuilder();
 	    
-		//找到第一个符合的element文本位置
+		//Returns the index within this block text String of the first occurrence of the specified substring element.toString()
 		int nelementLocation = BlockText.indexOf(element.toString());
 		if(-1 == nelementLocation){
 			// if no have element
@@ -243,6 +265,12 @@ public class RecRemoteOperator implements RemoteOperator{
 		return sbtext.toString();
 	}
 	
+	/**
+	 * do function's common part
+	 * @param outerBlockNames Indicate the target block position.
+	 * @return block info in HashMap
+	 * @throws RemoteException
+	 */
 	private HashMap<String,String> EditCommon(String outerBlockNames) throws RemoteException{
 		String nameAndIndex = null;
 		String blname = null;
@@ -328,6 +356,14 @@ public class RecRemoteOperator implements RemoteOperator{
 		
 		WriteRemoteConf();
 	}
+	
+	/**
+	 * Replace the specific old element with the new element in the specific block which Block’s Text is BlockText
+	 * @param BlockText
+	 * @param oldElement
+	 * @param newElement
+	 * @return return the replaced result
+	 */
 	private String BlockReplaceElement(String BlockText,Element oldElement,Element newElement){
 		
 		String strRtn = ReplaceString(BlockText,oldElement.toString(), newElement.toString());
@@ -386,6 +422,11 @@ public class RecRemoteOperator implements RemoteOperator{
 		return objRecBlock;
 	}
 	
+	/**
+	 * Check the validate of OuterBlockNames.
+	 * @param outerBlockNames
+	 * @return
+	 */
 	private boolean CheckOuterBlockNames(String outerBlockNames) {
 		if( outerBlockNames == null || "".equals(outerBlockNames.trim())){
 			return true;
@@ -394,6 +435,14 @@ public class RecRemoteOperator implements RemoteOperator{
 		return false;
 	}
 
+	/**
+	 * Get Block Length before nStartLine
+	 * @param blname Indicates block's name
+	 * @param nStartLine Indicates the start line
+	 * @param nbindex Indicates the block's number
+	 * @return the length before target block
+	 * @throws RemoteException
+	 */
 	private int GetPreBlockLength(String blname,int nStartLine,int nbindex) throws RemoteException {
 		int nRepeat = -1;
 		int nLineCount = -1;
@@ -444,6 +493,11 @@ public class RecRemoteOperator implements RemoteOperator{
 		return bHasBlockName;
 	}
 	
+	/**
+	 * get the block's name
+	 * @param linetxt may contain the block's name,or not return null.
+	 * @return block's name,if linetxt do not have block's name return null
+	 */
 	private String GetBlockName(String linetxt) {
 		String bname = null;
 		boolean bret = IsComment(linetxt);
@@ -457,6 +511,12 @@ public class RecRemoteOperator implements RemoteOperator{
 		}
 		return bname;
 	}
+	
+	/**
+	 * Check the text is comment or not
+	 * @param s :target text
+	 * @return true:is comment,false:is not comment
+	 */
 	private boolean IsComment(String s) {
 		String prefix = "#";
 		if(s.trim().startsWith(prefix)){
@@ -490,6 +550,10 @@ public class RecRemoteOperator implements RemoteOperator{
 		}
 	}
 	
+	/**
+	 * add local config Path with "nginx.conf"
+	 * @return local config Path with "nginx.conf"
+	 */
 	private String GetlocalConfFullName(){
 		return localConfPath + "nginx.conf";
 	}
@@ -521,6 +585,11 @@ public class RecRemoteOperator implements RemoteOperator{
 		}
 	}
 
+	/**
+	 * check weather the config file can commit
+	 * @return false: can't commit,true:can commit
+	 * @throws RemoteException
+	 */
 	private boolean CanCommitFile() throws RemoteException{
 		String nowConfDatestamp = getFileModifyTime();
 		if(StringToDate(oldConfDatestamp).compareTo(StringToDate(nowConfDatestamp)) != 0){
@@ -530,6 +599,12 @@ public class RecRemoteOperator implements RemoteOperator{
 		}
 	}
 	
+	/**
+	 * Format the string to date
+	 * @param s indicates the target string 
+	 * @return target string's date value
+	 * @throws RemoteException
+	 */
 	private Date StringToDate(String s) throws RemoteException{
 		if((null == s) || ("" == s)){
 			throw new RemoteException("Datestamp error,Please check Configurator.getBlocks and get date.");
@@ -546,6 +621,11 @@ public class RecRemoteOperator implements RemoteOperator{
 		return time;
 	}
 	
+	/**
+	 * get modify time of the remote server's config File
+	 * @return nginx.conf's modify time
+	 * @throws RemoteException
+	 */
 	private String getFileModifyTime() throws RemoteException {
 		Session sess = null;
 		try {
@@ -618,7 +698,11 @@ public class RecRemoteOperator implements RemoteOperator{
 		}
 	}
 
-	//write to local conf file
+	/**
+	 * write the config file to local path.
+	 * @param wcConftext Indicates config file's text string
+	 * @throws RemoteException
+	 */
 	private void WriteConf(String wcConftext) throws RemoteException{
 		try {
 	    	FileWriter fw = null;
@@ -632,6 +716,13 @@ public class RecRemoteOperator implements RemoteOperator{
 		}
 	}
 	
+	/**
+	 * get the text which before target text,and location is from special line. 
+	 * @param Text：target text
+	 * @param Index: special line
+	 * @return the text which before target text
+	 * @throws RemoteException
+	 */
 	private String GetPreBlockText(String Text,int Index) throws RemoteException{
 		String SufBlockText = null;
 	    String linetxt =null;
@@ -656,6 +747,13 @@ public class RecRemoteOperator implements RemoteOperator{
 		return SufBlockText;
 	}
 	
+	/**
+	 * get the text from line index indicates
+	 * @param Text Indicates target text
+	 * @param Index line index
+	 * @return the text from line Index indicates
+	 * @throws RemoteException
+	 */
 	private String GetSufBlockText(String Text,int Index) throws RemoteException{
 		String SufBlockText = null;
 	    String linetxt =null;
@@ -685,9 +783,14 @@ public class RecRemoteOperator implements RemoteOperator{
 		return SufBlockText;
 	}
 	
-	//return BlockText with start"{",and end with "}"
+	/**
+	 * Get Block Text which Block Name is gBlockName.before call GetBlockText you must set conf text.
+	 * @param blname Block name to be search.
+	 * @param Index :start location.
+	 * @return block's Text
+	 * @throws RemoteException 
+	 * */
 	private String GetBlockTextWithIndex(String blname,int Index) throws RemoteException{
-		
 		RecBlock rb = new RecBlock();
 		rb.setName("nginx.conf");
 		rb.SetBlockText(confText);
@@ -697,6 +800,11 @@ public class RecRemoteOperator implements RemoteOperator{
 		return BlockText;
 	}
 	
+	/**
+	 * the line count of Block's Text String
+	 * @param BlockText :Block's Text String
+	 * @return the line count of Block's Text String
+	 */
 	private int GetBlockLenth(String BlockText) {
 	    int nBlockLineCount = 0;
 

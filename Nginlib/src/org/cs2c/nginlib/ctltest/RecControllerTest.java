@@ -22,12 +22,12 @@ public class RecControllerTest extends TestCase {
 		super.setUp();
 		AuthInfo authInfo=null;
 		authInfo=MiddlewareFactory.newAuthInfo();
-		authInfo.setHost("10.1.50.4");
+		authInfo.setHost("10.1.50.3");
 		authInfo.setUsername("root");
-		authInfo.setPassword("cs2csolutions");
+		authInfo.setPassword("qwe123");
 
 		
-		instance = MiddlewareFactory.getInstance(authInfo, "/usr/local/nginx/");
+		instance = MiddlewareFactory.getInstance(authInfo, "/root/nginx/");
 
 		testController=(RecController)instance.getController();
 

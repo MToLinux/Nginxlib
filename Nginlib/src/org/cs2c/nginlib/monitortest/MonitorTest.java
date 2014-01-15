@@ -216,14 +216,14 @@ public class MonitorTest {
 		NetworkStatus netwstat = monitor.getNetworkStatus();
 
 		assertTrue(netwstat.getInputKbPerSec() >= 0);
-		assertTrue(netwstat.getOutputPerSec() >= 0);
+		assertTrue(netwstat.getOutputKbPerSec() >= 0);
 		assertEquals(expectedInputKbPerSec, netwstat.getInputKbPerSec(), InputKbPerSecDelta);
-		assertEquals(expectedOutputPerSec, netwstat.getOutputPerSec(), OutputPerSecDelta);
+		assertEquals(expectedOutputPerSec, netwstat.getOutputKbPerSec(), OutputPerSecDelta);
 		
 		//print
 		System.out.println("Network Status:");
 		System.out.println("InputKbPerSec:" + netwstat.getInputKbPerSec());
-		System.out.println("OutputPerSec:" + netwstat.getOutputPerSec());
+		System.out.println("OutputPerSec:" + netwstat.getOutputKbPerSec());
 
 		System.out.println("");
 	}

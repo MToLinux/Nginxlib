@@ -68,8 +68,8 @@ public interface RemoteOperator {
 	 * */
 	List<Block> getBlocks(String blockName, String outerBlockNames) throws RemoteException;
 	/**
-	 * Query all blocks in nginx.conf.
-	 * @return All blocks in a list.
+	 * Query the block which text is nginx.conf String and name is "nginx.conf".
+	 * @return nginx.conf block.
 	 * @throws RemoteException When this remote operation fails for any non-local reason.
 	 * */
 	public Block getRootBlock() throws RemoteException;

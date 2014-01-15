@@ -433,7 +433,7 @@ public class RecMonitor implements Monitor {
 			/* RecNetworkStatus */
 			RecNetworkStatus nwsta = new RecNetworkStatus();
 			nwsta.setInputKbPerSec(InputKbPerSec);
-			nwsta.setOutputPerSec(OutputPerSec);
+			nwsta.setOutputKbPerSec(OutputPerSec);
 
 			/* Close the session */
 			closeSession();
